@@ -1,6 +1,8 @@
 
 var KeyFilterStream = require("./lib/keyfilterstream");
+var JoinStream = require("./lib/joinstream");
 var CallbackStream = require("./lib/callbackstream");
+var Variable = require("./lib/variable");
 
 var defs = {
   spo: ["subject", "predicate", "object"],
@@ -26,7 +28,27 @@ module.exports = function levelgraph(leveldb) {
     },
     put: doAction('put', leveldb),
     del: doAction('del', leveldb),
-    close: leveldb.close.bind(leveldb)
+    close: leveldb.close.bind(leveldb),
+    v: Variable,
+    joinStream: function(query) {
+      var that = this;
+     
+      var streams = query.map(function(triple) {
+        var stream = new JoinStream({ triple: triple, db: that });
+        return stream;
+      });
+
+      streams[0].end({});
+
+      return streams.reduce(function(prev, current) {
+        return prev.pipe(current);
+      });
+    },
+    join: function(query, cb) {
+      var stream = this.joinStream(query);
+      stream.on("error", cb);
+      stream.pipe(CallbackStream({ callback: cb }));
+    }
   };
 
   return db;
