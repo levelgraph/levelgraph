@@ -86,6 +86,14 @@ describe("a basic triple store", function() {
         });
       });
     });
+
+    it("should return the triple through the getStream interface", function(done) {
+      var stream = db.getStream({ predicate: "b" });
+      stream.on("data", function(data) {
+        expect(data).to.eql(triple);
+      });
+      stream.on("end", done);
+    });
   });
 
   it("should put an array of triples", function(done) {
@@ -126,6 +134,16 @@ describe("a basic triple store", function() {
           done();
         });
       });
+    });
+
+    it("should return both triples through the getStream interface", function(done) {
+      var triples = [triple1, triple2];
+      var stream = db.getStream({ predicate: "b" });
+      stream.on("data", function(data) {
+        expect(data).to.eql(triples.shift());
+      });
+
+      stream.on("end", done);
     });
   });
 });

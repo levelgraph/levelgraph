@@ -1,4 +1,7 @@
 
+var KeyFilterStream = require("./lib/keyfilterstream");
+var CallbackStream = require("./lib/callbackstream");
+
 var defs = {
   spo: ["subject", "predicate", "object"],
   sop: ["subject", "object", "predicate"],
@@ -11,21 +14,14 @@ var defs = {
 module.exports = function levelgraph(leveldb) {
 
   var db = {
-    get: function(pattern, cb) {
-      var result = [];
+    getStream: function(pattern) {
       var query = createQuery(pattern);
-      var stream = leveldb.createReadStream(query);
-
-      stream.on("data", function(data) {
-        if (data.key.indexOf(query.start) < 0) {
-          stream.destroy();
-          return;
-        }
-        result.push(JSON.parse(data.value));
-      });
-      stream.on("end", function() {
-        cb(null, result);
-      });
+      return leveldb.createReadStream(query).
+        pipe(KeyFilterStream(query));
+    },
+    get: function(pattern, cb) {
+      var stream = this.getStream(pattern);
+      stream.pipe(CallbackStream({ callback: cb }));
       stream.on("error", cb);
     },
     put: doAction('put', leveldb),
