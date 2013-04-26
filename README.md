@@ -9,14 +9,25 @@ __LevelGraph__ is built on the uber-fast key-value store
 [LevelUp](https://github.com/rvagg/node-levelup) library.
 You can use it inside your node.js application.
 
-[![Build
-Status](https://travis-ci.org/mcollina/node-levelgraph.png)](https://travis-ci.org/mcollina/node-levelgraph)
+__LevelGraph__ loosely follows the __Hexastore__ approach as presente in the article:
+[Hexastore: sextuple indexing for semantic web data management
+C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
+2008](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.140.8776&rep=rep1&type=pdf)
+It uses six indices for every triple, in order to access them as fast as
+it is possible.
 
 ## Install
+
+[![Build
+Status](https://travis-ci.org/mcollina/node-levelgraph.png)](https://travis-ci.org/mcollina/node-levelgraph)
 
 ```
 npm install leveldb levelgraph --save
 ```
+
+At the moment it requires node v0.10.x, but the port to node v0.8.x
+should be straighforward.
+If you need it, just open a pull request.
 
 ## Usage
 
