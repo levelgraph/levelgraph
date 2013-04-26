@@ -22,7 +22,7 @@ in order to access them as fast as it is possible.
 Status](https://travis-ci.org/mcollina/node-levelgraph.png)](https://travis-ci.org/mcollina/node-levelgraph)
 
 ```
-npm install leveldb levelgraph --save
+npm install levelup levelgraph --save
 ```
 
 At the moment it requires node v0.10.x, but the port to node v0.8.x
