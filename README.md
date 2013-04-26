@@ -12,9 +12,9 @@ You can use it inside your node.js application.
 __LevelGraph__ loosely follows the __Hexastore__ approach as presente in the article:
 [Hexastore: sextuple indexing for semantic web data management
 C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
-2008](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.140.8776&rep=rep1&type=pdf)
-It uses six indices for every triple, in order to access them as fast as
-it is possible.
+2008](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.140.8776&rep=rep1&type=pdf).
+Following this approach, __LevelGraph__ uses six indices for every triple,
+in order to access them as fast as it is possible.
 
 ## Install
 
