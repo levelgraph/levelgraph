@@ -5,8 +5,8 @@ var tmp = require("tmp");
 
 tmp.dir(function(err, dir) {
   if (err) {
-    done(err);
-    return;
+    console.log(err);
+    process.exit(1);
   }
 
   db = levelgraph(levelup(dir));

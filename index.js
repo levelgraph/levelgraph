@@ -83,8 +83,9 @@ function genKeys(triple) {
 }
 
 function genActions(action, triple) {
+  var json = JSON.stringify(triple);
   return genKeys(triple).map(function(key) {
-    return { type: action, key: key, value: JSON.stringify(triple) };
+    return { type: action, key: key, value: json };
   });
 }
 
@@ -103,7 +104,8 @@ function createQuery(pattern) {
   var possibleDefs = filterDefsGiven(types);
   var key = genKey(possibleDefs[0], pattern);
   var query = {
-    start: key
+    start: key,
+    fillCache: true
   };
 
   return query;
