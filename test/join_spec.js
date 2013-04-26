@@ -35,6 +35,10 @@ describe("a basic triple store", function() {
         subject: "lucio",
         predicate: "friend",
         object: "marco"
+      }, {
+        subject: "marco",
+        predicate: "friend",
+        object: "davide"
       }], done);
     });
   });
@@ -124,6 +128,59 @@ describe("a basic triple store", function() {
       expect(data).to.eql(contexts.shift());
     });
 
-    stream.on("end", done);
+    stream.on("end", function() {
+      expect(contexts).to.have.property("length", 0);
+      done();
+    });
+  });
+
+  it("should allow to intersect common friends", function(done) {
+    var contexts = [{ x: "marco" }, { x: "matteo" }];
+
+    var stream = db.joinStream([{
+      subject: "lucio",
+      predicate: "friend",
+      object: db.v("x")
+    }, {
+      subject: "daniele",
+      predicate: "friend",
+      object: db.v("x")
+    }]);
+
+    stream.on("data", function(data) {
+      expect(data).to.eql(contexts.shift());
+    });
+
+    stream.on("end", function() {
+      expect(contexts).to.have.property("length", 0);
+      done();
+    });
+  });
+
+  it("should support the friend of a friend scenario", function(done) {
+    var contexts = [{ x: "daniele", y: "marco" }];
+
+    var stream = db.joinStream([{
+      subject: "matteo",
+      predicate: "friend",
+      object: db.v("x")
+    }, {
+      subject: db.v("x"),
+      predicate: "friend",
+      object: db.v("y")
+    }, {
+      subject: db.v("y"),
+      predicate: "friend",
+      object: "davide"
+    }]);
+
+    stream.on("data", function(data) {
+      expect(data).to.eql(contexts.shift());
+    });
+
+    stream.on("end", function() {
+      expect(contexts).to.have.property("length", 0);
+      done();
+    });
   });
 });
