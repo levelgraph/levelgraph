@@ -56,6 +56,15 @@ db.get({ subject: "a" }, function(err, list) {
 });
 ```
 
+It even support a Stream interface:
+```
+var stream = db.getStream({ predicate: "b" });
+stream.on("data", function(data) {
+  expect(data).to.eql(triple);
+});
+stream.on("end", done);
+```
+
 ### Multiple Puts
 
 __LevelGraph__ also supports adding putting multiple triples:
@@ -114,6 +123,31 @@ db.put([{
   stream.on("data", function(data) {
     // this will print "{ x: 'daniele', y: 'marco' }"
     console.log(data);
+  });
+});
+```
+
+It also support a similar API without streams:
+```
+db.put([{
+ ...
+}], function () {
+
+  db.join([{
+    subject: "matteo",
+    predicate: "friend",
+    object: db.v("x")
+  }, {
+    subject: db.v("x"),
+    predicate: "friend",
+    object: db.v("y")
+  }, {
+    subject: db.v("y"),
+    predicate: "friend",
+    object: "davide"
+  }], function(err, results) {
+    // this will print "[{ x: 'daniele', y: 'marco' }]"
+    console.log(results);
   });
 });
 ```
