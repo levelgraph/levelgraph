@@ -2,6 +2,10 @@
 History
 ======
 
+## 0.1.2
+
+* Updated the README.md
+
 ## 0.1.1
 
 * Updated the README.md
