@@ -7,6 +7,7 @@ __LevelGraph__ is a Graph Database. Unlike many other graph database,
 __LevelGraph__ is built on the uber-fast key-value store
 [LevelDB](http://code.google.com/p/leveldb/) through the powerful
 [LevelUp](https://github.com/rvagg/node-levelup) library.
+You can use it inside your node.js application.
 
 [![Build
 Status](https://travis-ci.org/mcollina/node-levelgraph.png)](https://travis-ci.org/mcollina/node-levelgraph)
