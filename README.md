@@ -1,7 +1,7 @@
 LevelGraph
 ===========
 
-![Logo](./logo.png)
+![Logo](https://github.com/mcollina/node-levelgraph/raw/master/logo.png)
 
 __LevelGraph__ is a Graph Database. Unlike many other graph database,
 __LevelGraph__ is built on the uber-fast key-value store
