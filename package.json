@@ -20,6 +20,9 @@
     "database",
     "triples"
   ],
+  "engines" : {
+    "node" : ">= 0.10.0"
+  },
   "author": "Matteo Collina <hello@matteocollina.com>",
   "license": "MIT",
   "devDependencies": {
