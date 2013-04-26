@@ -124,6 +124,7 @@ If you feel you want a feature added, just do it and __submit a
 pull-request__.
 
 Here are some ideas:
+
 * [ ] Return the matching triples in the JOIN results.
 * [ ] Support for Query Planning in JOIN.
 * [ ] Design and implement a nicer query interface using promises.
