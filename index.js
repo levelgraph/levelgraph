@@ -1,8 +1,8 @@
 
 var KeyFilterStream = require("./lib/keyfilterstream");
 var JoinStream = require("./lib/joinstream");
-var CallbackStream = require("./lib/callbackstream");
 var Variable = require("./lib/variable");
+var concat = require('concat-stream');
 
 var defs = {
   spo: ["subject", "predicate", "object"],
@@ -23,7 +23,7 @@ module.exports = function levelgraph(leveldb) {
     },
     get: function(pattern, cb) {
       var stream = this.getStream(pattern);
-      stream.pipe(CallbackStream({ callback: cb }));
+      stream.pipe(reconcat(cb));
       stream.on("error", cb);
     },
     put: doAction('put', leveldb),
@@ -46,8 +46,8 @@ module.exports = function levelgraph(leveldb) {
     },
     join: function(query, cb) {
       var stream = this.joinStream(query);
+      stream.pipe(reconcat(cb));
       stream.on("error", cb);
-      stream.pipe(CallbackStream({ callback: cb }));
     }
   };
 
@@ -109,4 +109,19 @@ function createQuery(pattern) {
   };
 
   return query;
+}
+
+function reconcat(cb) {
+  return concat(function(err, list) {
+    if(err) {
+      cb(err);
+      return;
+    }
+
+    if(!list) {
+      list = [];
+    }
+
+    cb(null, list);
+  });
 }
