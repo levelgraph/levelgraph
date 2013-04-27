@@ -3,6 +3,7 @@ var KeyFilterStream = require("./lib/keyfilterstream");
 var JoinStream = require("./lib/joinstream");
 var CallbackStream = require("./lib/callbackstream");
 var Variable = require("./lib/variable");
+var navigator = require('./lib/navigator');
 
 var defs = {
   spo: ["subject", "predicate", "object"],
@@ -40,7 +41,10 @@ module.exports = function levelgraph(leveldb) {
         return prev.pipe(current);
       });
     },
-    join: wrapCallback('joinStream')
+    join: wrapCallback('joinStream'),
+    nav: function(start) {
+      return navigator({ start: start, db: this });
+    }
   };
 
   return db;

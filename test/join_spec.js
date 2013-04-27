@@ -3,7 +3,7 @@ var levelgraph = require("../");
 var levelup = require("levelup");
 var tmp = require("tmp");
 
-describe("a basic triple store", function() {
+describe("join support", function() {
 
   var db;
 
@@ -15,31 +15,7 @@ describe("a basic triple store", function() {
       }
 
       db = levelgraph(levelup(dir));
-      db.put([{
-        subject: "matteo",
-        predicate: "friend",
-        object: "daniele"
-      }, {
-        subject: "daniele",
-        predicate: "friend",
-        object: "matteo"
-      }, {
-        subject: "daniele",
-        predicate: "friend",
-        object: "marco"
-      }, {
-        subject: "lucio",
-        predicate: "friend",
-        object: "matteo"
-      }, {
-        subject: "lucio",
-        predicate: "friend",
-        object: "marco"
-      }, {
-        subject: "marco",
-        predicate: "friend",
-        object: "davide"
-      }], done);
+      db.put(require("./fixture/foaf"), done);
     });
   });
 
