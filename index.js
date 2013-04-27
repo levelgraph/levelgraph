@@ -21,11 +21,7 @@ module.exports = function levelgraph(leveldb) {
       return leveldb.createReadStream(query).
         pipe(KeyFilterStream(query));
     },
-    get: function(pattern, cb) {
-      var stream = this.getStream(pattern);
-      stream.pipe(reconcat(cb));
-      stream.on("error", cb);
-    },
+    get: wrapCallback('getStream'),
     put: doAction('put', leveldb),
     del: doAction('del', leveldb),
     close: leveldb.close.bind(leveldb),
@@ -44,11 +40,7 @@ module.exports = function levelgraph(leveldb) {
         return prev.pipe(current);
       });
     },
-    join: function(query, cb) {
-      var stream = this.joinStream(query);
-      stream.pipe(reconcat(cb));
-      stream.on("error", cb);
-    }
+    join: wrapCallback('joinStream')
   };
 
   return db;
@@ -111,6 +103,14 @@ function createQuery(pattern) {
   return query;
 }
 
+function wrapCallback(method) {
+  return function(query, cb) {
+    var stream = this[method](query);
+    stream.pipe(reconcat(cb));
+    stream.on("error", cb);
+  };
+}
+
 function reconcat(cb) {
   return concat(function(err, list) {
     if(err) {
@@ -118,10 +118,6 @@ function reconcat(cb) {
       return;
     }
 
-    if(!list) {
-      list = [];
-    }
-
-    cb(null, list);
+    cb(null, list || []);
   });
 }
