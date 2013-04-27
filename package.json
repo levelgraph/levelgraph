@@ -21,8 +21,8 @@
     "triples",
     "triple"
   ],
-  "engines": {
-    "node": ">= 0.10.0"
+  "engines" : {
+    "node" : ">= 0.10.0"
   },
   "author": "Matteo Collina <hello@matteocollina.com>",
   "license": "MIT",
@@ -35,7 +35,6 @@
     "tmp": "0.0.18"
   },
   "dependencies": {
-    "levelup": "~0.8.0",
-    "concat-stream": "~0.1.1"
+    "levelup": "~0.8.0"
   }
 }
