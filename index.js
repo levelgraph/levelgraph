@@ -1,17 +1,11 @@
 
 var KeyFilterStream = require("./lib/keyfilterstream");
 var JoinStream = require("./lib/joinstream");
+var WriteStream = require("./lib/writestream");
 var Variable = require("./lib/variable");
 var concat = require('concat-stream');
-
-var defs = {
-  spo: ["subject", "predicate", "object"],
-  sop: ["subject", "object", "predicate"],
-  pso: ["predicate", "object", "subject"],
-  pos: ["predicate", "subject", "object"],
-  ops: ["object", "predicate", "subject"],
-  osp: ["object", "subject", "predicate"]
-};
+var genKey = require('./lib/utilities').genKey;
+var defs = require('./lib/utilities').defs;
 
 module.exports = function levelgraph(leveldb) {
 
@@ -22,6 +16,8 @@ module.exports = function levelgraph(leveldb) {
         pipe(KeyFilterStream(query));
     },
     get: wrapCallback('getStream'),
+    putStream: doActionStream('put', leveldb),
+    delStream: doActionStream('del', leveldb),
     put: doAction('put', leveldb),
     del: doAction('del', leveldb),
     close: leveldb.close.bind(leveldb),
@@ -46,39 +42,44 @@ module.exports = function levelgraph(leveldb) {
   return db;
 };
 
-function doAction(action, leveldb) {
+function doActionStream(type, leveldb) {
+  return function() {
+    var levelStream = leveldb.createWriteStream();
+    var writeStream = new WriteStream({ type: type });
+    writeStream.pipe(levelStream);
+    levelStream.on("error", function(err) {
+      writeStream.emit("error", err);
+    });
+    levelStream.on("close", function() {
+      writeStream.emit("close");
+    });
+    return writeStream;
+  };
+}
+
+function doAction(type, leveldb) {
   return function(triples, cb) {
     if(!triples.reduce) {
       triples = [triples];
     }
 
-    var actions = triples.reduce(function(acc, triple) {
-      return acc.concat(genActions(action, triple));
-    }, []);
+    var stream = this[type + "Stream"]();
+    stream.on("error", cb);
+    stream.on("close", cb);
 
-    leveldb.batch(actions, cb);
+    var doInserts = function() {
+      triples.forEach(function(triple) {
+        stream.write(triple);
+      });
+      stream.end();
+    };
+
+    if (leveldb.isOpen()) {
+      doInserts();
+    } else {
+      leveldb.once("open", doInserts);
+    }
   };
-}
-
-function genKey(key, triple) {
-  return [key].concat(defs[key].map(function(t) {
-    return triple[t];
-  })).filter(function(e) {
-    return e !== null && e !== undefined;
-  }).join("::");
-}
-
-function genKeys(triple) {
-  return Object.keys(defs).map(function(key) {
-    return genKey(key, triple);
-  });
-}
-
-function genActions(action, triple) {
-  var json = JSON.stringify(triple);
-  return genKeys(triple).map(function(key) {
-    return { type: action, key: key, value: json };
-  });
 }
 
 function filterDefsGiven(types) {

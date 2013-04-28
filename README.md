@@ -162,6 +162,24 @@ db.del(triple, function(err) {
 });
 ```
 
+### Putting and Deleting through Streams
+
+It is also possible to `put` or `del` triples from the store
+using a `Stream2` interface:
+
+```
+var t1 = { subject: "a", predicate: "b", object: "c" };
+var t2 = { subject: "a", predicate: "b", object: "d" };
+var stream = db.putStream();
+
+stream.write(t1);
+stream.end(t2);
+
+stream.on("close", function() {
+  // do something, the writes are done
+});
+```
+
 ## TODO
 
 There are plenty of things that this library is missing.
