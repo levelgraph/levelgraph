@@ -4,6 +4,7 @@ var JoinStream = require("./lib/joinstream");
 var CallbackStream = require("./lib/callbackstream");
 var Variable = require("./lib/variable");
 var navigator = require('./lib/navigator');
+var extend = require("xtend");
 
 var defs = {
   spo: ["subject", "predicate", "object"],
@@ -12,6 +13,10 @@ var defs = {
   pos: ["predicate", "subject", "object"],
   ops: ["object", "predicate", "subject"],
   osp: ["object", "subject", "predicate"]
+};
+
+var joinDefaults = {
+  context: {}
 };
 
 module.exports = function levelgraph(leveldb) {
@@ -27,15 +32,16 @@ module.exports = function levelgraph(leveldb) {
     del: doAction('del', leveldb),
     close: leveldb.close.bind(leveldb),
     v: Variable,
-    joinStream: function(query) {
+    joinStream: function(query, options) {
       var that = this;
+      options = extend(joinDefaults, options);
      
       var streams = query.map(function(triple) {
         var stream = new JoinStream({ triple: triple, db: that });
         return stream;
       });
 
-      streams[0].end({});
+      streams[0].end(options.context);
 
       return streams.reduce(function(prev, current) {
         return prev.pipe(current);

@@ -74,4 +74,14 @@ describe("navigator", function() {
       done();
     });
   });
+
+  it("should allow to bind a variable", 
+     function(done) {
+    db.nav("matteo").archIn("friend").bind("lucio").archOut("friend").bind("marco").
+      values(function(err, friends) {
+
+      expect(friends).to.eql(["marco"]);
+      done();
+    });
+  });
 });
