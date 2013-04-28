@@ -35,7 +35,7 @@
     "tmp": "0.0.18"
   },
   "dependencies": {
-    "levelup": "~0.8.0",
+    "levelup": "git://github.com/mcollina/node-levelup.git#write-stream-del-type",
     "concat-stream": "~0.1.1"
   }
 }
