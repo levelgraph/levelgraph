@@ -84,4 +84,14 @@ describe("navigator", function() {
       done();
     });
   });
+
+  it("should allow to start the navigation from a variable",
+     function(done) {
+    db.nav().archOut("friend").bind("matteo").archOut("friend").
+      values(function(err, friends) {
+
+      expect(friends).to.eql(["daniele"]);
+      done();
+    });
+  });
 });
