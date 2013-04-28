@@ -56,7 +56,7 @@ describe("navigator", function() {
 
   it("should follow multiple archs, in and out a path using a stream", 
      function(done) {
-    var stream = db.nav("davide").archIn("friend").archIn("friend").archOut("friend").stream();
+    var stream = db.nav("davide").archIn("friend").archIn("friend").archOut("friend").valuesStream();
 
     stream.on("data", function(data) {
       expect(["marco", "matteo"].indexOf(data) >= 0).to.be.ok;
