@@ -64,4 +64,14 @@ describe("navigator", function() {
 
     stream.on("end", done);
   });
+
+  it("should allow to set the name of the variables", 
+     function(done) {
+    db.nav("marco").archIn("friend").as("a").archOut("friend").archOut("friend").as("a").
+      values(function(err, friends) {
+
+      expect(friends).to.eql(["daniele"]);
+      done();
+    });
+  });
 });
