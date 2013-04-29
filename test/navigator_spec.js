@@ -94,4 +94,29 @@ describe("navigator", function() {
       done();
     });
   });
+
+  it("should return the contexts", 
+     function(done) {
+    db.nav("daniele").archOut("friend").as("a").
+      contexts(function(err, contexts) {
+
+      expect(contexts).to.eql([{ a: "marco" }, { a: "matteo" }]);
+      done();
+    });
+  });
+
+  it("should return the context as a stream", 
+     function(done) {
+
+    var contexts = [{ a: "marco" }, { a: "matteo" }];
+
+    var stream = db.nav("daniele").archOut("friend").as("a").
+      contextsStream();
+
+    stream.on("data", function(data) {
+      expect(data).to.eql(contexts.shift());
+    });
+
+    stream.on("end", done);
+  });
 });

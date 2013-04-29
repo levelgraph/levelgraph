@@ -1,10 +1,10 @@
 
 var KeyFilterStream = require("./lib/keyfilterstream");
 var JoinStream = require("./lib/joinstream");
-var CallbackStream = require("./lib/callbackstream");
 var Variable = require("./lib/variable");
 var navigator = require('./lib/navigator');
 var extend = require("xtend");
+var wrapCallback = require("./lib/utilities").wrapCallback;
 
 var defs = {
   spo: ["subject", "predicate", "object"],
@@ -111,11 +111,4 @@ function createQuery(pattern) {
   };
 
   return query;
-}
-
-function wrapCallback(method) {
-  return function(query, cb) {
-    var stream = this[method](query);
-    stream.pipe(CallbackStream({ callback: cb }));
-  };
 }
