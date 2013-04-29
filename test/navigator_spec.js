@@ -127,4 +127,61 @@ describe("navigator", function() {
       done();
     });
   });
+
+  it("should return the materialized triples", 
+     function(done) {
+    var pattern = {
+      subject: "daniele",
+      predicate: "friends-of-dani",
+      object: db.v("a")
+    };
+
+    db.nav("daniele").archOut("friend").as("a").
+      triples(pattern, function(err, triples) {
+
+      expect(triples).to.eql([{
+        subject: "daniele",
+        predicate: "friends-of-dani",
+        object: "marco"
+      }, {
+        subject: "daniele",
+        predicate: "friends-of-dani",
+        object: "matteo"
+      }]);
+
+      done();
+    });
+  });
+
+  it("should return the materialized triples as a stream", 
+     function(done) {
+
+    var pattern = {
+      subject: "daniele",
+      predicate: "friends-of-dani",
+      object: db.v("a")
+    };
+
+    var triples = [{
+      subject: "daniele",
+      predicate: "friends-of-dani",
+      object: "marco"
+    }, {
+      subject: "daniele",
+      predicate: "friends-of-dani",
+      object: "matteo"
+    }];
+
+    var stream = db.nav("daniele").archOut("friend").as("a").
+      triplesStream(pattern);
+
+    stream.on("data", function(data) {
+      expect(data).to.eql(triples.shift());
+    });
+
+    stream.on("end", function() {
+      expect(triples).to.have.property("length", 0);
+      done();
+    });
+  });
 });
