@@ -6,6 +6,7 @@ var Variable = require("./lib/variable");
 var navigator = require('./lib/navigator');
 var extend = require("xtend");
 var wrapCallback = require("./lib/utilities").wrapCallback;
+var PassThrough = require("stream").PassThrough;
 
 var defs = {
   spo: ["subject", "predicate", "object"],
@@ -34,8 +35,14 @@ module.exports = function levelgraph(leveldb) {
     close: leveldb.close.bind(leveldb),
     v: Variable,
     joinStream: function(query, options) {
-      var that = this;
+      var that = this, stream = null;
       options = extend(joinDefaults, options);
+
+      if (!query || query.length === 0) {
+        stream = new PassThrough({ objectMode: true });
+        stream.end();
+        return stream;
+      }
      
       var streams = query.map(function(triple) {
         var stream = new JoinStream({ triple: triple, db: that });

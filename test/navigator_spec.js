@@ -120,10 +120,10 @@ describe("navigator", function() {
     stream.on("end", done);
   });
 
-  it("should return an empty context if no condition is specified",
+  it("should return no context if no condition is specified",
      function(done) {
     db.nav("daniele").contexts(function(err, contexts) {
-      expect(contexts).to.eql([{}]);
+      expect(contexts).to.eql([]);
       done();
     });
   });
