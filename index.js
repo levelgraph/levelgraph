@@ -1,6 +1,7 @@
 
 var KeyFilterStream = require("./lib/keyfilterstream");
 var JoinStream = require("./lib/joinstream");
+var MaterializerStream = require("./lib/materializerstream");
 var Variable = require("./lib/variable");
 var navigator = require('./lib/navigator');
 var extend = require("xtend");
@@ -42,6 +43,12 @@ module.exports = function levelgraph(leveldb) {
       });
 
       streams[0].end(options.context);
+
+      if (options.materialized) {
+        streams.push(MaterializerStream({
+          pattern: options.materialized
+        }));
+      }
 
       return streams.reduce(function(prev, current) {
         return prev.pipe(current);

@@ -159,4 +159,70 @@ describe("join support", function() {
       done();
     });
   });
+
+  it("should return triples from a join aka materialized API", function(done) {
+    db.join([{
+      subject: db.v("x"),
+      predicate: "friend",
+      object: "marco"
+    }, {
+      subject: db.v("x"),
+      predicate: "friend",
+      object: "matteo"
+    }], {
+      materialized: {
+        subject: db.v("x"),
+        predicate: "newpredicate",
+        object: "abcde"
+      }
+    }, function(err, results) {
+      expect(results).to.eql([{
+        subject: "daniele",
+        predicate: "newpredicate",
+        object: "abcde"
+      }, {
+        subject: "lucio",
+        predicate: "newpredicate",
+        object: "abcde"
+      }]);
+      done();
+    });
+  });
+
+  it("should emit triples from the stream interface aka materialized API", function(done) {
+    var triples = [{
+      subject: "daniele",
+      predicate: "newpredicate",
+      object: "abcde"
+    }];
+
+    var stream = db.joinStream([{
+      subject: "matteo",
+      predicate: "friend",
+      object: db.v("x")
+    }, {
+      subject: db.v("x"),
+      predicate: "friend",
+      object: db.v("y")
+    }, {
+      subject: db.v("y"),
+      predicate: "friend",
+      object: "davide"
+    }], {
+      materialized: {
+        subject: db.v("x"),
+        predicate: "newpredicate",
+        object: "abcde"
+      }
+    });
+
+    stream.on("data", function(data) {
+      expect(data).to.eql(triples.shift());
+    });
+
+    stream.on("end", function() {
+      expect(triples).to.have.property("length", 0);
+      done();
+    });
+  });
 });

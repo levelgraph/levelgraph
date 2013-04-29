@@ -152,6 +152,36 @@ db.put([{
 });
 ```
 
+It also allows to generate a stream of triples, instead of a context:
+```
+  db.join([{
+    subject: db.v("a"),
+    predicate: "friend",
+    object: db.v("x")
+  }, {
+    subject: db.v("x"),
+    predicate: "friend",
+    object: db.v("y")
+  }, {
+    subject: db.v("y"),
+    predicate: "friend",
+    object: db.v("b")
+  }], {
+    materialized: {
+      subject: db.v("a"),
+      predicate: "friend-of-a-friend",
+      object: db.v("b")
+    }
+  }, function(err, results) {
+    // this will print all the 'friend of a friend triples..'
+    // like so: { 
+    //   subject: "lucio", 
+    //   predicate: "friend-of-a-friend",
+    //   object: "daniele"
+    // }
+  });
+```
+
 ### Deleting
 
 Deleting is easy too:
