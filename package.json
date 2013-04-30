@@ -36,6 +36,6 @@
   },
   "dependencies": {
     "levelup": "~0.8.0",
-    "concat-stream": "~0.1.1"
+    "xtend": "~2.0.3"
   }
 }
