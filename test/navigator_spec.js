@@ -184,4 +184,36 @@ describe("navigator", function() {
       done();
     });
   });
+
+  it("should go to another vertex", function(done) {
+    db.nav("marco").archIn("friend").as("a").go("matteo").archOut("friend").as("b").
+      contexts(function(err, contexts) {
+
+      expect(contexts).to.eql([{
+        a: "daniele",
+        b: "daniele"
+      }, {
+        a: "lucio", 
+        b: "daniele"
+      }]);
+
+      done();
+    });
+  });
+
+  it("should go to another vertex as a variable", function(done) {
+    db.nav("marco").go().as("a").archOut("friend").as("b").bind("matteo").
+      contexts(function(err, contexts) {
+
+      expect(contexts).to.eql([{
+        a: "daniele",
+        b: "matteo"
+      }, {
+        a: "lucio", 
+        b: "matteo"
+      }]);
+
+      done();
+    });
+  });
 });
