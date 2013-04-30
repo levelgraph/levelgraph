@@ -1,8 +1,12 @@
 
 var KeyFilterStream = require("./lib/keyfilterstream");
 var JoinStream = require("./lib/joinstream");
+var MaterializerStream = require("./lib/materializerstream");
 var Variable = require("./lib/variable");
-var concat = require('concat-stream');
+var navigator = require('./lib/navigator');
+var extend = require("xtend");
+var wrapCallback = require("./lib/utilities").wrapCallback;
+var PassThrough = require("stream").PassThrough;
 
 var defs = {
   spo: ["subject", "predicate", "object"],
@@ -11,6 +15,10 @@ var defs = {
   pos: ["predicate", "subject", "object"],
   ops: ["object", "predicate", "subject"],
   osp: ["object", "subject", "predicate"]
+};
+
+var joinDefaults = {
+  context: {}
 };
 
 module.exports = function levelgraph(leveldb) {
@@ -26,21 +34,37 @@ module.exports = function levelgraph(leveldb) {
     del: doAction('del', leveldb),
     close: leveldb.close.bind(leveldb),
     v: Variable,
-    joinStream: function(query) {
-      var that = this;
+    joinStream: function(query, options) {
+      var that = this, stream = null;
+      options = extend(joinDefaults, options);
+
+      if (!query || query.length === 0) {
+        stream = new PassThrough({ objectMode: true });
+        stream.end();
+        return stream;
+      }
      
       var streams = query.map(function(triple) {
         var stream = new JoinStream({ triple: triple, db: that });
         return stream;
       });
 
-      streams[0].end({});
+      streams[0].end(options.context);
+
+      if (options.materialized) {
+        streams.push(MaterializerStream({
+          pattern: options.materialized
+        }));
+      }
 
       return streams.reduce(function(prev, current) {
         return prev.pipe(current);
       });
     },
-    join: wrapCallback('joinStream')
+    join: wrapCallback('joinStream'),
+    nav: function(start) {
+      return navigator({ start: start, db: this });
+    }
   };
 
   return db;
@@ -101,23 +125,4 @@ function createQuery(pattern) {
   };
 
   return query;
-}
-
-function wrapCallback(method) {
-  return function(query, cb) {
-    var stream = this[method](query);
-    stream.pipe(reconcat(cb));
-    stream.on("error", cb);
-  };
-}
-
-function reconcat(cb) {
-  return concat(function(err, list) {
-    if(err) {
-      cb(err);
-      return;
-    }
-
-    cb(null, list || []);
-  });
 }

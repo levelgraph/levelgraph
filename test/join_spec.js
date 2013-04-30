@@ -3,7 +3,7 @@ var levelgraph = require("../");
 var levelup = require("levelup");
 var tmp = require("tmp");
 
-describe("a basic triple store", function() {
+describe("join support", function() {
 
   var db;
 
@@ -15,31 +15,7 @@ describe("a basic triple store", function() {
       }
 
       db = levelgraph(levelup(dir));
-      db.put([{
-        subject: "matteo",
-        predicate: "friend",
-        object: "daniele"
-      }, {
-        subject: "daniele",
-        predicate: "friend",
-        object: "matteo"
-      }, {
-        subject: "daniele",
-        predicate: "friend",
-        object: "marco"
-      }, {
-        subject: "lucio",
-        predicate: "friend",
-        object: "matteo"
-      }, {
-        subject: "lucio",
-        predicate: "friend",
-        object: "marco"
-      }, {
-        subject: "marco",
-        predicate: "friend",
-        object: "davide"
-      }], done);
+      db.put(require("./fixture/foaf"), done);
     });
   });
 
@@ -180,6 +156,72 @@ describe("a basic triple store", function() {
 
     stream.on("end", function() {
       expect(contexts).to.have.property("length", 0);
+      done();
+    });
+  });
+
+  it("should return triples from a join aka materialized API", function(done) {
+    db.join([{
+      subject: db.v("x"),
+      predicate: "friend",
+      object: "marco"
+    }, {
+      subject: db.v("x"),
+      predicate: "friend",
+      object: "matteo"
+    }], {
+      materialized: {
+        subject: db.v("x"),
+        predicate: "newpredicate",
+        object: "abcde"
+      }
+    }, function(err, results) {
+      expect(results).to.eql([{
+        subject: "daniele",
+        predicate: "newpredicate",
+        object: "abcde"
+      }, {
+        subject: "lucio",
+        predicate: "newpredicate",
+        object: "abcde"
+      }]);
+      done();
+    });
+  });
+
+  it("should emit triples from the stream interface aka materialized API", function(done) {
+    var triples = [{
+      subject: "daniele",
+      predicate: "newpredicate",
+      object: "abcde"
+    }];
+
+    var stream = db.joinStream([{
+      subject: "matteo",
+      predicate: "friend",
+      object: db.v("x")
+    }, {
+      subject: db.v("x"),
+      predicate: "friend",
+      object: db.v("y")
+    }, {
+      subject: db.v("y"),
+      predicate: "friend",
+      object: "davide"
+    }], {
+      materialized: {
+        subject: db.v("x"),
+        predicate: "newpredicate",
+        object: "abcde"
+      }
+    });
+
+    stream.on("data", function(data) {
+      expect(data).to.eql(triples.shift());
+    });
+
+    stream.on("end", function() {
+      expect(triples).to.have.property("length", 0);
       done();
     });
   });

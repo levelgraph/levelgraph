@@ -152,6 +152,36 @@ db.put([{
 });
 ```
 
+It also allows to generate a stream of triples, instead of a context:
+```
+  db.join([{
+    subject: db.v("a"),
+    predicate: "friend",
+    object: db.v("x")
+  }, {
+    subject: db.v("x"),
+    predicate: "friend",
+    object: db.v("y")
+  }, {
+    subject: db.v("y"),
+    predicate: "friend",
+    object: db.v("b")
+  }], {
+    materialized: {
+      subject: db.v("a"),
+      predicate: "friend-of-a-friend",
+      object: db.v("b")
+    }
+  }, function(err, results) {
+    // this will print all the 'friend of a friend triples..'
+    // like so: { 
+    //   subject: "lucio", 
+    //   predicate: "friend-of-a-friend",
+    //   object: "daniele"
+    // }
+  });
+```
+
 ### Deleting
 
 Deleting is easy too:
@@ -159,6 +189,110 @@ Deleting is easy too:
 var triple = { subject: "a", predicate: "b", object: "c" };
 db.del(triple, function(err) {
   // do something after the triple is deleted
+});
+```
+
+## Navigator API
+
+The Navigator API is a fluent API for LevelGraph, loosely inspired by
+[Gremlin](http://markorodriguez.com/2011/06/15/graph-pattern-matching-with-gremlin-1-1/)
+It allows to specify joins in a much more compact way and navigate
+between vertexes in our graph.
+
+Here is an example, using the same dataset as before:
+```
+    db.nav("matteo").archIn("friend").archOut("friend").
+      contexts(function(err, results) {
+      // prints:
+      // [ { x0: 'daniele', x1: 'marco' },
+      //   { x0: 'daniele', x1: 'matteo' },
+      //   { x0: 'lucio', x1: 'marco' },
+      //   { x0: 'lucio', x1: 'matteo' } ]
+      console.log(results);
+    });
+```
+
+The above example match the same triples of:
+```
+    db.join([{
+      subject: db.v("x0"),
+      predicate: 'friend',
+      object: 'matteo'
+    }, {
+      subject: db.v("x0"),
+      predicate: 'friend',
+      object: db.v("x1")
+    }], function(err, results) {
+      // prints:
+      // [ { x0: 'daniele', x1: 'marco' },
+      //   { x0: 'daniele', x1: 'matteo' },
+      //   { x0: 'lucio', x1: 'marco' },
+      //   { x0: 'lucio', x1: 'matteo' } ]
+      console.log(results);
+    });
+```
+
+It allows to see just the last reached vertex:
+```
+    db.nav("matteo").archIn("friend").archOut("friend").
+      values(function(err, results) {
+      // prints [ 'marco', 'matteo' ]
+      console.log(results);
+    });
+```
+
+Variable names can also be specified, like so:
+```
+db.nav("marco").archIn("friend").as("a").archOut("friend").archOut("friend").as("a").
+      contexts(function(err, friends) {
+ 
+  console.log(friends); // will print [{ a: "daniele" }]
+});
+```
+
+Variables can also be bound to a specific value, like so:
+```
+db.nav("matteo").archIn("friend").bind("lucio").archOut("friend").bind("marco").
+      values(function(err, friends) {
+  console.log(friends); // this will print ['marco']
+});
+```
+
+A materialized join can also be produced, like so:
+```
+db.nav("matteo").archOut("friend").bind("lucio").archOut("friend").bind("marco").
+      triples({:
+        materialized: {
+        subject: db.v("a"),
+        predicate: "friend-of-a-friend",
+        object: db.v("b")
+      }
+    }, function(err, results) {
+      
+  // this will return all the 'friend of a friend triples..'
+  // like so: { 
+  //   subject: "lucio", 
+  //   predicate: "friend-of-a-friend",
+  //   object: "daniele"
+  // }
+
+  console.log(results); 
+});
+```
+
+It is also possible to change the current vertex:
+```
+db.nav("marco").archIn("friend").as("a").go("matteo").archOut("friend").as("b").
+      contexts(function(err, contexts) {
+
+   //  contexs is: [{
+   //    a: "daniele",
+   //    b: "daniele"
+   //   }, {
+   //     a: "lucio", 
+   //     b: "daniele"
+   //   }]
+
 });
 ```
 
@@ -172,7 +306,6 @@ Here are some ideas:
 
 * [ ] Return the matching triples in the JOIN results.
 * [ ] Support for Query Planning in JOIN.
-* [ ] Design and implement a nicer query interface using promises.
 * [ ] Add more database operators.
 
 ## Contributing to LevelGraph 
