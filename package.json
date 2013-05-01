@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "levelup": "~0.8.0",
-    "xtend": "~2.0.3"
+    "xtend": "~2.0.3",
+    "relational-join-stream": "git://github.com/mcollina/relational-join-stream.git#no-emit-on-undefined"
   }
 }
