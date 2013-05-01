@@ -22,6 +22,7 @@ tmp.dir(function(err, dir) {
       startTime = new Date();
       counts = startCounts;
       doReads();
+      return;
     }
 
     var triple = { 
@@ -44,7 +45,7 @@ tmp.dir(function(err, dir) {
       var totalTime = endTime - startTime;
       console.log("total time", totalTime);
       console.log("reads/s", startCounts / totalTime * 1000);
-      process.exit(0);
+      db.close();
     });
   };
 
