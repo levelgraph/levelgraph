@@ -7,6 +7,9 @@ var navigator = require('./lib/navigator');
 var extend = require("xtend");
 var wrapCallback = require("./lib/utilities").wrapCallback;
 var PassThrough = require("stream").PassThrough;
+var join = require('relational-join-stream');
+var queryMask = require("./lib/utilities").queryMask;
+var matcher = require("./lib/utilities").matcher;
 
 var defs = {
   spo: ["subject", "predicate", "object"],
@@ -34,33 +37,7 @@ module.exports = function levelgraph(leveldb) {
     del: doAction('del', leveldb),
     close: leveldb.close.bind(leveldb),
     v: Variable,
-    joinStream: function(query, options) {
-      var that = this, stream = null;
-      options = extend(joinDefaults, options);
-
-      if (!query || query.length === 0) {
-        stream = new PassThrough({ objectMode: true });
-        stream.end();
-        return stream;
-      }
-     
-      var streams = query.map(function(triple) {
-        var stream = new JoinStream({ triple: triple, db: that });
-        return stream;
-      });
-
-      streams[0].end(options.context);
-
-      if (options.materialized) {
-        streams.push(MaterializerStream({
-          pattern: options.materialized
-        }));
-      }
-
-      return streams.reduce(function(prev, current) {
-        return prev.pipe(current);
-      });
-    },
+    joinStream: hashJoin,
     join: wrapCallback('joinStream'),
     nav: function(start) {
       return navigator({ start: start, db: this });
@@ -125,4 +102,107 @@ function createQuery(pattern) {
   };
 
   return query;
+}
+
+function naiveJoin(query, options) {
+  var that = this, stream = null;
+  options = extend(joinDefaults, options);
+
+  if (!query || query.length === 0) {
+    stream = new PassThrough({ objectMode: true });
+    stream.end();
+    return stream;
+  }
+
+  var streams = query.map(function(triple) {
+    var stream = new JoinStream({ triple: triple, db: that });
+    return stream;
+  });
+
+  streams[0].end(options.context);
+
+  if (options.materialized) {
+    streams.push(MaterializerStream({
+      pattern: options.materialized
+    }));
+  }
+
+  return streams.reduce(function(prev, current) {
+    return prev.pipe(current);
+  });
+}
+
+function hashJoin(query, options) {
+  var that = this, stream = null;
+  options = extend(joinDefaults, options);
+
+  if (!query || query.length === 0) {
+    stream = new PassThrough({ objectMode: true });
+    stream.end();
+    return stream;
+  }
+
+  var totalVariables = query.map(function(triple) {
+    return Object.keys(triple).reduce(function(acc, key) {
+      var name = triple[key].name;
+      if (name) {
+        acc.push(triple[key].name);
+      }
+      return acc;
+    }, []);
+  });
+
+  var commonVariables = totalVariables.reduce(function(acc, vars) {
+    return acc.filter(function(name) {
+      return vars.indexOf(name) >= 0;
+    });
+  }).sort();
+
+  if (totalVariables.length > commonVariables + 1) {
+    // an hashJoin can have only one free variable
+    // FIXME
+    return naiveJoin.apply(this, arguments);
+  }
+
+  var streams = query.map(function(triple) {
+    var stream = that.getStream(queryMask(triple));
+    stream.matcher = matcher(triple);
+    return stream;
+  });
+
+  var hashJoinStream = join(
+    streams,
+    function key(data, i) {
+      var match = streams[i].matcher(options.context, data);
+      var result = commonVariables.map(function(v) {
+        return match[v];
+      }).join("\xff");
+
+      return result;
+    },
+    function map(data, i) {
+      return data;
+    },
+    function reduce(triples) {
+
+      var result = triples.reduce(function(context, triple, i) {
+        if(!context) {
+          return false;
+        }
+        return streams[i].matcher(context, triple);
+      }, options.context);
+
+      if (result) {
+        return result;
+      }
+    }
+  );
+
+  if (options.materialized) {
+    return hashJoinStream.pipe(MaterializerStream({
+      pattern: options.materialized
+    }));
+  }
+
+  return hashJoinStream;
 }
