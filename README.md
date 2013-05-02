@@ -324,6 +324,12 @@ Here are some ideas:
   fine, but please isolate to its own commit so I can cherry-pick around
   it.
 
+## Credits
+
+*LevelGraph builds on the excellent work on both the LevelUp community
+and the LevelDB and Snappy teams from Google and additional contributors. 
+LevelDB and Snappy are both issued under the [New BSD Licence](http://opensource.org/licenses/BSD-3-Clause).*
+
 ## LICENSE - "MIT License"
 
 Copyright (c) 2013 Matteo Collina, http://matteocollina.com
