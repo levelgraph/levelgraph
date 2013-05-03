@@ -20,6 +20,7 @@
     "beforeEach": false,
     "afterEach": false,
     "expect": false,
-    "it": false
+    "it": false,
+    "setImmediate": false
   }
 }

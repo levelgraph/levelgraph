@@ -23,7 +23,7 @@ describe("join support", function() {
     db.close(done);
   });
 
-  it("should a join with one results", function(done) {
+  it("should do a join with one results", function(done) {
     db.join([{
       subject: db.v("x"),
       predicate: "friend",
@@ -31,23 +31,6 @@ describe("join support", function() {
     }], function(err, results) {
       expect(results).to.have.property("length", 1);
       expect(results[0]).to.have.property("x", "matteo");
-      done();
-    });
-  });
-
-  it("should a join with two results", function(done) {
-    db.join([{
-      subject: db.v("x"),
-      predicate: "friend",
-      object: "marco"
-    }, {
-      subject: db.v("x"),
-      predicate: "friend",
-      object: "matteo"
-    }], function(err, results) {
-      expect(results).to.have.property("length", 2);
-      expect(results[0]).to.have.property("x", "daniele");
-      expect(results[1]).to.have.property("x", "lucio");
       done();
     });
   });
@@ -89,7 +72,9 @@ describe("join support", function() {
   });
 
   it("should allow to find mutual friends", function(done) {
+    //var contexts = [{ x: "daniele", y: "matteo" }, { x: "matteo", y: "daniele" }]
     var contexts = [{ x: "matteo", y: "daniele" }, { x: "daniele", y: "matteo" }]
+
       , stream = db.joinStream([{
           subject: db.v("x"),
           predicate: "friend",
@@ -101,7 +86,9 @@ describe("join support", function() {
         }]);
 
     stream.on("data", function(data) {
-      expect(data).to.eql(contexts.shift());
+      var expected = contexts.shift();
+      console.log("----> DATA", data);
+      expect(data).to.eql(expected);
     });
 
     stream.on("end", function() {
@@ -123,6 +110,7 @@ describe("join support", function() {
         }]);
 
     stream.on("data", function(data) {
+      console.log("----> DATA", data);
       expect(data).to.eql(contexts.shift());
     });
 
@@ -149,6 +137,7 @@ describe("join support", function() {
         }]);
 
     stream.on("data", function(data) {
+      console.log("----> DATA", data);
       expect(data).to.eql(contexts.shift());
     });
 
