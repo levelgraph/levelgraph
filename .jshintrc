@@ -13,6 +13,8 @@
   "unused": false,
   "boss": true,
   "eqnull": true,
+  "laxcomma": true,
+  "quotmark": true,
   "globals": {
     "describe": false,
     "beforeEach": false,

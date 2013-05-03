@@ -70,16 +70,16 @@ describe("join support", function() {
   });
 
   it("should return the two contexts through the joinStream interface", function(done) {
-    var contexts = [{ x: "daniele" }, { x: "lucio" }];
-    var stream = db.joinStream([{
-      subject: db.v("x"),
-      predicate: "friend",
-      object: "marco"
-    }, {
-      subject: db.v("x"),
-      predicate: "friend",
-      object: "matteo"
-    }]);
+    var contexts = [{ x: "daniele" }, { x: "lucio" }]
+      , stream = db.joinStream([{
+          subject: db.v("x"),
+          predicate: "friend",
+          object: "marco"
+        }, {
+          subject: db.v("x"),
+          predicate: "friend",
+          object: "matteo"
+        }]);
 
     stream.on("data", function(data) {
       expect(data).to.eql(contexts.shift());
@@ -89,16 +89,16 @@ describe("join support", function() {
   });
 
   it("should allow to find mutual friends", function(done) {
-    var contexts = [{ x: "matteo", y: "daniele" }, { x: "daniele", y: "matteo" }];
-    var stream = db.joinStream([{
-      subject: db.v("x"),
-      predicate: "friend",
-      object: db.v("y")
-    }, {
-      subject: db.v("y"),
-      predicate: "friend",
-      object: db.v("x")
-    }]);
+    var contexts = [{ x: "matteo", y: "daniele" }, { x: "daniele", y: "matteo" }]
+      , stream = db.joinStream([{
+          subject: db.v("x"),
+          predicate: "friend",
+          object: db.v("y")
+        }, {
+          subject: db.v("y"),
+          predicate: "friend",
+          object: db.v("x")
+        }]);
 
     stream.on("data", function(data) {
       expect(data).to.eql(contexts.shift());
@@ -111,17 +111,16 @@ describe("join support", function() {
   });
 
   it("should allow to intersect common friends", function(done) {
-    var contexts = [{ x: "marco" }, { x: "matteo" }];
-
-    var stream = db.joinStream([{
-      subject: "lucio",
-      predicate: "friend",
-      object: db.v("x")
-    }, {
-      subject: "daniele",
-      predicate: "friend",
-      object: db.v("x")
-    }]);
+    var contexts = [{ x: "marco" }, { x: "matteo" }]
+      , stream = db.joinStream([{
+          subject: "lucio",
+          predicate: "friend",
+          object: db.v("x")
+        }, {
+          subject: "daniele",
+          predicate: "friend",
+          object: db.v("x")
+        }]);
 
     stream.on("data", function(data) {
       expect(data).to.eql(contexts.shift());
@@ -134,21 +133,20 @@ describe("join support", function() {
   });
 
   it("should support the friend of a friend scenario", function(done) {
-    var contexts = [{ x: "daniele", y: "marco" }];
-
-    var stream = db.joinStream([{
-      subject: "matteo",
-      predicate: "friend",
-      object: db.v("x")
-    }, {
-      subject: db.v("x"),
-      predicate: "friend",
-      object: db.v("y")
-    }, {
-      subject: db.v("y"),
-      predicate: "friend",
-      object: "davide"
-    }]);
+    var contexts = [{ x: "daniele", y: "marco" }]
+      , stream = db.joinStream([{
+          subject: "matteo",
+          predicate: "friend",
+          object: db.v("x")
+        }, {
+          subject: db.v("x"),
+          predicate: "friend",
+          object: db.v("y")
+        }, {
+          subject: db.v("y"),
+          predicate: "friend",
+          object: "davide"
+        }]);
 
     stream.on("data", function(data) {
       expect(data).to.eql(contexts.shift());
@@ -191,30 +189,30 @@ describe("join support", function() {
 
   it("should emit triples from the stream interface aka materialized API", function(done) {
     var triples = [{
-      subject: "daniele",
-      predicate: "newpredicate",
-      object: "abcde"
-    }];
+          subject: "daniele",
+          predicate: "newpredicate",
+          object: "abcde"
+        }]
 
-    var stream = db.joinStream([{
-      subject: "matteo",
-      predicate: "friend",
-      object: db.v("x")
-    }, {
-      subject: db.v("x"),
-      predicate: "friend",
-      object: db.v("y")
-    }, {
-      subject: db.v("y"),
-      predicate: "friend",
-      object: "davide"
-    }], {
-      materialized: {
-        subject: db.v("x"),
-        predicate: "newpredicate",
-        object: "abcde"
-      }
-    });
+      , stream = db.joinStream([{
+          subject: "matteo",
+          predicate: "friend",
+          object: db.v("x")
+        }, {
+          subject: db.v("x"),
+          predicate: "friend",
+          object: db.v("y")
+        }, {
+          subject: db.v("y"),
+          predicate: "friend",
+          object: "davide"
+        }], {
+          materialized: {
+            subject: db.v("x"),
+            predicate: "newpredicate",
+            object: "abcde"
+          }
+        });
 
     stream.on("data", function(data) {
       expect(data).to.eql(triples.shift());

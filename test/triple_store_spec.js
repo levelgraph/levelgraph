@@ -77,7 +77,9 @@ describe("a basic triple store", function() {
     });
 
     ["subject", "predicate", "object"].forEach(function(type) {
-      it("should get nothing if nothing matches an only " + type + " query", function(done) {
+      it("should get nothing if nothing matches an only " + type + " query", 
+         function(done) {
+
         var query  = {};
         query[type] = "notfound";
         db.get(query, function(err, list) {
@@ -97,15 +99,15 @@ describe("a basic triple store", function() {
   });
 
   it("should put an array of triples", function(done) {
-    var t1 = { subject: "a", predicate: "b", object: "c" };
-    var t2 = { subject: "a", predicate: "b", object: "d" };
+    var t1 = { subject: "a", predicate: "b", object: "c" }
+      , t2 = { subject: "a", predicate: "b", object: "d" };
     db.put([t1, t2], done);
   });
 
   describe("with two triple inserted with the same predicate", function() {
 
-    var triple1;
-    var triple2;
+    var triple1
+      , triple2;
 
     beforeEach(function(done) {
       triple1 = { subject: "a1", predicate: "b", object: "c" };
@@ -137,8 +139,8 @@ describe("a basic triple store", function() {
     });
 
     it("should return both triples through the getStream interface", function(done) {
-      var triples = [triple1, triple2];
-      var stream = db.getStream({ predicate: "b" });
+      var triples = [triple1, triple2]
+        , stream = db.getStream({ predicate: "b" });
       stream.on("data", function(data) {
         expect(data).to.eql(triples.shift());
       });
