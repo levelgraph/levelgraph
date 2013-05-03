@@ -1,12 +1,21 @@
 {
   "node": true,
-  "indent": 2,
+  "browser": true,
   "es5": true,
-  "expr": true,
+  "curly": true,
+  "eqeqeq": true,
+  "immed": true,
+  "latedef": true,
+  "newcap": true,
+  "noarg": true,
+  "sub": true,
+  "undef": true,
+  "unused": false,
+  "boss": true,
+  "eqnull": true,
   "globals": {
-    "it": false,
-    "afterEach": false,
+    "describe": false,
     "beforeEach": false,
-    "describe": false
+    "it": false
   }
 }
