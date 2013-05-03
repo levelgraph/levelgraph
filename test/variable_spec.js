@@ -22,15 +22,15 @@ describe("Variable", function() {
     });
 
     it("should return true if there is a key in the context", function() {
-      expect(instance.isBound({ x: "hello" })).to.be.true;
+      expect(instance.isBound({ x: "hello" })).to.equal(true);
     });
 
     it("should return false if there is no key in the context", function() {
-      expect(instance.isBound({})).to.be.false;
+      expect(instance.isBound({})).to.equal(false);
     });
 
     it("should return false if there is another key in the context", function() {
-      expect(instance.isBound({ hello: "world" })).to.be.false;
+      expect(instance.isBound({ hello: "world" })).to.equal(false);
     });
   });
 
@@ -67,15 +67,15 @@ describe("Variable", function() {
     });
 
     it("should bind to the same value", function() {
-      expect(instance.isBindable({ x: "hello" }, "hello")).to.be.true;
+      expect(instance.isBindable({ x: "hello" }, "hello")).to.equal(true);
     });
 
     it("should not bind to a different value", function() {
-      expect(instance.isBindable({ x: "hello" }, "hello2")).to.be.false;
+      expect(instance.isBindable({ x: "hello" }, "hello2")).to.equal(false);
     });
 
     it("should bind if the key is not present", function() {
-      expect(instance.isBindable({}, "hello")).to.be.true;
+      expect(instance.isBindable({}, "hello")).to.equal(true);
     });
   });
 });

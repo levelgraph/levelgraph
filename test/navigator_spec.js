@@ -59,7 +59,7 @@ describe("navigator", function() {
     var stream = db.nav("davide").archIn("friend").archIn("friend").archOut("friend").valuesStream();
 
     stream.on("data", function(data) {
-      expect(["marco", "matteo"].indexOf(data) >= 0).to.be.ok;
+      expect(["marco", "matteo"].indexOf(data) >= 0).to.equal(true);
     });
 
     stream.on("end", done);
