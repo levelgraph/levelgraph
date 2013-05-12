@@ -72,8 +72,8 @@ describe("join support", function() {
   });
 
   it("should allow to find mutual friends", function(done) {
-    //var contexts = [{ x: "daniele", y: "matteo" }, { x: "matteo", y: "daniele" }]
-    var contexts = [{ x: "matteo", y: "daniele" }, { x: "daniele", y: "matteo" }]
+    var contexts = [{ x: "daniele", y: "matteo" }, { x: "matteo", y: "daniele" }]
+    //var contexts = [{ x: "matteo", y: "daniele" }, { x: "daniele", y: "matteo" }]
 
       , stream = db.joinStream([{
           subject: db.v("x"),

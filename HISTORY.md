@@ -2,6 +2,11 @@
 History
 ======
 
+## 0.3.0
+
+* Basic query planner based on levelup's approximateSize
+* Extracted CallbackStream in a separate module
+
 ## 0.2.0
 
 * Navigator API, in Gremlin style, see
