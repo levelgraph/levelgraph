@@ -1,6 +1,6 @@
 {
   "name": "levelgraph",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A graph database built on top of LevelUp",
   "main": "index.js",
   "scripts": {
@@ -37,6 +37,7 @@
   "dependencies": {
     "levelup": "~0.8.0",
     "xtend": "~2.0.3",
-    "callback-stream": "~1.0.0"
+    "callback-stream": "~1.0.0",
+    "async": "~0.2.8"
   }
 }
