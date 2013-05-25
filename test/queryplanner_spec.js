@@ -18,7 +18,7 @@ describe("query planner", function() {
     query = [ { predicate: "friend" } ];
 
     stub
-      .withArgs("pso::friend::", "pso::friend\xff", sinon.match.func)
+      .withArgs("pos::friend::", "pos::friend\xff", sinon.match.func)
       .yields(null, 10);
 
     planner(query, function(err, result) {
@@ -36,7 +36,7 @@ describe("query planner", function() {
     }];
 
     stub
-      .withArgs("pso::friend::", "pso::friend\xff")
+      .withArgs("pos::friend::", "pos::friend\xff")
       .yields(null, 10);
 
     stub
@@ -49,7 +49,7 @@ describe("query planner", function() {
     });
   });
 
-  it("should order two conditions based on their size", function(done) {
+  it("should order two conditions based on their size (bis)", function(done) {
     query = [{
         predicate: "friend"
     }, {
@@ -65,7 +65,7 @@ describe("query planner", function() {
     }];
 
     db.approximateSize
-      .withArgs("pso::friend::", "pso::friend\xff")
+      .withArgs("pos::friend::", "pos::friend\xff")
       .yields(null, 10);
 
     db.approximateSize
@@ -82,7 +82,7 @@ describe("query planner", function() {
     query = [ { predicate: "friend", subject: v("x") } ];
 
     stub
-      .withArgs("pso::friend::", "pso::friend\xff", sinon.match.func)
+      .withArgs("pos::friend::", "pos::friend\xff", sinon.match.func)
       .yields(null, 10);
 
     planner(query, function(err, result) {
