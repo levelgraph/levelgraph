@@ -1,6 +1,7 @@
 
 var queryplanner = require("../lib/queryplanner")
   , v = require("../lib/variable")
+  , SortJoinStream = require("../lib/sortjoinstream")
   , JoinStream = require("../lib/joinstream");
 
 describe("query planner", function() {
