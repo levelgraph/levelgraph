@@ -14,8 +14,7 @@ module.exports = function(joinAlgorithm) {
         return;
       }
 
-      db = levelgraph(levelup(dir));
-      db.joinAlgorithm = joinAlgorithm;
+      db = levelgraph(levelup(dir), { joinAlgorithm: joinAlgorithm });
       db.put(require("./fixture/foaf"), done);
     });
   });
