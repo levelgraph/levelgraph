@@ -3,7 +3,7 @@ var levelgraph = require("../");
 var levelup = require("levelup");
 var tmp = require("tmp");
 
-describe("join support", function() {
+module.exports = function(joinAlgorithm) {
 
   var db;
 
@@ -15,6 +15,7 @@ describe("join support", function() {
       }
 
       db = levelgraph(levelup(dir));
+      db.joinAlgorithm = joinAlgorithm;
       db.put(require("./fixture/foaf"), done);
     });
   });
@@ -212,4 +213,4 @@ describe("join support", function() {
       done();
     });
   });
-});
+};

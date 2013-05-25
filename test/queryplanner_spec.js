@@ -1,10 +1,11 @@
 
 var queryplanner = require("../lib/queryplanner")
-  , v = require("../lib/variable");
+  , v = require("../lib/variable")
+  , JoinStream = require("../lib/joinstream");
 
 describe("query planner", function() {
 
-  var db, query, planner, stub;
+  var db, query, planner, stub, expected;
 
   beforeEach(function() {
     db = {
@@ -16,13 +17,14 @@ describe("query planner", function() {
 
   it("should return a single condition as-is", function(done) {
     query = [ { predicate: "friend" } ];
+    expected = [ { predicate: "friend", stream: JoinStream } ];
 
     stub
       .withArgs("pos::friend::", "pos::friend\xff", sinon.match.func)
       .yields(null, 10);
 
     planner(query, function(err, result) {
-      expect(result).to.eql(query);
+      expect(result).to.eql(expected);
       done();
     });
   });
@@ -35,6 +37,15 @@ describe("query planner", function() {
         predicate: "friend"
     }];
 
+    expected = [{
+        subject: "matteo"
+      , predicate: "friend"
+      , stream: JoinStream
+    }, {
+        predicate: "friend"
+      , stream: JoinStream
+    }];
+
     stub
       .withArgs("pos::friend::", "pos::friend\xff")
       .yields(null, 10);
@@ -44,7 +55,7 @@ describe("query planner", function() {
       .yields(null, 1);
 
     planner(query, function(err, result) {
-      expect(result).to.eql(query);
+      expect(result).to.eql(expected);
       done();
     });
   });
@@ -57,11 +68,13 @@ describe("query planner", function() {
       , predicate: "friend"
     }];
 
-    var expected = [{
+    expected = [{
         subject: "matteo"
       , predicate: "friend"
+      , stream: JoinStream
     }, {
         predicate: "friend"
+      , stream: JoinStream
     }];
 
     db.approximateSize
@@ -80,6 +93,7 @@ describe("query planner", function() {
 
   it("should avoid variables", function(done) {
     query = [ { predicate: "friend", subject: v("x") } ];
+    expected = [ { predicate: "friend", subject: v("x"), stream: JoinStream } ];
 
     stub
       .withArgs("pos::friend::", "pos::friend\xff", sinon.match.func)
