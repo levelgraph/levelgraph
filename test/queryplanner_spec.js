@@ -203,5 +203,40 @@ describe("query planner", function() {
         done();
       });
     });
+
+    it("should create the proper index for the friend-of-a-friend query", function(done) {
+      query = [{
+          subject: v("x")
+        , predicate: "friend"
+        , object: v("c")
+      }, {
+          subject: v("c")
+        , predicate: "friend"
+        , object: v("x")
+      }];
+      
+      expected = [{
+          subject: v("x")
+        , predicate: "friend"
+        , object: v("c")
+        , stream: JoinStream
+        , index: "pos"
+      }, {
+          subject: v("c")
+        , predicate: "friend"
+        , object: v("x")
+        , stream: SortJoinStream
+        , index: "pso"
+      }];
+
+      stub
+        .withArgs("pos::friend::", "pos::friend\xff", sinon.match.func)
+        .yields(null, 10);
+
+      planner(query, function(err, result) {
+        expect(result).to.eql(expected);
+        done();
+      });
+    });
   });
 });
