@@ -16,6 +16,8 @@ C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
 Following this approach, __LevelGraph__ uses six indices for every triple,
 in order to access them as fast as it is possible.
 
+[![Project Status](http://githubkanban.herokuapp.com/images/mcollina_node-levelgraph.png)](http://bit.ly/ZJ9Qta)
+
 ## Install
 
 [![Build
