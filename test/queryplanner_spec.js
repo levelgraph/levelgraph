@@ -238,5 +238,54 @@ describe("query planner", function() {
         done();
       });
     });
+
+    it("should use a SortJoinStream for a three-conditions query", function(done) {
+      query = [{
+          subject: v("x")
+        , predicate: "friend"
+        , object: v("c")
+      }, {
+          subject: v("c")
+        , predicate: "friend"
+        , object: v("x")
+      }, {
+          subject: "bob"
+        , predicate: "father"
+        , object: v("c")
+      }];
+      
+      expected = [{
+          subject: v("x")
+        , predicate: "friend"
+        , object: v("c")
+        , stream: JoinStream
+        , index: "pos"
+      }, {
+          subject: v("c")
+        , predicate: "friend"
+        , object: v("x")
+        , stream: SortJoinStream
+        , index: "pso"
+      }, {
+          subject: "bob"
+        , predicate: "father"
+        , object: v("c")
+        , stream: SortJoinStream
+        , index: "pso"
+      }];
+
+      stub
+        .withArgs("pos::friend::", "pos::friend\xff", sinon.match.func)
+        .yields(null, 10);
+
+      stub
+        .withArgs("pso::father::bob::", "pso::father::bob\xff", sinon.match.func)
+        .yields(null, 100);
+
+      planner(query, function(err, result) {
+        expect(result).to.eql(expected);
+        done();
+      });
+    });
   });
 });
