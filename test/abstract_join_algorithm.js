@@ -176,12 +176,40 @@ module.exports = function(joinAlgorithm) {
     });
   });
 
+  it("should support a friend-of-a-friend-of-a-friend scenario", function(done) {
+
+    var contexts = [{ x: "daniele", y: "marco", z: "davide" }, { x: "daniele", y: "matteo", z: "daniele" }]
+
+      , stream = db.joinStream([{
+          subject: "matteo",
+          predicate: "friend",
+          object: db.v("x")
+        }, {
+          subject: db.v("x"),
+          predicate: "friend",
+          object: db.v("y")
+        }, {
+          subject: db.v("y"),
+          predicate: "friend",
+          object: db.v("z")
+        }]);
+
+    stream.on("data", function(data) {
+      expect(data).to.eql(contexts.shift());
+    });
+
+    stream.on("end", function() {
+      expect(contexts).to.have.property("length", 0);
+      done();
+    });
+  });
+
   it("should emit triples from the stream interface aka materialized API", function(done) {
     var triples = [{
-          subject: "daniele",
-          predicate: "newpredicate",
-          object: "abcde"
-        }]
+           subject: "daniele"
+         , predicate: "newpredicate"
+         , object: "abcde"
+        }] 
 
       , stream = db.joinStream([{
           subject: "matteo",

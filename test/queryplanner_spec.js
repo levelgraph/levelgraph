@@ -382,7 +382,7 @@ describe("query planner", function() {
       });
     });
 
-    it.skip("should use a SortJoinStream for another three-conditions query", function(done) {
+    it("should use a SortJoinStream for another three-conditions query", function(done) {
       query = [{
           subject: "matteo"
         , predicate: "friend"
