@@ -287,5 +287,152 @@ describe("query planner", function() {
         done();
       });
     });
+
+    it("should support inverting the index even on three-conditions queries", function(done) {
+      query = [{
+          subject: v("x")
+        , predicate: "friend"
+        , object: v("c")
+      }, {
+          subject: v("c")
+        , predicate: "friend"
+        , object: v("y")
+      }, {
+          subject: v("y")
+        , predicate: "friend"
+        , object: v("z")
+      }];
+      
+      expected = [{
+          subject: v("x")
+        , predicate: "friend"
+        , object: v("c")
+        , stream: JoinStream
+        , index: "pos"
+      }, {
+          subject: v("c")
+        , predicate: "friend"
+        , object: v("y")
+        , stream: SortJoinStream
+        , index: "pso"
+      }, {
+          subject: v("y")
+        , predicate: "friend"
+        , object: v("z")
+        , stream: SortJoinStream
+        , index: "pos"
+      }];
+
+      stub
+        .withArgs("pos::friend::", "pos::friend\xff", sinon.match.func)
+        .yields(null, 10);
+
+      planner(query, function(err, result) {
+        expect(result).to.eql(expected);
+        done();
+      });
+    });
+    
+    it("should put the variables from the previous condition in the same order", function(done) {
+      query = [{
+          subject: v("x0")
+        , predicate: "friend"
+        , object: "davide"
+      }, {
+          subject: v("x1")
+        , predicate: "friend"
+        , object: v("x0")
+      }, {
+          subject: v("x1")
+        , predicate: "friend"
+        , object: v("x2")
+      }];
+      
+      expected = [{
+          subject: v("x0")
+        , predicate: "friend"
+        , object: "davide"
+        , stream: JoinStream
+        , index: "pos"
+      }, {
+          subject: v("x1")
+        , predicate: "friend"
+        , object: v("x0")
+        , stream: SortJoinStream
+        , index: "pos"
+      }, {
+          subject: v("x1")
+        , predicate: "friend"
+        , object: v("x2")
+        , stream: SortJoinStream
+        , index: "pso"
+      }];
+
+      stub
+        .withArgs("pos::friend::", "pos::friend\xff", sinon.match.func)
+        .yields(null, 10);
+
+      stub
+        .withArgs("ops::davide::friend::", "ops::davide::friend\xff", sinon.match.func)
+        .yields(null, 1);
+
+      planner(query, function(err, result) {
+        expect(result).to.eql(expected);
+        done();
+      });
+    });
+
+    it.skip("should use a SortJoinStream for another three-conditions query", function(done) {
+      query = [{
+          subject: "matteo"
+        , predicate: "friend"
+        , object: v("x")
+      }, {
+          subject: v("x")
+        , predicate: "friend"
+        , object: v("y")
+      }, {
+          subject: v("y")
+        , predicate: "friend"
+        , object: "daniele"
+      }];
+      
+      expected = [{
+          subject: "matteo"
+        , predicate: "friend"
+        , object: v("x")
+        , stream: JoinStream
+        , index: "pso"
+      }, {
+          subject: v("x")
+        , predicate: "friend"
+        , object: v("y")
+        , stream: SortJoinStream
+        , index: "pso"
+      }, {
+          subject: v("y")
+        , predicate: "friend"
+        , object: "daniele"
+        , stream: SortJoinStream
+        , index: "pos"
+      }];
+
+      stub
+        .withArgs("pos::friend::", "pos::friend\xff", sinon.match.func)
+        .yields(null, 10);
+
+      stub
+        .withArgs("pso::friend::matteo::", "pso::friend::matteo\xff", sinon.match.func)
+        .yields(null, 1);
+
+      stub
+        .withArgs("ops::daniele::friend::", "ops::daniele::friend\xff", sinon.match.func)
+        .yields(null, 100);
+
+      planner(query, function(err, result) {
+        expect(result).to.eql(expected);
+        done();
+      });
+    });
   });
 });
