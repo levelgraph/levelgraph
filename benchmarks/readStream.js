@@ -1,53 +1,45 @@
-var levelup = require("levelup");
-var levelgraph = require("../");
+var level = require("level-test")()
 
-var tmp = require("tmp");
+  , levelgraph = require("../")
 
-tmp.dir(function(err, dir) {
-  if (err) {
-    console.log(err);
-    process.exit(1);
-  }
+  , db = levelgraph(level())
 
-  var db = levelgraph(levelup(dir));
+  , startCounts = 100000
+  , counts = startCounts
 
-  var startCounts = 100000;
-  var counts = startCounts;
+  , startTime
+  , endTime
 
-  var startTime;
-  var endTime;
+  , doWrites = function() {
+      if(--counts === 0) {
+        startTime = new Date();
+        counts = startCounts;
+        doReads();
+        return;
+      }
 
-  var doWrites = function() {
-    if(--counts === 0) {
-      startTime = new Date();
-      counts = startCounts;
-      doReads();
-      return;
+      var triple = { 
+        subject: "s" + counts,
+        predicate: "p" + counts,
+        object: "o" + counts
+      };
+
+      db.put(triple, doWrites);
     }
 
-    var triple = { 
-      subject: "s" + counts,
-      predicate: "p" + counts,
-      object: "o" + counts
+  , doReads = function() {
+
+      var stream = db.getStream({});
+      stream.on("data", function() {
+        counts--;
+      });
+      stream.on("end", function() {
+        endTime = new Date();
+        var totalTime = endTime - startTime;
+        console.log("total time", totalTime);
+        console.log("reads/s", startCounts / totalTime * 1000);
+        db.close();
+      });
     };
 
-    db.put(triple, doWrites);
-  };
-
-  var doReads = function() {
-
-    var stream = db.getStream({});
-    stream.on("data", function() {
-      counts--;
-    });
-    stream.on("end", function() {
-      endTime = new Date();
-      var totalTime = endTime - startTime;
-      console.log("total time", totalTime);
-      console.log("reads/s", startCounts / totalTime * 1000);
-      db.close();
-    });
-  };
-
-  doWrites();
-});
+doWrites();

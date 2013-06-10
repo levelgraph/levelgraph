@@ -16,13 +16,15 @@ C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
 Following this approach, __LevelGraph__ uses six indices for every triple,
 in order to access them as fast as it is possible.
 
+[![Project Status](http://githubkanban.herokuapp.com/images/mcollina_node-levelgraph.png)](http://bit.ly/ZJ9Qta)
+
 ## Install
 
 [![Build
 Status](https://travis-ci.org/mcollina/node-levelgraph.png)](https://travis-ci.org/mcollina/node-levelgraph)
 
 ```
-npm install levelup levelgraph --save
+npm install level levelgraph --save
 ```
 
 At the moment it requires node v0.10.x, but the port to node v0.8.x
@@ -33,9 +35,9 @@ If you need it, just open a pull request.
 
 Initializing a database is very easy:
 ```
-var levelup = require("levelup");
+var levelup = require("level");
 var levelgraph = require("../");
-var db = levelgraph(levelup(dir));
+var db = levelgraph(level("yourdb"));
 ```
 
 ### Get and Put

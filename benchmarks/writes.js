@@ -1,40 +1,31 @@
 
-var levelup = require("levelup");
-var levelgraph = require("../");
+var level = require("level-test")()
+  , levelgraph = require("../")
 
-var tmp = require("tmp");
+  , db = levelgraph(level())
 
-tmp.dir(function(err, dir) {
-  if (err) {
-    console.log(err);
-    process.exit(1);
-  }
+  , startCounts = 100000
+  , counts = startCounts
 
-  var db = levelgraph(levelup(dir));
+  , startTime = new Date()
+  , endTime
 
-  var startCounts = 100000;
-  var counts = startCounts;
+  , doBench = function() {
+      if(--counts === 0) {
+        endTime = new Date();
+        var totalTime = endTime - startTime;
+        console.log("total time", totalTime);
+        console.log("writes/s", startCounts / totalTime * 1000);
+        return;
+      }
 
-  var startTime = new Date();
-  var endTime;
+      var triple = { 
+        subject: "s" + counts,
+        predicate: "p" + counts,
+        object: "o" + counts
+      };
 
-  var doBench = function() {
-    if(--counts === 0) {
-      endTime = new Date();
-      var totalTime = endTime - startTime;
-      console.log("total time", totalTime);
-      console.log("writes/s", startCounts / totalTime * 1000);
-      return;
-    }
-
-    var triple = { 
-      subject: "s" + counts,
-      predicate: "p" + counts,
-      object: "o" + counts
+      db.put(triple, doBench);
     };
 
-    db.put(triple, doBench);
-  };
-
-  doBench();
-});
+doBench();
