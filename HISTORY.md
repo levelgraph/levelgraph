@@ -2,6 +2,12 @@
 History
 ======
 
+## 0.5.0
+
+* Upgrade to levelup 0.9 through as a peer depedency
+* Sort-Join algorithm for faster joins (3x)
+* Added a `putStream` and a `delStream`
+
 ## 0.3.0
 
 * Basic query planner based on levelup's approximateSize
