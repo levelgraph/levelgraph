@@ -16,12 +16,10 @@ C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
 Following this approach, __LevelGraph__ uses six indices for every triple,
 in order to access them as fast as it is possible.
 
+[![Build Status](https://travis-ci.org/mcollina/node-levelgraph.png)](https://travis-ci.org/mcollina/node-levelgraph)
 [![Project Status](http://githubkanban.herokuapp.com/images/mcollina_node-levelgraph.png)](http://bit.ly/ZJ9Qta)
 
 ## Install
-
-[![Build
-Status](https://travis-ci.org/mcollina/node-levelgraph.png)](https://travis-ci.org/mcollina/node-levelgraph)
 
 ```
 npm install level levelgraph --save
@@ -324,9 +322,14 @@ pull-request__.
 
 Here are some ideas:
 
-* [ ] Return the matching triples in the JOIN results.
-* [ ] Support for Query Planning in JOIN.
-* [ ] Add more database operators.
+* [x] Return the matching triples in the JOIN results.
+* [x] Support for Query Planning in JOIN.
+* [x] Added a Sort-Join algorithm.
+* [ ] Add more database operators (grouping, filtering).
+* [ ] Browser support
+  [#10](https://github.com/mcollina/node-levelgraph/issues/10)
+* [ ] Live Joins 
+  [#3](https://github.com/mcollina/node-levelgraph/issues/3)
 
 ## Contributing to LevelGraph 
 
