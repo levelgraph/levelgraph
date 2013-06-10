@@ -87,7 +87,6 @@ module.exports = function(joinAlgorithm) {
 
     stream.on("data", function(data) {
       var expected = contexts.shift();
-      console.log("----> DATA", data);
       expect(data).to.eql(expected);
     });
 
@@ -110,7 +109,6 @@ module.exports = function(joinAlgorithm) {
         }]);
 
     stream.on("data", function(data) {
-      console.log("----> DATA", data);
       expect(data).to.eql(contexts.shift());
     });
 
@@ -137,7 +135,6 @@ module.exports = function(joinAlgorithm) {
         }]);
 
     stream.on("data", function(data) {
-      console.log("----> DATA", data);
       expect(data).to.eql(contexts.shift());
     });
 
@@ -195,7 +192,6 @@ module.exports = function(joinAlgorithm) {
         }]);
 
     stream.on("data", function(data) {
-      console.log("---> Data", data);
       expect(data).to.eql(contexts.shift());
     });
 
