@@ -132,39 +132,6 @@ describe("query planner", function() {
       });
     });
 
-    it("should use the same index if there is a possible matching", function(done) {
-      query = [{
-          subject: "matteo"
-        , predicate: "friend"
-      }, {
-          predicate: "friend"
-      }];
-
-      expected = [{
-          subject: "matteo"
-        , predicate: "friend"
-        , stream: JoinStream
-        , index: "pso"
-      }, {
-          predicate: "friend"
-        , stream: SortJoinStream
-        , index: "pso"
-      }];
-
-      stub
-        .withArgs("pos::friend::", "pos::friend\xff")
-        .yields(null, 10);
-
-      stub
-        .withArgs("pso::friend::matteo::", "pso::friend::matteo\xff")
-        .yields(null, 1);
-
-      planner(query, function(err, result) {
-        expect(result).to.eql(expected);
-        done();
-      });
-    });
-
     it("should put the second condition in the same order as the first", function(done) {
       query = [{
           subject: v("x")
@@ -353,7 +320,7 @@ describe("query planner", function() {
         , predicate: "friend"
         , object: "davide"
         , stream: JoinStream
-        , index: "pos"
+        , index: "ops"
       }, {
           subject: v("x1")
         , predicate: "friend"
@@ -414,7 +381,7 @@ describe("query planner", function() {
         , predicate: "friend"
         , object: "daniele"
         , stream: SortJoinStream
-        , index: "pos"
+        , index: "ops"
       }];
 
       stub
@@ -476,6 +443,55 @@ describe("query planner", function() {
 
       stub
         .withArgs("pso::friend::matteo::", "pso::friend::matteo\xff", sinon.match.func)
+        .yields(null, 1);
+
+      planner(query, function(err, result) {
+        expect(result).to.eql(expected);
+        done();
+      });
+    });
+
+    it("should pick the correct indexes with multiple predicates going out the same subject", function(done) {
+      query = [{
+          subject: v("a")
+        , predicate: "friend"
+        , object: "marco"
+      }, {
+          subject: v("a")
+        , predicate: "friend"
+        , object: v("x1")
+      }, {
+          subject: v("x1")
+        , predicate: "friend"
+        , object: v("a")
+      }];
+      
+      expected = [{
+          subject: v("a")
+        , predicate: "friend"
+        , object: "marco"
+        , stream: JoinStream
+        , index: "ops"
+      }, {
+          subject: v("a")
+        , predicate: "friend"
+        , object: v("x1")
+        , stream: SortJoinStream
+        , index: "pso"
+      }, {
+          subject: v("x1")
+        , predicate: "friend"
+        , object: v("a")
+        , stream: SortJoinStream
+        , index: "pos"
+      }];
+
+      stub
+        .withArgs("pos::friend::", "pos::friend\xff", sinon.match.func)
+        .yields(null, 10);
+
+      stub
+        .withArgs("ops::marco::friend::", "ops::marco::friend\xff", sinon.match.func)
         .yields(null, 1);
 
       planner(query, function(err, result) {

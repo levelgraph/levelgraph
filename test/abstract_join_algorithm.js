@@ -72,8 +72,7 @@ module.exports = function(joinAlgorithm) {
   });
 
   it("should allow to find mutual friends", function(done) {
-    //var contexts = [{ x: "daniele", y: "matteo" }, { x: "matteo", y: "daniele" }]
-    var contexts = [{ x: "matteo", y: "daniele" }, { x: "daniele", y: "matteo" }]
+    var contexts = [{ x: "daniele", y: "matteo" }, { x: "matteo", y: "daniele" }]
 
       , stream = db.joinStream([{
           subject: db.v("x"),
@@ -86,8 +85,20 @@ module.exports = function(joinAlgorithm) {
         }]);
 
     stream.on("data", function(data) {
-      var expected = contexts.shift();
-      expect(data).to.eql(expected);
+      var contextIndex = -1;
+
+      contexts.forEach(function(context, i) {
+        var found = Object.keys(contexts).every(function(v) {
+          return context[v] == data[v];
+        });
+        if (found) {
+          contextIndex = i;
+        }
+      });
+
+      if (contextIndex !== -1) {
+        contexts.splice(contextIndex, 1);
+      }
     });
 
     stream.on("end", function() {
