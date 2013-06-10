@@ -1,29 +1,21 @@
 
 var levelgraph = require("../");
-var levelup = require("levelup");
-var tmp = require("tmp");
+var level = require("level-test")();
 
-describe("join support", function() {
+module.exports = function(joinAlgorithm) {
 
   var db;
 
   beforeEach(function(done) {
-    tmp.dir(function(err, dir) {
-      if (err) {
-        done(err);
-        return;
-      }
-
-      db = levelgraph(levelup(dir));
-      db.put(require("./fixture/foaf"), done);
-    });
+    db = levelgraph(level(), { joinAlgorithm: joinAlgorithm });
+    db.put(require("./fixture/foaf"), done);
   });
 
   afterEach(function(done) {
     db.close(done);
   });
 
-  it("should a join with one results", function(done) {
+  it("should do a join with one results", function(done) {
     db.join([{
       subject: db.v("x"),
       predicate: "friend",
@@ -31,23 +23,6 @@ describe("join support", function() {
     }], function(err, results) {
       expect(results).to.have.property("length", 1);
       expect(results[0]).to.have.property("x", "matteo");
-      done();
-    });
-  });
-
-  it("should a join with two results", function(done) {
-    db.join([{
-      subject: db.v("x"),
-      predicate: "friend",
-      object: "marco"
-    }, {
-      subject: db.v("x"),
-      predicate: "friend",
-      object: "matteo"
-    }], function(err, results) {
-      expect(results).to.have.property("length", 2);
-      expect(results[0]).to.have.property("x", "daniele");
-      expect(results[1]).to.have.property("x", "lucio");
       done();
     });
   });
@@ -89,7 +64,8 @@ describe("join support", function() {
   });
 
   it("should allow to find mutual friends", function(done) {
-    var contexts = [{ x: "matteo", y: "daniele" }, { x: "daniele", y: "matteo" }]
+    var contexts = [{ x: "daniele", y: "matteo" }, { x: "matteo", y: "daniele" }]
+
       , stream = db.joinStream([{
           subject: db.v("x"),
           predicate: "friend",
@@ -101,7 +77,20 @@ describe("join support", function() {
         }]);
 
     stream.on("data", function(data) {
-      expect(data).to.eql(contexts.shift());
+      var contextIndex = -1;
+
+      contexts.forEach(function(context, i) {
+        var found = Object.keys(contexts).every(function(v) {
+          return context[v] == data[v];
+        });
+        if (found) {
+          contextIndex = i;
+        }
+      });
+
+      if (contextIndex !== -1) {
+        contexts.splice(contextIndex, 1);
+      }
     });
 
     stream.on("end", function() {
@@ -187,12 +176,40 @@ describe("join support", function() {
     });
   });
 
+  it("should support a friend-of-a-friend-of-a-friend scenario", function(done) {
+
+    var contexts = [{ x: "daniele", y: "marco", z: "davide" }, { x: "daniele", y: "matteo", z: "daniele" }]
+
+      , stream = db.joinStream([{
+          subject: "matteo",
+          predicate: "friend",
+          object: db.v("x")
+        }, {
+          subject: db.v("x"),
+          predicate: "friend",
+          object: db.v("y")
+        }, {
+          subject: db.v("y"),
+          predicate: "friend",
+          object: db.v("z")
+        }]);
+
+    stream.on("data", function(data) {
+      expect(data).to.eql(contexts.shift());
+    });
+
+    stream.on("end", function() {
+      expect(contexts).to.have.property("length", 0);
+      done();
+    });
+  });
+
   it("should emit triples from the stream interface aka materialized API", function(done) {
     var triples = [{
-          subject: "daniele",
-          predicate: "newpredicate",
-          object: "abcde"
-        }]
+           subject: "daniele"
+         , predicate: "newpredicate"
+         , object: "abcde"
+        }] 
 
       , stream = db.joinStream([{
           subject: "matteo",
@@ -223,4 +240,4 @@ describe("join support", function() {
       done();
     });
   });
-});
+};
