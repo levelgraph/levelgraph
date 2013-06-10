@@ -195,6 +195,7 @@ module.exports = function(joinAlgorithm) {
         }]);
 
     stream.on("data", function(data) {
+      console.log("---> Data", data);
       expect(data).to.eql(contexts.shift());
     });
 
