@@ -320,7 +320,7 @@ describe("query planner", function() {
         , predicate: "friend"
         , object: v("z")
         , stream: SortJoinStream
-        , index: "pos"
+        , index: "pso"
       }];
 
       stub
@@ -428,6 +428,55 @@ describe("query planner", function() {
       stub
         .withArgs("ops::daniele::friend::", "ops::daniele::friend\xff", sinon.match.func)
         .yields(null, 100);
+
+      planner(query, function(err, result) {
+        expect(result).to.eql(expected);
+        done();
+      });
+    });
+
+    it("should use a SortJoinStream for the friend-of-a-friend-of-a-friend scenario", function(done) {
+      query = [{
+          subject: "matteo"
+        , predicate: "friend"
+        , object: v("x")
+      }, {
+          subject: v("x")
+        , predicate: "friend"
+        , object: v("y")
+      }, {
+          subject: v("y")
+        , predicate: "friend"
+        , object: v("z")
+      }];
+      
+      expected = [{
+          subject: "matteo"
+        , predicate: "friend"
+        , object: v("x")
+        , stream: JoinStream
+        , index: "pso"
+      }, {
+          subject: v("x")
+        , predicate: "friend"
+        , object: v("y")
+        , stream: SortJoinStream
+        , index: "pso"
+      }, {
+          subject: v("y")
+        , predicate: "friend"
+        , object: v("z")
+        , stream: SortJoinStream
+        , index: "pso"
+      }];
+
+      stub
+        .withArgs("pos::friend::", "pos::friend\xff", sinon.match.func)
+        .yields(null, 10);
+
+      stub
+        .withArgs("pso::friend::matteo::", "pso::friend::matteo\xff", sinon.match.func)
+        .yields(null, 1);
 
       planner(query, function(err, result) {
         expect(result).to.eql(expected);
