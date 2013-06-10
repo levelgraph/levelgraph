@@ -16,15 +16,13 @@ C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
 Following this approach, __LevelGraph__ uses six indices for every triple,
 in order to access them as fast as it is possible.
 
+[![Build Status](https://travis-ci.org/mcollina/node-levelgraph.png)](https://travis-ci.org/mcollina/node-levelgraph)
 [![Project Status](http://githubkanban.herokuapp.com/images/mcollina_node-levelgraph.png)](http://bit.ly/ZJ9Qta)
 
 ## Install
 
-[![Build
-Status](https://travis-ci.org/mcollina/node-levelgraph.png)](https://travis-ci.org/mcollina/node-levelgraph)
-
 ```
-npm install levelup levelgraph --save
+npm install level levelgraph --save
 ```
 
 At the moment it requires node v0.10.x, but the port to node v0.8.x
@@ -35,9 +33,9 @@ If you need it, just open a pull request.
 
 Initializing a database is very easy:
 ```
-var levelup = require("levelup");
+var levelup = require("level");
 var levelgraph = require("../");
-var db = levelgraph(levelup(dir));
+var db = levelgraph(level("yourdb"));
 ```
 
 ### Get and Put
@@ -194,6 +192,7 @@ db.del(triple, function(err) {
 });
 ```
 
+<<<<<<< HEAD
 ## Navigator API
 
 The Navigator API is a fluent API for LevelGraph, loosely inspired by
@@ -295,6 +294,23 @@ db.nav("marco").archIn("friend").as("a").go("matteo").archOut("friend").as("b").
    //     b: "daniele"
    //   }]
 
+=======
+### Putting and Deleting through Streams
+
+It is also possible to `put` or `del` triples from the store
+using a `Stream2` interface:
+
+```
+var t1 = { subject: "a", predicate: "b", object: "c" };
+var t2 = { subject: "a", predicate: "b", object: "d" };
+var stream = db.putStream();
+
+stream.write(t1);
+stream.end(t2);
+
+stream.on("close", function() {
+  // do something, the writes are done
+>>>>>>> write-streams
 });
 ```
 
@@ -306,9 +322,14 @@ pull-request__.
 
 Here are some ideas:
 
-* [ ] Return the matching triples in the JOIN results.
-* [ ] Support for Query Planning in JOIN.
-* [ ] Add more database operators.
+* [x] Return the matching triples in the JOIN results.
+* [x] Support for Query Planning in JOIN.
+* [x] Added a Sort-Join algorithm.
+* [ ] Add more database operators (grouping, filtering).
+* [ ] Browser support
+  [#10](https://github.com/mcollina/node-levelgraph/issues/10)
+* [ ] Live Joins 
+  [#3](https://github.com/mcollina/node-levelgraph/issues/3)
 
 ## Contributing to LevelGraph 
 

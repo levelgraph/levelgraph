@@ -1,6 +1,6 @@
 {
   "name": "levelgraph",
-  "version": "0.4.0",
+  "version": "0.5.0-dev",
   "description": "A graph database built on top of LevelUp",
   "main": "index.js",
   "scripts": {
@@ -27,17 +27,19 @@
   "author": "Matteo Collina <hello@matteocollina.com>",
   "license": "MIT",
   "devDependencies": {
-    "mocha": "~1.8.1",
-    "chai": "~1.3.0",
+    "mocha": "~1.10.0",
+    "chai": "~1.6.0",
     "sinon": "~1.4.2",
     "sinon-chai": "~2.1.2",
     "jshint": "~1.1.0",
-    "tmp": "0.0.18"
+    "level-test": "~1.2.1"
   },
   "dependencies": {
-    "levelup": "~0.8.0",
     "xtend": "~2.0.3",
     "callback-stream": "~1.0.0",
     "async": "~0.2.8"
+  },
+  "peerDependencies": {
+    "level": "~0.9.0"
   }
 }

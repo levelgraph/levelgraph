@@ -1,19 +1,13 @@
 
-var levelgraph = require("../");
-var levelup = require("levelup");
-var tmp = require("tmp");
+var levelgraph = require("../")
+  , level = require("level-test")();
 
 describe("a basic triple store", function() {
 
   var db;
 
-  beforeEach(function(done) {
-    tmp.dir(function(err, dir) {
-      if (dir) {
-        db = levelgraph(levelup(dir));
-      }
-      done(err);
-    });
+  beforeEach(function() {
+    db = levelgraph(level());
   });
 
   afterEach(function(done) {
@@ -146,6 +140,66 @@ describe("a basic triple store", function() {
       });
 
       stream.on("end", done);
+    });
+  });
+
+  it("should put triples using a stream", function(done) {
+    var t1 = { subject: "a", predicate: "b", object: "c" };
+    var t2 = { subject: "a", predicate: "b", object: "d" };
+    var stream = db.putStream();
+    stream.on("close", done);
+
+    stream.write(t1);
+    stream.end(t2);
+  });
+
+  it("should store the triples written using a stream", function(done) {
+    var t1 = { subject: "a", predicate: "b", object: "c" };
+    var t2 = { subject: "a", predicate: "b", object: "d" };
+    var stream = db.putStream();
+
+    stream.write(t1);
+    stream.end(t2);
+
+    stream.on("close", function() {
+      var triples = [t1, t2];
+      var readStream = db.getStream({ predicate: "b" });
+
+      readStream.on("data", function(data) {
+        expect(data).to.eql(triples.shift());
+      });
+
+      readStream.on("end", done);
+    });
+  });
+
+  it("should del the triples using a stream", function(done) {
+    var t1 = { subject: "a", predicate: "b", object: "c" };
+    var t2 = { subject: "a", predicate: "b", object: "d" };
+    var stream = db.putStream();
+
+    stream.write(t1);
+    stream.end(t2);
+
+    stream.on("close", function() {
+
+      var delStream = db.delStream();
+      delStream.write(t1);
+      delStream.end(t2);
+
+      delStream.on("close", function() {
+        var readStream = db.getStream({ predicate: "b" });
+
+        var results = [];
+        readStream.on("data", function(data) {
+          results.push(data);
+        });
+
+        readStream.on("end", function() {
+          expect(results).to.have.property("length", 0);
+          done();
+        });
+      });
     });
   });
 });
