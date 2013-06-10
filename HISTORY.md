@@ -2,6 +2,10 @@
 History
 ======
 
+## 0.5.1
+
+* Improved README.
+
 ## 0.5.0
 
 * Upgrade to levelup 0.9 through as a peer depedency
