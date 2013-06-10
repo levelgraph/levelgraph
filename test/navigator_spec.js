@@ -46,7 +46,10 @@ describe("navigator", function() {
 
   it("should follow multiple archs, in and out a path", 
      function(done) {
-    db.nav("davide").archIn("friend").archIn("friend").archOut("friend").
+    db.nav("davide")
+      .archIn("friend")
+      .archIn("friend")
+      .archOut("friend").
       values(function(err, friends) {
 
       expect(friends).to.eql(["marco", "matteo"]);
