@@ -194,6 +194,7 @@ db.del(triple, function(err) {
 });
 ```
 
+<<<<<<< HEAD
 ## Navigator API
 
 The Navigator API is a fluent API for LevelGraph, loosely inspired by
@@ -295,6 +296,23 @@ db.nav("marco").archIn("friend").as("a").go("matteo").archOut("friend").as("b").
    //     b: "daniele"
    //   }]
 
+=======
+### Putting and Deleting through Streams
+
+It is also possible to `put` or `del` triples from the store
+using a `Stream2` interface:
+
+```
+var t1 = { subject: "a", predicate: "b", object: "c" };
+var t2 = { subject: "a", predicate: "b", object: "d" };
+var stream = db.putStream();
+
+stream.write(t1);
+stream.end(t2);
+
+stream.on("close", function() {
+  // do something, the writes are done
+>>>>>>> write-streams
 });
 ```
 
