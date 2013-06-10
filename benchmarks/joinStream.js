@@ -21,6 +21,7 @@ tmp.dir(function(err, dir) {
 
   var doWrites = function() {
     if(--counts === 0) {
+      console.log("done writing");
       startTime = new Date();
       doReads();
       return;
@@ -52,6 +53,9 @@ tmp.dir(function(err, dir) {
 
     stream.on("data", function() {
       counts++;
+      if (counts % 100 === 0) {
+        console.log(counts);
+      }
     });
     stream.on("end", function() {
       endTime = new Date();
