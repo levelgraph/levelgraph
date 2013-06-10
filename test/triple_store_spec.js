@@ -1,19 +1,13 @@
 
-var levelgraph = require("../");
-var levelup = require("levelup");
-var tmp = require("tmp");
+var levelgraph = require("../")
+  , level = require("level-test")();
 
 describe("a basic triple store", function() {
 
   var db;
 
-  beforeEach(function(done) {
-    tmp.dir(function(err, dir) {
-      if (dir) {
-        db = levelgraph(levelup(dir));
-      }
-      done(err);
-    });
+  beforeEach(function() {
+    db = levelgraph(level());
   });
 
   afterEach(function(done) {

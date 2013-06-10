@@ -1,22 +1,14 @@
 
 var levelgraph = require("../");
-var levelup = require("levelup");
-var tmp = require("tmp");
+var level = require("level-test")();
 
 describe("join support", function() {
 
   var db;
 
   beforeEach(function(done) {
-    tmp.dir(function(err, dir) {
-      if (err) {
-        done(err);
-        return;
-      }
-
-      db = levelgraph(levelup(dir));
-      db.put(require("./fixture/foaf"), done);
-    });
+    db = levelgraph(level());
+    db.put(require("./fixture/foaf"), done);
   });
 
   afterEach(function(done) {

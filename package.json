@@ -32,12 +32,15 @@
     "sinon": "~1.4.2",
     "sinon-chai": "~2.1.2",
     "jshint": "~1.1.0",
-    "tmp": "0.0.18"
+    "level-test": "~1.2.1"
   },
   "dependencies": {
-    "levelup": "~0.8.0",
     "xtend": "~2.0.3",
     "callback-stream": "~1.0.0",
     "async": "~0.2.8"
+  },
+  "peerDependencies": {
+    "level": "~0.9.0",
+    "levelup": "~0.9.0"
   }
 }

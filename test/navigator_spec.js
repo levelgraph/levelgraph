@@ -1,22 +1,14 @@
 
 var levelgraph = require("../")
-  , levelup = require("levelup")
-  , tmp = require("tmp");
+  , level = require("level-test")();
 
 describe("navigator", function() {
 
   var db;
 
   beforeEach(function(done) {
-    tmp.dir(function(err, dir) {
-      if (err) {
-        done(err);
-        return;
-      }
-
-      db = levelgraph(levelup(dir));
-      db.put(require("./fixture/foaf"), done);
-    });
+    db = levelgraph(level());
+    db.put(require("./fixture/foaf"), done);
   });
 
   afterEach(function(done) {
