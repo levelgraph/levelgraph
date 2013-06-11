@@ -34,7 +34,7 @@ If you need it, just open a pull request.
 Initializing a database is very easy:
 ```
 var levelup = require("level");
-var levelgraph = require("../");
+var levelgraph = require("levelgraph");
 var db = levelgraph(level("yourdb"));
 ```
 
