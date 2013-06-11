@@ -2,6 +2,10 @@
 History
 ======
 
+## 0.5.2
+
+* Fixed example in the README.
+
 ## 0.5.1
 
 * Improved README.
