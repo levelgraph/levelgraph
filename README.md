@@ -22,7 +22,7 @@ in order to access them as fast as it is possible.
 ## Install
 
 ```
-npm install level levelgraph --save
+npm install levelgraph --save
 ```
 
 At the moment it requires node v0.10.x, but the port to node v0.8.x
@@ -35,7 +35,7 @@ Initializing a database is very easy:
 ```
 var levelup = require("level");
 var levelgraph = require("levelgraph");
-var db = levelgraph(level("yourdb"));
+var db = levelgraph(levelup("yourdb"));
 ```
 
 ### Get and Put
