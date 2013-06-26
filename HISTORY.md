@@ -2,6 +2,11 @@
 History
 ======
 
+## 0.5.3
+
+* Fixed installation instructions in the README,
+  thanks to @jez0990.
+
 ## 0.5.2
 
 * Fixed example in the README.
