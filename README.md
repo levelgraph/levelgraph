@@ -314,6 +314,19 @@ stream.on("close", function() {
 });
 ```
 
+## Browserify
+
+Simply `require("levelgraph")` in your browser modules and use [level.js](https://github.com/maxogden/level.js) instead of `level`:
+
+```
+var levelgraph = require("levelgraph");
+var leveljs = require("level-js");
+var levelup = require("levelup");
+var factory = function (location) { return new leveljs(location) };
+
+var db = levelgraph(levelup("yourdb", { db: factory }));
+```
+
 ## TODO
 
 There are plenty of things that this library is missing.
