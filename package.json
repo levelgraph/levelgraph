@@ -32,7 +32,8 @@
     "sinon": "~1.4.2",
     "sinon-chai": "~2.1.2",
     "jshint": "~1.1.0",
-    "level-test": "~1.2.1"
+    "level-test": "~1.2.1",
+    "beefy": "~0.3.0"
   },
   "dependencies": {
     "xtend": "~2.0.3",
@@ -52,8 +53,8 @@
   },
   "testling": {
     "browsers": [
-      "ie6", "ie7", "ie8", "ie9",
-      "firefox/15", "chrome/22", "opera/12", "safari/5.1"
+      "ie/9..latest",
+      "firefox/15..latest", "chrome/22..latest", "opera/12..latest", "safari/5.1..latest"
     ],
     "harness": "mocha",
     "files": "test/*.js"
