@@ -57,6 +57,6 @@
       "firefox/15..latest", "chrome/22..latest", "opera/12..latest", "safari/5.1..latest"
     ],
     "harness": "mocha",
-    "files": "test/*.js"
+    "files": "test/browser.js"
   }
 }
