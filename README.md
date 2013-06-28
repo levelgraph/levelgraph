@@ -18,6 +18,7 @@ in order to access them as fast as it is possible.
 
 [![Build Status](https://travis-ci.org/mcollina/node-levelgraph.png)](https://travis-ci.org/mcollina/node-levelgraph)
 [![Project Status](http://githubkanban.herokuapp.com/images/mcollina_node-levelgraph.png)](http://bit.ly/ZJ9Qta)
+[![browser support](http://ci.testling.com/mcollina/node-levelgraph.png)](http://ci.testling.com/mcollina/node-levelgraph)
 
 ## Install
 
