@@ -317,6 +317,8 @@ stream.on("close", function() {
 
 ## Browserify
 
+You can use [browserify](https://github.com/substack/node-browserify) to bundle your module and all the dependencies, including levelgraph, into a single script-tag friendly js file for use in webpages.
+
 Simply `require("levelgraph")` in your browser modules and use [level.js](https://github.com/maxogden/level.js) instead of `level`:
 
 ```
@@ -327,6 +329,10 @@ var factory = function (location) { return new leveljs(location) };
 
 var db = levelgraph(levelup("yourdb", { db: factory }));
 ```
+
+### Testling
+
+Follow the [Testling install instructions](https://github.com/substack/testling#install) and run `testling` in the levelgraph directory to run the test suite against a headless browser using level.js
 
 ## TODO
 
@@ -340,7 +346,7 @@ Here are some ideas:
 * [x] Support for Query Planning in JOIN.
 * [x] Added a Sort-Join algorithm.
 * [ ] Add more database operators (grouping, filtering).
-* [ ] Browser support
+* [x] Browser support
   [#10](https://github.com/mcollina/node-levelgraph/issues/10)
 * [ ] Live Joins 
   [#3](https://github.com/mcollina/node-levelgraph/issues/3)
