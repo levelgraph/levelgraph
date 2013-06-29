@@ -32,14 +32,31 @@
     "sinon": "~1.4.2",
     "sinon-chai": "~2.1.2",
     "jshint": "~1.1.0",
-    "level-test": "~1.2.1"
+    "level-test": "~1.2.1",
+    "beefy": "~0.3.0"
   },
   "dependencies": {
     "xtend": "~2.0.3",
     "callback-stream": "~1.0.0",
-    "async": "~0.2.8"
+    "async": "~0.2.8",
+    "setimmediate": "~1.0.1",
+    "readable-stream": "~1.0.2"
   },
   "peerDependencies": {
-    "level": "~0.9.0"
+    "level": "~0.9.0",
+    "levelup": "~0.10.0",
+    "level-js": "~1.0.6"
+  },
+  "browser": {
+    "index.js": "browser.js",
+    "./lib/streamwrapper.js": "./lib/browserstreamwrapper.js"
+  },
+  "testling": {
+    "browsers": [
+      "ie/9..latest",
+      "firefox/15..latest", "chrome/22..latest", "opera/12..latest", "safari/5.1..latest"
+    ],
+    "harness": "mocha",
+    "files": "test/*.js"
   }
 }
