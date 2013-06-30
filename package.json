@@ -32,8 +32,7 @@
     "sinon": "~1.4.2",
     "sinon-chai": "~2.1.2",
     "jshint": "~1.1.0",
-    "level-test": "~1.2.1",
-    "beefy": "~0.3.0"
+    "level-test": "git://github.com:jez0990/level-test.git#f49c0e58e1"
   },
   "dependencies": {
     "xtend": "~2.0.3",
