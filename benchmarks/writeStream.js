@@ -1,19 +1,18 @@
-
 var level = require("level-test")()
   , levelgraph = require("../")
 
   , db = levelgraph(level())
 
-  , startCounts = 16777216
+  , startCounts = 10000
   , counts = startCounts
 
   , startTime = new Date()
   , endTime
 
+  , stream  = db.putStream()
+
   , doBench = function() {
-      if(counts % 10000 === 0) {
-        console.log(counts);
-      }
+
       if(--counts === 0) {
         endTime = new Date();
         var totalTime = endTime - startTime;
@@ -29,7 +28,12 @@ var level = require("level-test")()
         object: "o" + counts
       };
 
-      db.put(triple, doBench);
+      stream.write(triple);
+      if (counts % 100 === 0) {
+        setImmediate(doBench);
+      } else {
+        doBench();
+      }
     };
 
 doBench();
