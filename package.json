@@ -37,7 +37,8 @@
   "dependencies": {
     "xtend": "~2.0.3",
     "callback-stream": "~1.0.0",
-    "async": "~0.2.8"
+    "async": "~0.2.8",
+    "level-hooks": "~4.3.2"
   },
   "peerDependencies": {
     "level": "~0.9.0"
