@@ -373,9 +373,19 @@ Here are some ideas:
 and the LevelDB and Snappy teams from Google and additional contributors. 
 LevelDB and Snappy are both issued under the [New BSD Licence](http://opensource.org/licenses/BSD-3-Clause).*
 
+## Contributors
+
+LevelGraph is only possible due to the excellent work of the following contributors:
+
+<table><tbody>
+<tr><th align="left">Matteo Collina</th><td><a href="https://github.com/mcollina">GitHub/mcollina</a></td><td><a href="https://twitter.com/matteocollina">Twitter/@matteocollina</a></td></tr>
+<tr><th align="left">Jeremy Taylor</th><td><a
+href="https://github.com/jez0990">GitHub/jez0990</a></td></tr>
+</tbody></table>
+
 ## LICENSE - "MIT License"
 
-Copyright (c) 2013 Matteo Collina, http://matteocollina.com
+Copyright (c) 2013 Matteo Collina (http://matteocollina.com) and LevelGraph Contributors 
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
