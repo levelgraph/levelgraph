@@ -538,5 +538,43 @@ describe("query planner", function() {
         done();
       });
     });
+
+    it("should always put a live condition at the beginning", function(done) {
+      query = [{
+          subject: v("x")
+        , predicate: "friend"
+        , object: v("c")
+        , live: true
+      }, {
+          subject: v("x")
+        , predicate: "abc"
+        , object: v("c")
+      }];
+      
+      expected = [{
+          subject: v("x")
+        , predicate: "friend"
+        , object: v("c")
+        , stream: LiveJoinStream
+      }, {
+          subject: v("x")
+        , predicate: "abc"
+        , object: v("c")
+        , stream: JoinStream
+      }];
+
+      stub
+        .withArgs("pos::friend::", "pos::friend\xff", sinon.match.func)
+        .yields(null, 10);
+
+      stub
+        .withArgs("pos::abc::", "pos::abc\xff", sinon.match.func)
+        .yields(null, 1);
+
+      planner(query, function(err, result) {
+        expect(result).to.eql(expected);
+        done();
+      });
+    });
   });
 });
