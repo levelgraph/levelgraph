@@ -51,7 +51,7 @@ describe("live join algorithm", function() {
           , object: "code"
           , live: true
         }, {
-            subject: db.v("person")
+            subject: db.v("coder")
           , predicate: "friend"
           , object: db.v("friend")
         }]);
