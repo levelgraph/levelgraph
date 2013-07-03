@@ -38,7 +38,6 @@
     "xtend": "~2.0.3",
     "callback-stream": "~1.0.0",
     "async": "~0.2.8",
-    "setimmediate": "~1.0.1",
     "readable-stream": "~1.0.2"
   },
   "peerDependencies": {
@@ -47,7 +46,6 @@
     "level-js": "~1.0.6"
   },
   "browser": {
-    "index.js": "browser.js",
     "./lib/streamwrapper.js": "./lib/browserstreamwrapper.js"
   },
   "testling": {
