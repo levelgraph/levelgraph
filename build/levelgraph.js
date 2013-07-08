@@ -1,22 +1,5 @@
 (function(e){if("function"==typeof bootstrap)bootstrap("levelgraph",e);else if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else if("undefined"!=typeof ses){if(!ses.ok())return;ses.makeLevelgraph=e}else"undefined"!=typeof window?window.levelgraph=e():global.levelgraph=e()})(function(){var define,ses,bootstrap,module,exports;
 return (function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require=="function"&&require;if(!s&&o)return o(n,!0);if(r)return r(n,!0);throw new Error("Cannot find module '"+n+"'")}var u=t[n]={exports:{}};e[n][0].call(u.exports,function(t){var r=e[n][1][t];return i(r?r:t)},u,u.exports)}return t[n].exports}var r=typeof require=="function"&&require;for(var s=0;s<n.length;s++)i(n[s]);return i})({1:[function(require,module,exports){
-
-var Leveljs = require("level-js")
-  , levelup = require("levelup")
-  , levelgraph = require("levelgraph");
-
-module.exports = function(name, opts) {
-  opts = opts || {};
-  opts.db = function(l) { return new Leveljs(l); };
-  return levelgraph(levelup(name, opts));
-};
-
-},{"level-js":"AGZKLE","levelgraph":"1A8W9U","levelup":"yHv6bk"}],"levelgraph":[function(require,module,exports){
-module.exports=require('1A8W9U');
-},{}],"1A8W9U":[function(require,module,exports){
-module.exports = require("./lib/levelgraph");
-
-},{"./lib/levelgraph":2}],3:[function(require,module,exports){
 var events = require('events');
 
 exports.isArray = isArray;
@@ -369,7 +352,7 @@ exports.format = function(f) {
   return str;
 };
 
-},{"events":4}],5:[function(require,module,exports){
+},{"events":2}],3:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -423,7 +406,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],4:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 (function(process){if (!process.EventEmitter) process.EventEmitter = function () {};
 
 var EventEmitter = exports.EventEmitter = process.EventEmitter;
@@ -609,7 +592,44 @@ EventEmitter.prototype.listeners = function(type) {
 };
 
 })(require("__browserify_process"))
-},{"__browserify_process":5}],"level-js":[function(require,module,exports){
+},{"__browserify_process":3}],4:[function(require,module,exports){
+
+function Variable(name) {
+  if (!(this instanceof Variable)) {
+    return new Variable(name);
+  }
+
+  this.name = name;
+}
+
+Variable.prototype.bind = function(context, value) {
+  var newContext = {};
+
+  Object.keys(context).reduce(function(acc, key) {
+    acc[key] = context[key];
+    return acc;
+  }, newContext);
+
+  newContext[this.name] = value;
+
+  return newContext;
+};
+
+Variable.prototype.isBound = function(context) {
+  if(context[this.name]) {
+    return true;
+  }
+
+  return false;
+};
+
+Variable.prototype.isBindable = function(context, value) {
+  return !this.isBound(context) || context[this.name] === value;
+};
+
+module.exports = Variable;
+
+},{}],"level-js":[function(require,module,exports){
 module.exports=require('AGZKLE');
 },{}],"AGZKLE":[function(require,module,exports){
 module.exports = Level
@@ -722,7 +742,7 @@ function StringToArrayBuffer(str) {
   return buf
 }
 
-},{"util":3,"./iterator":6,"abstract-leveldown":7,"isbuffer":8,"idb-wrapper":9}],9:[function(require,module,exports){
+},{"util":1,"./iterator":5,"abstract-leveldown":6,"isbuffer":7,"idb-wrapper":8}],8:[function(require,module,exports){
 (function(){/*jshint expr:true */
 /*global window:false, console:false, define:false, module:false */
 
@@ -1712,7 +1732,7 @@ function StringToArrayBuffer(str) {
 }, this);
 
 })()
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var events = require('events');
 var util = require('util');
 
@@ -1833,7 +1853,270 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":4,"util":3}],8:[function(require,module,exports){
+},{"events":2,"util":1}],10:[function(require,module,exports){
+
+var Transform = require("./streamwrapper").Transform;
+
+var counter = 0;
+
+function KeyFilterStream(options) {
+  if (!(this instanceof KeyFilterStream)) {
+    return new KeyFilterStream(options);
+  }
+
+  options.objectMode = true;
+
+  Transform.call(this, options);
+
+  this.start = options.start;
+  
+  var that = this;
+  this.counter = counter++;
+
+  this.once("pipe", function(source) {
+    that.source = source;
+  });
+
+  this._destroyed = false;
+}
+
+KeyFilterStream.prototype = Object.create(
+  Transform.prototype,
+  { constructor: { value: KeyFilterStream } }
+);
+
+KeyFilterStream.prototype._transform = function(data, encoding, done) {
+
+  if (this._destroyed || data.key.indexOf(this.start) < 0) {
+    this.source.destroy();
+  } else {
+    this.push(JSON.parse(data.value));
+  }
+
+  done();
+};
+
+KeyFilterStream.prototype.destroy = function() {
+  this._destroyed = true;
+};
+
+module.exports = KeyFilterStream;
+
+},{"./streamwrapper":11}],12:[function(require,module,exports){
+
+var Transform = require("./streamwrapper").Transform
+  , materializer = require("./utilities").materializer;
+
+function MaterializerStream(options) {
+  if (!(this instanceof MaterializerStream)) {
+    return new MaterializerStream(options);
+  }
+
+  options.objectMode = true;
+
+  Transform.call(this, options);
+
+  this.pattern = options.pattern;
+}
+
+MaterializerStream.prototype = Object.create(
+  Transform.prototype,
+  { constructor: { value: MaterializerStream } }
+);
+
+MaterializerStream.prototype._transform = function(data, encoding, done) {
+
+  this.push(materializer(this.pattern, data));
+
+  done();
+};
+
+module.exports = MaterializerStream;
+
+},{"./streamwrapper":11,"./utilities":13}],14:[function(require,module,exports){
+
+var Transform = require("./streamwrapper").Transform;
+var genKey = require('./utilities').genKey;
+var defs = require('./utilities').defs;
+
+function WriteStream(options) {
+  if (!(this instanceof WriteStream)) {
+    return new WriteStream(options);
+  }
+
+  options.objectMode = true;
+  this._type = options.type || 'put';
+
+  Transform.call(this, options);
+}
+
+WriteStream.prototype = Object.create(
+  Transform.prototype,
+  { constructor: { value: WriteStream } }
+);
+
+WriteStream.prototype._transform = function(data, encoding, done) {
+  var that = this;
+
+  genActions(this._type, data).forEach(function(action) {
+    that.push(action);
+  });
+
+  done();
+};
+
+module.exports = WriteStream;
+
+function genKeys(triple) {
+  return Object.keys(defs).map(function(key) {
+    return genKey(key, triple);
+  });
+}
+
+function genActions(type, triple) {
+  var json = JSON.stringify(triple);
+  return genKeys(triple).map(function(key) {
+    return { type: type, key: key, value: json };
+  });
+}
+
+},{"./streamwrapper":11,"./utilities":13}],15:[function(require,module,exports){
+
+var keyfilter = require("./keyfilterstream")
+  , materializer = require("./materializerstream")
+  , Variable = require("./variable")
+  , Navigator = require("./navigator")
+  , extend = require("xtend")
+  , utilities = require("./utilities")
+  , queryplanner = require("./queryplanner")
+  , PassThrough = require("./streamwrapper").PassThrough
+  , WriteStream = require("./writestream")
+  , levelup = require("levelup")
+  , joinStream
+  , doAction
+  , doActionStream;
+
+var joinDefaults = {
+  context: {}
+};
+
+module.exports = function levelgraph(leveldb, options) {
+
+  options = options || {};
+
+  var name = leveldb
+    , db;
+  
+  if (typeof leveldb === "string") {
+    // we are using LevelDown on node or level-js in the Browser
+    if (window && !options.db) {
+      options.db = function(l) { return new require("level-js")(l); };
+    }
+    leveldb = levelup(name, options);
+  }
+  
+  db = {
+      getStream: function(pattern, options) {
+        var query = utilities.createQuery(pattern, options);
+        return leveldb.createReadStream(query).
+          pipe(keyfilter(query));
+      }
+    , get: utilities.wrapCallback("getStream")
+    , put: doAction("put", leveldb)
+    , del: doAction("del", leveldb)
+    , putStream: doActionStream('put', leveldb)
+    , delStream: doActionStream('del', leveldb)
+    , close: leveldb.close.bind(leveldb)
+    , v: Variable
+    , joinStream: joinStream(leveldb, options)
+    , join: utilities.wrapCallback("joinStream")
+    , nav: function(start) {
+        return new Navigator({ start: start, db: this });
+      }
+  };
+
+  return db;
+};
+
+joinStream = function(db, options) {
+  options = extend({ joinAlgorithm: "sort" }, options);
+
+  var planner = queryplanner(db, options);
+
+  return function(query, options) {
+    var that = this
+      , result = new PassThrough({ objectMode: true });
+
+
+    options = extend(joinDefaults, options);
+
+    if (!query || query.length === 0) {
+      result.end();
+      return result;
+    }
+
+    planner(query, function(err, newquery) {
+      if (err) {
+        result.emit("error", err);
+        return;
+      }
+
+      var streams = newquery.map(function(triple) {
+        var stream = triple.stream
+          , index  = triple.index
+        delete triple.stream;
+        delete triple.index;
+        return stream({ triple: triple, db: that, index: index });
+      });
+
+      streams[0].start = true;
+      streams[0].end(options.context);
+
+      if (options.materialized) {
+        streams.push(materializer({
+          pattern: options.materialized
+        }));
+      }
+
+      streams.reduce(function(prev, current) {
+        return prev.pipe(current);
+      }).pipe(result);
+    });
+
+    return result;
+  };
+};
+
+doAction = function(action, leveldb) {
+  return function(triples, cb) {
+    if(!triples.reduce) {
+      triples = [triples];
+    }
+
+    var actions = triples.reduce(function(acc, triple) {
+      return acc.concat(utilities.genActions(action, triple));
+    }, []);
+
+    leveldb.batch(actions, cb);
+  };
+};
+
+doActionStream = function(type, leveldb) {
+  return function() {
+    var levelStream = leveldb.createWriteStream();
+    var writeStream = new WriteStream({ type: type });
+    writeStream.pipe(levelStream);
+    levelStream.on("error", function(err) {
+      writeStream.emit("error", err);
+    });
+    levelStream.on("close", function() {
+      writeStream.emit("close");
+    });
+    return writeStream;
+  };
+}
+
+},{"levelup":"yHv6bk","./keyfilterstream":10,"./materializerstream":12,"./variable":4,"./navigator":16,"./utilities":13,"./queryplanner":17,"./streamwrapper":11,"./writestream":14,"xtend":18}],7:[function(require,module,exports){
 (function(){var Buffer = require('buffer').Buffer;
 
 module.exports = isBuffer;
@@ -1844,46 +2127,9 @@ function isBuffer (o) {
 }
 
 })()
-},{"buffer":11}],12:[function(require,module,exports){
+},{"buffer":19}],20:[function(require,module,exports){
 
-function Variable(name) {
-  if (!(this instanceof Variable)) {
-    return new Variable(name);
-  }
-
-  this.name = name;
-}
-
-Variable.prototype.bind = function(context, value) {
-  var newContext = {};
-
-  Object.keys(context).reduce(function(acc, key) {
-    acc[key] = context[key];
-    return acc;
-  }, newContext);
-
-  newContext[this.name] = value;
-
-  return newContext;
-};
-
-Variable.prototype.isBound = function(context) {
-  if(context[this.name]) {
-    return true;
-  }
-
-  return false;
-};
-
-Variable.prototype.isBindable = function(context, value) {
-  return !this.isBound(context) || context[this.name] === value;
-};
-
-module.exports = Variable;
-
-},{}],13:[function(require,module,exports){
-
-},{}],14:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 require=(function(e,t,n,r){function i(r){if(!n[r]){if(!t[r]){if(e)return e(r);throw new Error("Cannot find module '"+r+"'")}var s=n[r]={exports:{}};t[r][0](function(e){var n=t[r][1][e];return i(n?n:e)},s,s.exports)}return n[r].exports}for(var s=0;s<r.length;s++)i(r[s]);return i})(typeof require!=="undefined"&&require,{1:[function(require,module,exports){
 // UTILITY
 var util = require('util');
@@ -5745,7 +5991,7 @@ SlowBuffer.prototype.writeDoubleBE = Buffer.prototype.writeDoubleBE;
 },{}]},{},[])
 ;;module.exports=require("buffer-browserify")
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function(process,Buffer){/* Copyright (c) 2013 Rod Vagg, MIT License */
 
 var AbstractIterator     = require('./abstract-iterator')
@@ -5930,7 +6176,7 @@ module.exports.AbstractLevelDOWN = AbstractLevelDOWN
 module.exports.AbstractIterator  = AbstractIterator
 
 })(require("__browserify_process"),require("__browserify_Buffer").Buffer)
-},{"./abstract-iterator":15,"./abstract-chained-batch":16,"__browserify_process":5,"__browserify_Buffer":14}],6:[function(require,module,exports){
+},{"./abstract-iterator":22,"./abstract-chained-batch":23,"__browserify_process":3,"__browserify_Buffer":21}],5:[function(require,module,exports){
 var util = require('util')
 var AbstractIterator  = require('abstract-leveldown').AbstractIterator
 module.exports = Iterator
@@ -6016,7 +6262,7 @@ Iterator.prototype._next = function (callback) {
   }
   this.callback = callback
 }
-},{"util":3,"abstract-leveldown":7}],17:[function(require,module,exports){
+},{"util":1,"abstract-leveldown":6}],24:[function(require,module,exports){
 (function(){module.exports={
   "name": "levelup",
   "description": "Fast & simple storage - a Node.js-style LevelDB wrapper",
@@ -6138,7 +6384,7 @@ Iterator.prototype._next = function (callback) {
 }
 
 })()
-},{}],18:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /*!
   * prr
   * (c) 2013 Rod Vagg <rod@vagg.org>
@@ -6202,7 +6448,7 @@ Iterator.prototype._next = function (callback) {
 
   return prr
 })
-},{}],19:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 function State () {
   this.ended = this._ready = this._reading = this._destroyed = this._paused = false
 }
@@ -6723,7 +6969,7 @@ module.exports.destroy = utilStatic('destroy')
 // DEPRECATED: prefer accessing LevelDOWN for this: require('leveldown').repair()
 module.exports.repair  = utilStatic('repair')
 })(require("__browserify_process"))
-},{"events":4,"util":3,"./errors":20,"./read-stream":21,"./write-stream":22,"./util":23,"prr":18,"xtend":24,"__browserify_process":5}],15:[function(require,module,exports){
+},{"events":2,"util":1,"./errors":27,"./read-stream":28,"./write-stream":29,"./util":30,"prr":25,"xtend":18,"__browserify_process":3}],22:[function(require,module,exports){
 (function(process){/* Copyright (c) 2013 Rod Vagg, MIT License */
 
 function AbstractIterator (db) {
@@ -6775,7 +7021,7 @@ AbstractIterator.prototype.end = function (callback) {
 module.exports = AbstractIterator
 
 })(require("__browserify_process"))
-},{"__browserify_process":5}],16:[function(require,module,exports){
+},{"__browserify_process":3}],23:[function(require,module,exports){
 (function(process){/* Copyright (c) 2013 Rod Vagg, MIT License */
 
 function AbstractChainedBatch (db) {
@@ -6845,119 +7091,194 @@ AbstractChainedBatch.prototype.write = function (options, callback) {
 
 module.exports = AbstractChainedBatch
 })(require("__browserify_process"))
-},{"__browserify_process":5}],25:[function(require,module,exports){
+},{"__browserify_process":3}],16:[function(require,module,exports){
+var Variable = require("./variable")
+  , Transform = require("./streamwrapper").Transform
+  , CallbackStream = require("callback-stream")
+  , wrapCallback = require("./utilities").wrapCallback;
 
-var Transform = require("./streamwrapper").Transform;
-
-var counter = 0;
-
-function KeyFilterStream(options) {
-  if (!(this instanceof KeyFilterStream)) {
-    return new KeyFilterStream(options);
+function NavigatorStream(options) {
+  if (!(this instanceof NavigatorStream)) {
+    return new NavigatorStream(options);
   }
 
   options.objectMode = true;
 
   Transform.call(this, options);
 
-  this.start = options.start;
+  this._lastElement = options._lastElement;
+}
+
+NavigatorStream.prototype = Object.create(
+  Transform.prototype,
+  { constructor: { value: NavigatorStream } }
+);
+
+NavigatorStream.prototype._transform = function(data, encoding, done) {
+  var value = data[this._lastElement.name] || this._lastElement;
+  this.push(value);
+  done();
+};
+
+function Navigator(options) {
+  if (!(this instanceof Navigator)) {
+    return new Navigator(options);
+  }
+
+  this.db = options.db;
+  this._conditions = [];
+  this._initialContext = {};
+
+  var count = 0;
+  this._nextVar = function() {
+    return this.db.v("x" + count++);
+  };
+
+  this.go(options.start);
+}
+
+function arch(varKey, lastKey) {
+  return function(predicate) {
+    var triple = {
+      predicate: predicate
+    };
+
+    triple[varKey] = this._nextVar();
+    triple[lastKey] = this._lastElement;
+
+    this._conditions.push(triple);
+
+    this._lastElement = triple[varKey];
+
+    return this;
+  };
+}
+
+Navigator.prototype.archOut = arch("object", "subject");
+Navigator.prototype.archIn = arch("subject", "object");
+
+Navigator.prototype.bind  = function (value) {
+  this._initialContext[this._lastElement.name] = value;
+  return this;
+};
+
+Navigator.prototype.as = function (name) {
+  this._lastElement.name = name;
+  return this;
+};
+
+Navigator.prototype.go = function (vertex) {
+  if (!vertex) {
+    vertex = this._nextVar();
+  }
+  this._lastElement = vertex;
+  return this;
+};
+
+Navigator.prototype.triples = wrapCallback("triplesStream");
+
+Navigator.prototype.triplesStream = function (pattern) {
+
+  var stream = null;
+
+  var options = {
+    context: this._initialContext,
+    materialized: pattern
+  };
+  stream = this.db.joinStream(this._conditions, options);
+
+  return stream;
+};
+
+Navigator.prototype.contexts = Navigator.prototype.triples;
+Navigator.prototype.contextsStream = Navigator.prototype.triplesStream;
+
+Navigator.prototype.valuesStream = function () {
+  var stream, options;
   
-  var that = this;
-  this.counter = counter++;
-
-  this.once("pipe", function(source) {
-    that.source = source;
+  stream = new NavigatorStream({
+    _lastElement: this._lastElement
   });
 
-  this._destroyed = false;
-}
-
-KeyFilterStream.prototype = Object.create(
-  Transform.prototype,
-  { constructor: { value: KeyFilterStream } }
-);
-
-KeyFilterStream.prototype._transform = function(data, encoding, done) {
-
-  if (this._destroyed || data.key.indexOf(this.start) < 0) {
-    this.source.destroy();
-  } else {
-    this.push(JSON.parse(data.value));
+  if (this._conditions.length === 0) {
+    stream.end({});
+    return stream;
   }
 
-  done();
+  options = { context: this._initialContext };
+
+  this.db.joinStream(this._conditions, options).
+    pipe(stream);
+
+  return stream;
 };
 
-KeyFilterStream.prototype.destroy = function() {
-  this._destroyed = true;
+Navigator.prototype.values = function (cb) {
+  var that = this
+    , stream = this.valuesStream()
+    , collect = function(err, results) {
+        if (err) {
+          cb(err);
+          return;
+        }
+
+        results = results.reduce(function(acc, result) {
+          if (acc.indexOf(result) < 0) {
+            acc.push(result);
+          }
+          return acc;
+        }, []);
+
+        cb(null, results);
+      };
+
+  stream.pipe(new CallbackStream({
+    objectMode: true
+  }, collect));
+
+  return this;
 };
 
-module.exports = KeyFilterStream;
+module.exports = Navigator;
 
-},{"./streamwrapper":26}],27:[function(require,module,exports){
+},{"./variable":4,"./streamwrapper":11,"./utilities":13,"callback-stream":31}],13:[function(require,module,exports){
 
-var Transform = require("./streamwrapper").Transform
-  , materializer = require("./utilities").materializer;
+var CallbackStream = require("callback-stream")
+  , Variable       = require("./variable")
+  , defs = {
+      spo: ["subject", "predicate", "object"],
+      sop: ["subject", "object", "predicate"],
+      pos: ["predicate", "object", "subject"],
+      pso: ["predicate", "subject", "object"],
+      ops: ["object", "predicate", "subject"],
+      osp: ["object", "subject", "predicate"]
+    };
 
-function MaterializerStream(options) {
-  if (!(this instanceof MaterializerStream)) {
-    return new MaterializerStream(options);
-  }
+module.exports.defs = defs;
 
-  options.objectMode = true;
+function wrapCallback(method) {
+  return function(query, cb) {
+    var args = Array.prototype.slice.call(arguments, 0)
+      , callback = args.pop()
+      , stream = null;
 
-  Transform.call(this, options);
+    stream = this[method].apply(this, args);
 
-  this.pattern = options.pattern;
+    stream.pipe(new CallbackStream({ objectMode: true }, callback));
+  };
 }
 
-MaterializerStream.prototype = Object.create(
-  Transform.prototype,
-  { constructor: { value: MaterializerStream } }
-);
+module.exports.wrapCallback = wrapCallback;
 
-MaterializerStream.prototype._transform = function(data, encoding, done) {
-
-  this.push(materializer(this.pattern, data));
-
-  done();
-};
-
-module.exports = MaterializerStream;
-
-},{"./streamwrapper":26,"./utilities":28}],29:[function(require,module,exports){
-
-var Transform = require("./streamwrapper").Transform;
-var genKey = require('./utilities').genKey;
-var defs = require('./utilities').defs;
-
-function WriteStream(options) {
-  if (!(this instanceof WriteStream)) {
-    return new WriteStream(options);
-  }
-
-  options.objectMode = true;
-  this._type = options.type || 'put';
-
-  Transform.call(this, options);
+function genKey(key, triple) {
+  return [key].concat(defs[key].map(function(t) {
+    return triple[t];
+  })).filter(function(e) {
+    return e !== null && e !== undefined;
+  }).join("::");
 }
 
-WriteStream.prototype = Object.create(
-  Transform.prototype,
-  { constructor: { value: WriteStream } }
-);
-
-WriteStream.prototype._transform = function(data, encoding, done) {
-  var that = this;
-
-  genActions(this._type, data).forEach(function(action) {
-    that.push(action);
-  });
-
-  done();
-};
-
-module.exports = WriteStream;
+module.exports.genKey = genKey;
 
 function genKeys(triple) {
   return Object.keys(defs).map(function(key) {
@@ -6965,138 +7286,414 @@ function genKeys(triple) {
   });
 }
 
-function genActions(type, triple) {
+module.exports.genKeys = genKeys;
+
+function possibleIndexes(types) {
+  var result = Object.keys(defs).filter(function(key) {
+    var matches = 0;
+    return defs[key].every(function (e, i) {
+      if (types.indexOf(e) >= 0) {
+        matches++;
+        return true;
+      }
+      
+      if (matches === types.length) {
+        return true;
+      }
+    });
+  });
+
+  result.sort();
+
+  return result;
+}
+
+module.exports.possibleIndexes = possibleIndexes;
+
+function findIndex(types, preferiteIndex) {
+  var result = possibleIndexes(types)
+    , index
+    , there;
+
+  there = result.some(function(r) {
+    return r === preferiteIndex;
+  });
+
+  if (preferiteIndex && there) {
+    index = preferiteIndex;
+  } else {
+    index = result[0];
+  }
+
+  return index;
+}
+
+module.exports.findIndex = findIndex;
+
+function createQuery(pattern, options) {
+  var types = Object.keys(pattern)
+    , preferiteIndex = (options || {}).index
+    , index = findIndex(types, preferiteIndex)
+    , key = genKey(index, pattern)
+    , query = {
+        start: key,
+        end: key + "\xff",
+        fillCache: true
+      };
+
+  return query;
+}
+
+module.exports.createQuery = createQuery;
+
+function genActions(action, triple) {
   var json = JSON.stringify(triple);
   return genKeys(triple).map(function(key) {
-    return { type: type, key: key, value: json };
+    return { type: action, key: key, value: json };
   });
 }
 
-},{"./streamwrapper":26,"./utilities":28}],2:[function(require,module,exports){
+module.exports.genActions = genActions;
 
-var keyfilter = require("./keyfilterstream")
-  , materializer = require("./materializerstream")
-  , Variable = require("./variable")
-  , Navigator = require("./navigator")
-  , extend = require("xtend")
-  , utilities = require("./utilities")
-  , queryplanner = require("./queryplanner")
-  , PassThrough = require("./streamwrapper").PassThrough
-  , WriteStream = require("./writestream")
-  , joinStream
-  , doAction
-  , doActionStream;
+function materializer(pattern, data) {
+  return Object.keys(pattern)
+               .reduce(function(result, key) {
 
-var joinDefaults = {
-  context: {}
-};
-
-module.exports = function levelgraph(leveldb, options) {
-
-  options = options || {};
-
-  var db = {
-        getStream: function(pattern, options) {
-          var query = utilities.createQuery(pattern, options);
-          return leveldb.createReadStream(query).
-            pipe(keyfilter(query));
-        }
-      , get: utilities.wrapCallback("getStream")
-      , put: doAction("put", leveldb)
-      , del: doAction("del", leveldb)
-      , putStream: doActionStream('put', leveldb)
-      , delStream: doActionStream('del', leveldb)
-      , close: leveldb.close.bind(leveldb)
-      , v: Variable
-      , joinStream: joinStream(leveldb, options)
-      , join: utilities.wrapCallback("joinStream")
-      , nav: function(start) {
-          return new Navigator({ start: start, db: this });
-        }
-  };
-
-  return db;
-};
-
-joinStream = function(db, options) {
-  options = extend({ joinAlgorithm: "sort" }, options);
-
-  var planner = queryplanner(db, options);
-
-  return function(query, options) {
-    var that = this
-      , result = new PassThrough({ objectMode: true });
-
-
-    options = extend(joinDefaults, options);
-
-    if (!query || query.length === 0) {
-      result.end();
-      return result;
+    if (pattern[key] instanceof Variable) {
+      result[key] = data[pattern[key].name];
+    } else {
+      result[key] = pattern[key];
     }
-
-    planner(query, function(err, newquery) {
-      if (err) {
-        result.emit("error", err);
-        return;
-      }
-
-      var streams = newquery.map(function(triple) {
-        var stream = triple.stream
-          , index  = triple.index
-        delete triple.stream;
-        delete triple.index;
-        return stream({ triple: triple, db: that, index: index });
-      });
-
-      streams[0].start = true;
-      streams[0].end(options.context);
-
-      if (options.materialized) {
-        streams.push(materializer({
-          pattern: options.materialized
-        }));
-      }
-
-      streams.reduce(function(prev, current) {
-        return prev.pipe(current);
-      }).pipe(result);
-    });
 
     return result;
-  };
-};
-
-doAction = function(action, leveldb) {
-  return function(triples, cb) {
-    if(!triples.reduce) {
-      triples = [triples];
-    }
-
-    var actions = triples.reduce(function(acc, triple) {
-      return acc.concat(utilities.genActions(action, triple));
-    }, []);
-
-    leveldb.batch(actions, cb);
-  };
-};
-
-doActionStream = function(type, leveldb) {
-  return function() {
-    var levelStream = leveldb.createWriteStream();
-    var writeStream = new WriteStream({ type: type });
-    writeStream.pipe(levelStream);
-    levelStream.on("error", function(err) {
-      writeStream.emit("error", err);
-    });
-    levelStream.on("close", function() {
-      writeStream.emit("close");
-    });
-    return writeStream;
-  };
+  }, {});
 }
 
-},{"./keyfilterstream":25,"./materializerstream":27,"./variable":12,"./navigator":30,"./utilities":28,"./queryplanner":31,"./streamwrapper":26,"./writestream":29,"xtend":24}],32:[function(require,module,exports){
+module.exports.materializer = materializer;
+
+var objectMask = function(criteria, object) {
+  return Object.keys(object).
+    filter(function(key) {
+      return defs.spo.indexOf(key) >= 0;
+    }).
+    filter(function(key) {
+      return criteria(object, key);
+    }).
+    reduce(function(acc, key) {
+      acc[key] = object[key];
+      return acc;
+    },
+  {});
+};
+
+module.exports.queryMask = objectMask.bind(null, function(triple, key) {
+  return typeof triple[key] !== "object";
+});
+
+module.exports.variablesMask = objectMask.bind(null, function(triple, key) {
+  return triple[key] instanceof Variable;
+});
+
+},{"./variable":4,"callback-stream":31}],32:[function(require,module,exports){
+
+var Transform = require("./streamwrapper").Transform
+  , Variable = require("./variable")
+  , utilities = require("./utilities")
+  , queryMask = utilities.queryMask
+  , variablesMask = utilities.variablesMask
+  , maskUpdater
+  , matcher;
+
+function JoinStream(options) {
+  if (!(this instanceof JoinStream)) {
+    return new JoinStream(options);
+  }
+
+  options.objectMode = true;
+
+  Transform.call(this, options);
+  
+  this.triple = options.triple;
+  this.matcher = matcher(options.triple);
+  this.mask = queryMask(options.triple);
+  this.maskUpdater = maskUpdater(options.triple);
+  this.db = options.db;
+  this._index = options.index;
+
+  var that = this;
+  this.once("pipe", function(source) {
+    source.on("error", function(err) {
+      that.emit("error", err);
+    });
+  });
+}
+
+JoinStream.prototype = Object.create(
+  Transform.prototype,
+  { constructor: { value: JoinStream } }
+);
+
+JoinStream.prototype._transform = function(context, encoding, done) {
+
+  var that = this;
+
+  var newMask = this.maskUpdater(context, this.mask);
+  var readStream = this.db.getStream(newMask, { index: this._index });
+
+  readStream.on("data", function(triple) {
+    var newContext = that.matcher(context, triple);
+
+    if (newContext) {
+      that.push(newContext);
+    }
+  });
+
+  readStream.on("error", function(err) {
+    that.emit("error", err);
+  });
+
+  readStream.on("end", done);
+};
+
+module.exports = JoinStream;
+
+matcher = function(pattern) {
+  var variables = variablesMask(pattern);
+  return function(context, triple) {
+    var bindable = Object.keys(variables).every(function(key) {
+      var variable = variables[key];
+      return variable.isBindable(context, triple[key]);
+    });
+
+    if (!bindable) {
+      return false;
+    }
+  
+    return Object.keys(variables).reduce(function(newContext, key) {
+      var variable = variables[key];
+      return variable.bind(newContext, triple[key]);
+    }, context);
+  };
+};
+
+maskUpdater = function(pattern) {
+  var variables = variablesMask(pattern);
+  return function(context, mask) {
+    return Object.keys(variables).reduce(function(newMask, key) {
+      var variable = variables[key];
+      if (variable.isBound(context)) {
+        newMask[key] = context[variable.name];
+      }
+      return newMask;
+    }, Object.keys(mask).reduce(function(acc, key) {
+      acc[key] = mask[key];
+      return acc;
+    }, {}));
+  };
+};
+
+},{"./streamwrapper":11,"./variable":4,"./utilities":13}],33:[function(require,module,exports){
+
+var Transform = require("./streamwrapper").Transform
+  , Variable = require("./variable")
+  , queryMask = require("./utilities").queryMask
+  , variablesMask = require("./utilities").variablesMask
+  , maskUpdater
+  , matcher
+  , materializer = require("./utilities").materializer
+  , createQuery = require("./utilities").createQuery
+  , genKey = require("./utilities").genKey
+  , genKeys = require("./utilities").genKeys;
+
+var counter = 0;
+
+function SortJoinStream(options) {
+  if (!(this instanceof SortJoinStream)) {
+    return new SortJoinStream(options);
+  }
+
+  options.objectMode = true;
+
+  Transform.call(this, options);
+  
+  this.triple = options.triple;
+  this.matcher = matcher(options.triple);
+  this.db = options.db;
+
+  var that = this;
+  this.once("pipe", function(source) {
+    source.on("error", function(err) {
+      that.emit("error", err);
+    });
+  });
+
+  this._queryMask = queryMask(options.triple);
+
+  this.index = options.index;
+
+  this._previousTriple = null;
+  this._lastDone = null;
+  this._restart();
+}
+
+SortJoinStream.prototype = Object.create(
+  Transform.prototype,
+  { constructor: { value: SortJoinStream } }
+);
+
+SortJoinStream.prototype._restart = function() {
+  var that = this;
+
+  this._readStream = this.db.getStream(this._queryMask, { index: this.index });
+
+  this._readStream.on("error", function(err) {
+    that.emit("error", err);
+  });
+
+  this._readStream.on("end", function() {
+    that._readStream = null;
+    that._execLastDone();
+  });
+
+  this._readStream.on("readable", function() {
+    if (that._toNextTriple) {
+      that._toNextTriple();
+    }
+  });
+};
+
+SortJoinStream.prototype._execLastDone = function() {
+  var that = this;
+  if(that._lastDone) {
+    var func = that._lastDone;
+    that._toNextTriple = null;
+    that._lastDone = null;
+    func();
+  }
+};
+
+SortJoinStream.prototype._flush = function(cb) {
+  var that = this;
+
+  this._execLastDone();
+
+  if (this._readStream && this._readStream.readable) {
+    that._readStream.destroy();
+  }
+
+  cb();
+};
+
+SortJoinStream.prototype._nextTriple = function(cb, skip) {
+  var that = this
+    , triple
+    , callCallback = function() {
+        if (!that._previousTriple && that._readStream) {
+          that._previousTriple = that._readStream.read();
+        } else if (!that._readStream && that._lastDone) {
+          that._execLastDone();
+        }
+        that._toNextTriple = null;
+
+        if (that._previousTriple) {
+          cb(that._previousTriple);
+        } else {
+          that._toNextTriple = callCallback;
+        }
+      };
+
+  if (skip) {
+    that._previousTriple = null;
+  }
+
+  callCallback();
+};
+
+
+SortJoinStream.prototype._transform = function(context, encoding, done) {
+
+  if (!this._readStream && !this._previousTriple) {
+    done();
+    return;
+  }
+
+  var that = this
+
+    , reCount = this.count++
+
+    , matched = false
+
+    , doRead = function(triple) {
+
+        var newContext = that.matcher(context, triple)
+          , key
+          , otherKey;
+
+        key = genKey(that.index, materializer(that.triple, context)) + "::\xff";
+
+        if (newContext) {
+          that.push(newContext);
+          that._nextTriple(doRead, true);
+          return;
+        }
+
+        key = genKey(that.index, materializer(that.triple, context)) + "::\xff";
+        otherKey = genKey(that.index, triple);
+
+        if (key >= otherKey) {
+          that._nextTriple(doRead, true);
+        } else {
+          that._lastDone = null;
+          that._toNextTriple = null;
+          done();
+        }
+      };
+
+  this._lastDone = done;
+  this._nextTriple(doRead);
+};
+
+module.exports = SortJoinStream;
+
+matcher = function(pattern) {
+  var variables = variablesMask(pattern);
+  return function(context, triple) {
+    var bindable = Object.keys(variables).every(function(key) {
+      var variable = variables[key];
+      return variable.isBindable(context, triple[key]);
+    });
+
+    if (!bindable) {
+      return false;
+    }
+  
+    return Object.keys(variables).reduce(function(newContext, key) {
+      var variable = variables[key];
+      return variable.bind(newContext, triple[key]);
+    }, context);
+  };
+};
+
+maskUpdater = function(pattern) {
+  var variables = variablesMask(pattern);
+  return function(context, mask) {
+    return Object.keys(variables).reduce(function(newMask, key) {
+      var variable = variables[key];
+      if (variable.isBound(context)) {
+        newMask[key] = context[variable.name];
+      }
+      return newMask;
+    }, Object.keys(mask).reduce(function(acc, key) {
+      acc[key] = mask[key];
+      return acc;
+    }, {}));
+  };
+};
+
+},{"./streamwrapper":11,"./variable":4,"./utilities":13}],11:[function(require,module,exports){
+module.exports = require("readable-stream");
+
+},{"readable-stream":34}],35:[function(require,module,exports){
 (function(){// UTILITY
 var util = require('util');
 var Buffer = require("buffer").Buffer;
@@ -7413,7 +8010,7 @@ assert.doesNotThrow = function(block, /*optional*/error, /*optional*/message) {
 assert.ifError = function(err) { if (err) {throw err;}};
 
 })()
-},{"buffer":11,"util":3}],20:[function(require,module,exports){
+},{"buffer":19,"util":1}],27:[function(require,module,exports){
 /* Copyright (c) 2012-2013 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
  * MIT +no-false-attribs License
@@ -7433,7 +8030,153 @@ module.exports = {
   , EncodingError       : createError('EncodingError', LevelUPError)
 }
 
-},{"errno":33}],34:[function(require,module,exports){
+},{"errno":36}],17:[function(require,module,exports){
+
+var utilities = require("./utilities")
+  , queryMask = utilities.queryMask
+  , variablesMask = utilities.variablesMask
+  , JoinStream = require("./joinstream")
+  , SortJoinStream = require("./sortjoinstream")
+  , doSortQueryPlan
+  , async = require("async");
+
+function queryplanner(db, options) {
+  return function planner(query, callback) {
+    // dupes!
+    var result = [].concat(query);
+
+    async.each(query, function(q, cb) {
+      var newq = queryMask(q)
+        , range = utilities.createQuery(newq)
+        , result = function(err, size) {
+            if (err) {
+              callback(err);
+              return;
+            }
+            q.size = size;
+            cb();
+          };
+     
+      try {
+        db.approximateSize(range.start, range.end, result);
+      } catch(err) {
+        result(null, Object.keys(variablesMask(q)).length);
+      }
+
+    }, function(err) {
+      if (err) {
+        callback(err);
+        return;
+      }
+
+      result.sort(function compare(a, b) {
+        if (a.size < b.size) {
+          return -1;
+        }
+        if (a.size > b.size) {
+          return 1;
+        }
+        return 0;
+      });
+
+      result.forEach(function(q) {
+        delete q.size;
+      });
+
+      if (options.joinAlgorithm === "sort" && result.length > 1) {
+        result.reduce(doSortQueryPlan);
+      }
+
+      result.forEach(function(q) {
+        if (!q.stream) {
+          q.stream = JoinStream;
+        }
+      });
+
+      callback(null, result);
+    });
+  };
+}
+
+doSortQueryPlan = function(first, second) {
+  if (first === null || first.stream === JoinStream) {
+    return null;
+  }
+
+  var firstQueryMask = utilities.queryMask(first)
+    , secondQueryMask = utilities.queryMask(second)
+    , firstVariablesMask = utilities.variablesMask(first)
+    , secondVariablesMask = utilities.variablesMask(second)
+
+    , firstVariables = Object.keys(firstVariablesMask).map(function(key) {
+        return firstVariablesMask[key];
+      })
+
+    , secondVariables = Object.keys(secondVariablesMask).map(function(key) {
+        return secondVariablesMask[key];
+      })
+      
+    , variableKey = function(obj, variable) {
+        return Object.keys(obj).filter(function(key) {
+          return obj[key].name === variable.name;
+        })[0];
+      }
+
+    , commonVariables = firstVariables.filter(function(firstVar) {
+        return secondVariables.some(function(secondVar) {
+          return firstVar.name === secondVar.name;
+        });
+      })
+    , firstIndexArray = Object.keys(firstQueryMask)
+    , secondIndexArray = Object.keys(secondQueryMask)
+    , firstIndexes
+    , secondIndexes;
+
+  if (commonVariables.length === 0) {
+    return null;
+  }
+
+  first.stream = first.stream ? first.stream : JoinStream;
+
+  firstIndexArray.sort();
+  secondIndexArray.sort();
+
+  commonVariables.sort(function(a, b) {
+    if (a.name < b.name) {
+      return -1;
+    } else if (a.name > b.name) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+
+  commonVariables.forEach(function(commonVar) {
+    firstIndexArray.push(variableKey(firstVariablesMask, commonVar));
+    secondIndexArray.push(variableKey(secondVariablesMask, commonVar));
+  });
+
+  firstIndexes = orderedPossibleIndex(firstIndexArray);
+  secondIndexes = orderedPossibleIndex(secondIndexArray);
+
+  first.index = first.index || firstIndexes[0];
+  second.index = secondIndexes[0];
+  second.stream = SortJoinStream;
+
+  return second;
+}
+
+function orderedPossibleIndex(keys) {
+  return Object.keys(utilities.defs).filter(function(index) {
+    return keys.every(function(key, pos) {
+      return utilities.defs[index][pos] === key;
+    });
+  });
+}
+
+module.exports = queryplanner;
+
+},{"./utilities":13,"./joinstream":32,"./sortjoinstream":33,"async":37}],38:[function(require,module,exports){
 exports.readIEEE754 = function(buffer, offset, isBE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
@@ -7519,7 +8262,965 @@ exports.writeIEEE754 = function(buffer, value, offset, isBE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128;
 };
 
-},{}],35:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
+(function(process){/*global setImmediate: false, setTimeout: false, console: false */
+(function () {
+
+    var async = {};
+
+    // global on the server, window in the browser
+    var root, previous_async;
+
+    root = this;
+    if (root != null) {
+      previous_async = root.async;
+    }
+
+    async.noConflict = function () {
+        root.async = previous_async;
+        return async;
+    };
+
+    function only_once(fn) {
+        var called = false;
+        return function() {
+            if (called) throw new Error("Callback was already called.");
+            called = true;
+            fn.apply(root, arguments);
+        }
+    }
+
+    //// cross-browser compatiblity functions ////
+
+    var _each = function (arr, iterator) {
+        if (arr.forEach) {
+            return arr.forEach(iterator);
+        }
+        for (var i = 0; i < arr.length; i += 1) {
+            iterator(arr[i], i, arr);
+        }
+    };
+
+    var _map = function (arr, iterator) {
+        if (arr.map) {
+            return arr.map(iterator);
+        }
+        var results = [];
+        _each(arr, function (x, i, a) {
+            results.push(iterator(x, i, a));
+        });
+        return results;
+    };
+
+    var _reduce = function (arr, iterator, memo) {
+        if (arr.reduce) {
+            return arr.reduce(iterator, memo);
+        }
+        _each(arr, function (x, i, a) {
+            memo = iterator(memo, x, i, a);
+        });
+        return memo;
+    };
+
+    var _keys = function (obj) {
+        if (Object.keys) {
+            return Object.keys(obj);
+        }
+        var keys = [];
+        for (var k in obj) {
+            if (obj.hasOwnProperty(k)) {
+                keys.push(k);
+            }
+        }
+        return keys;
+    };
+
+    //// exported async module functions ////
+
+    //// nextTick implementation with browser-compatible fallback ////
+    if (typeof process === 'undefined' || !(process.nextTick)) {
+        if (typeof setImmediate === 'function') {
+            async.nextTick = function (fn) {
+                // not a direct alias for IE10 compatibility
+                setImmediate(fn);
+            };
+            async.setImmediate = async.nextTick;
+        }
+        else {
+            async.nextTick = function (fn) {
+                setTimeout(fn, 0);
+            };
+            async.setImmediate = async.nextTick;
+        }
+    }
+    else {
+        async.nextTick = process.nextTick;
+        if (typeof setImmediate !== 'undefined') {
+            async.setImmediate = setImmediate;
+        }
+        else {
+            async.setImmediate = async.nextTick;
+        }
+    }
+
+    async.each = function (arr, iterator, callback) {
+        callback = callback || function () {};
+        if (!arr.length) {
+            return callback();
+        }
+        var completed = 0;
+        _each(arr, function (x) {
+            iterator(x, only_once(function (err) {
+                if (err) {
+                    callback(err);
+                    callback = function () {};
+                }
+                else {
+                    completed += 1;
+                    if (completed >= arr.length) {
+                        callback(null);
+                    }
+                }
+            }));
+        });
+    };
+    async.forEach = async.each;
+
+    async.eachSeries = function (arr, iterator, callback) {
+        callback = callback || function () {};
+        if (!arr.length) {
+            return callback();
+        }
+        var completed = 0;
+        var iterate = function () {
+            iterator(arr[completed], function (err) {
+                if (err) {
+                    callback(err);
+                    callback = function () {};
+                }
+                else {
+                    completed += 1;
+                    if (completed >= arr.length) {
+                        callback(null);
+                    }
+                    else {
+                        iterate();
+                    }
+                }
+            });
+        };
+        iterate();
+    };
+    async.forEachSeries = async.eachSeries;
+
+    async.eachLimit = function (arr, limit, iterator, callback) {
+        var fn = _eachLimit(limit);
+        fn.apply(null, [arr, iterator, callback]);
+    };
+    async.forEachLimit = async.eachLimit;
+
+    var _eachLimit = function (limit) {
+
+        return function (arr, iterator, callback) {
+            callback = callback || function () {};
+            if (!arr.length || limit <= 0) {
+                return callback();
+            }
+            var completed = 0;
+            var started = 0;
+            var running = 0;
+
+            (function replenish () {
+                if (completed >= arr.length) {
+                    return callback();
+                }
+
+                while (running < limit && started < arr.length) {
+                    started += 1;
+                    running += 1;
+                    iterator(arr[started - 1], function (err) {
+                        if (err) {
+                            callback(err);
+                            callback = function () {};
+                        }
+                        else {
+                            completed += 1;
+                            running -= 1;
+                            if (completed >= arr.length) {
+                                callback();
+                            }
+                            else {
+                                replenish();
+                            }
+                        }
+                    });
+                }
+            })();
+        };
+    };
+
+
+    var doParallel = function (fn) {
+        return function () {
+            var args = Array.prototype.slice.call(arguments);
+            return fn.apply(null, [async.each].concat(args));
+        };
+    };
+    var doParallelLimit = function(limit, fn) {
+        return function () {
+            var args = Array.prototype.slice.call(arguments);
+            return fn.apply(null, [_eachLimit(limit)].concat(args));
+        };
+    };
+    var doSeries = function (fn) {
+        return function () {
+            var args = Array.prototype.slice.call(arguments);
+            return fn.apply(null, [async.eachSeries].concat(args));
+        };
+    };
+
+
+    var _asyncMap = function (eachfn, arr, iterator, callback) {
+        var results = [];
+        arr = _map(arr, function (x, i) {
+            return {index: i, value: x};
+        });
+        eachfn(arr, function (x, callback) {
+            iterator(x.value, function (err, v) {
+                results[x.index] = v;
+                callback(err);
+            });
+        }, function (err) {
+            callback(err, results);
+        });
+    };
+    async.map = doParallel(_asyncMap);
+    async.mapSeries = doSeries(_asyncMap);
+    async.mapLimit = function (arr, limit, iterator, callback) {
+        return _mapLimit(limit)(arr, iterator, callback);
+    };
+
+    var _mapLimit = function(limit) {
+        return doParallelLimit(limit, _asyncMap);
+    };
+
+    // reduce only has a series version, as doing reduce in parallel won't
+    // work in many situations.
+    async.reduce = function (arr, memo, iterator, callback) {
+        async.eachSeries(arr, function (x, callback) {
+            iterator(memo, x, function (err, v) {
+                memo = v;
+                callback(err);
+            });
+        }, function (err) {
+            callback(err, memo);
+        });
+    };
+    // inject alias
+    async.inject = async.reduce;
+    // foldl alias
+    async.foldl = async.reduce;
+
+    async.reduceRight = function (arr, memo, iterator, callback) {
+        var reversed = _map(arr, function (x) {
+            return x;
+        }).reverse();
+        async.reduce(reversed, memo, iterator, callback);
+    };
+    // foldr alias
+    async.foldr = async.reduceRight;
+
+    var _filter = function (eachfn, arr, iterator, callback) {
+        var results = [];
+        arr = _map(arr, function (x, i) {
+            return {index: i, value: x};
+        });
+        eachfn(arr, function (x, callback) {
+            iterator(x.value, function (v) {
+                if (v) {
+                    results.push(x);
+                }
+                callback();
+            });
+        }, function (err) {
+            callback(_map(results.sort(function (a, b) {
+                return a.index - b.index;
+            }), function (x) {
+                return x.value;
+            }));
+        });
+    };
+    async.filter = doParallel(_filter);
+    async.filterSeries = doSeries(_filter);
+    // select alias
+    async.select = async.filter;
+    async.selectSeries = async.filterSeries;
+
+    var _reject = function (eachfn, arr, iterator, callback) {
+        var results = [];
+        arr = _map(arr, function (x, i) {
+            return {index: i, value: x};
+        });
+        eachfn(arr, function (x, callback) {
+            iterator(x.value, function (v) {
+                if (!v) {
+                    results.push(x);
+                }
+                callback();
+            });
+        }, function (err) {
+            callback(_map(results.sort(function (a, b) {
+                return a.index - b.index;
+            }), function (x) {
+                return x.value;
+            }));
+        });
+    };
+    async.reject = doParallel(_reject);
+    async.rejectSeries = doSeries(_reject);
+
+    var _detect = function (eachfn, arr, iterator, main_callback) {
+        eachfn(arr, function (x, callback) {
+            iterator(x, function (result) {
+                if (result) {
+                    main_callback(x);
+                    main_callback = function () {};
+                }
+                else {
+                    callback();
+                }
+            });
+        }, function (err) {
+            main_callback();
+        });
+    };
+    async.detect = doParallel(_detect);
+    async.detectSeries = doSeries(_detect);
+
+    async.some = function (arr, iterator, main_callback) {
+        async.each(arr, function (x, callback) {
+            iterator(x, function (v) {
+                if (v) {
+                    main_callback(true);
+                    main_callback = function () {};
+                }
+                callback();
+            });
+        }, function (err) {
+            main_callback(false);
+        });
+    };
+    // any alias
+    async.any = async.some;
+
+    async.every = function (arr, iterator, main_callback) {
+        async.each(arr, function (x, callback) {
+            iterator(x, function (v) {
+                if (!v) {
+                    main_callback(false);
+                    main_callback = function () {};
+                }
+                callback();
+            });
+        }, function (err) {
+            main_callback(true);
+        });
+    };
+    // all alias
+    async.all = async.every;
+
+    async.sortBy = function (arr, iterator, callback) {
+        async.map(arr, function (x, callback) {
+            iterator(x, function (err, criteria) {
+                if (err) {
+                    callback(err);
+                }
+                else {
+                    callback(null, {value: x, criteria: criteria});
+                }
+            });
+        }, function (err, results) {
+            if (err) {
+                return callback(err);
+            }
+            else {
+                var fn = function (left, right) {
+                    var a = left.criteria, b = right.criteria;
+                    return a < b ? -1 : a > b ? 1 : 0;
+                };
+                callback(null, _map(results.sort(fn), function (x) {
+                    return x.value;
+                }));
+            }
+        });
+    };
+
+    async.auto = function (tasks, callback) {
+        callback = callback || function () {};
+        var keys = _keys(tasks);
+        if (!keys.length) {
+            return callback(null);
+        }
+
+        var results = {};
+
+        var listeners = [];
+        var addListener = function (fn) {
+            listeners.unshift(fn);
+        };
+        var removeListener = function (fn) {
+            for (var i = 0; i < listeners.length; i += 1) {
+                if (listeners[i] === fn) {
+                    listeners.splice(i, 1);
+                    return;
+                }
+            }
+        };
+        var taskComplete = function () {
+            _each(listeners.slice(0), function (fn) {
+                fn();
+            });
+        };
+
+        addListener(function () {
+            if (_keys(results).length === keys.length) {
+                callback(null, results);
+                callback = function () {};
+            }
+        });
+
+        _each(keys, function (k) {
+            var task = (tasks[k] instanceof Function) ? [tasks[k]]: tasks[k];
+            var taskCallback = function (err) {
+                var args = Array.prototype.slice.call(arguments, 1);
+                if (args.length <= 1) {
+                    args = args[0];
+                }
+                if (err) {
+                    var safeResults = {};
+                    _each(_keys(results), function(rkey) {
+                        safeResults[rkey] = results[rkey];
+                    });
+                    safeResults[k] = args;
+                    callback(err, safeResults);
+                    // stop subsequent errors hitting callback multiple times
+                    callback = function () {};
+                }
+                else {
+                    results[k] = args;
+                    async.setImmediate(taskComplete);
+                }
+            };
+            var requires = task.slice(0, Math.abs(task.length - 1)) || [];
+            var ready = function () {
+                return _reduce(requires, function (a, x) {
+                    return (a && results.hasOwnProperty(x));
+                }, true) && !results.hasOwnProperty(k);
+            };
+            if (ready()) {
+                task[task.length - 1](taskCallback, results);
+            }
+            else {
+                var listener = function () {
+                    if (ready()) {
+                        removeListener(listener);
+                        task[task.length - 1](taskCallback, results);
+                    }
+                };
+                addListener(listener);
+            }
+        });
+    };
+
+    async.waterfall = function (tasks, callback) {
+        callback = callback || function () {};
+        if (tasks.constructor !== Array) {
+          var err = new Error('First argument to waterfall must be an array of functions');
+          return callback(err);
+        }
+        if (!tasks.length) {
+            return callback();
+        }
+        var wrapIterator = function (iterator) {
+            return function (err) {
+                if (err) {
+                    callback.apply(null, arguments);
+                    callback = function () {};
+                }
+                else {
+                    var args = Array.prototype.slice.call(arguments, 1);
+                    var next = iterator.next();
+                    if (next) {
+                        args.push(wrapIterator(next));
+                    }
+                    else {
+                        args.push(callback);
+                    }
+                    async.setImmediate(function () {
+                        iterator.apply(null, args);
+                    });
+                }
+            };
+        };
+        wrapIterator(async.iterator(tasks))();
+    };
+
+    var _parallel = function(eachfn, tasks, callback) {
+        callback = callback || function () {};
+        if (tasks.constructor === Array) {
+            eachfn.map(tasks, function (fn, callback) {
+                if (fn) {
+                    fn(function (err) {
+                        var args = Array.prototype.slice.call(arguments, 1);
+                        if (args.length <= 1) {
+                            args = args[0];
+                        }
+                        callback.call(null, err, args);
+                    });
+                }
+            }, callback);
+        }
+        else {
+            var results = {};
+            eachfn.each(_keys(tasks), function (k, callback) {
+                tasks[k](function (err) {
+                    var args = Array.prototype.slice.call(arguments, 1);
+                    if (args.length <= 1) {
+                        args = args[0];
+                    }
+                    results[k] = args;
+                    callback(err);
+                });
+            }, function (err) {
+                callback(err, results);
+            });
+        }
+    };
+
+    async.parallel = function (tasks, callback) {
+        _parallel({ map: async.map, each: async.each }, tasks, callback);
+    };
+
+    async.parallelLimit = function(tasks, limit, callback) {
+        _parallel({ map: _mapLimit(limit), each: _eachLimit(limit) }, tasks, callback);
+    };
+
+    async.series = function (tasks, callback) {
+        callback = callback || function () {};
+        if (tasks.constructor === Array) {
+            async.mapSeries(tasks, function (fn, callback) {
+                if (fn) {
+                    fn(function (err) {
+                        var args = Array.prototype.slice.call(arguments, 1);
+                        if (args.length <= 1) {
+                            args = args[0];
+                        }
+                        callback.call(null, err, args);
+                    });
+                }
+            }, callback);
+        }
+        else {
+            var results = {};
+            async.eachSeries(_keys(tasks), function (k, callback) {
+                tasks[k](function (err) {
+                    var args = Array.prototype.slice.call(arguments, 1);
+                    if (args.length <= 1) {
+                        args = args[0];
+                    }
+                    results[k] = args;
+                    callback(err);
+                });
+            }, function (err) {
+                callback(err, results);
+            });
+        }
+    };
+
+    async.iterator = function (tasks) {
+        var makeCallback = function (index) {
+            var fn = function () {
+                if (tasks.length) {
+                    tasks[index].apply(null, arguments);
+                }
+                return fn.next();
+            };
+            fn.next = function () {
+                return (index < tasks.length - 1) ? makeCallback(index + 1): null;
+            };
+            return fn;
+        };
+        return makeCallback(0);
+    };
+
+    async.apply = function (fn) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return function () {
+            return fn.apply(
+                null, args.concat(Array.prototype.slice.call(arguments))
+            );
+        };
+    };
+
+    var _concat = function (eachfn, arr, fn, callback) {
+        var r = [];
+        eachfn(arr, function (x, cb) {
+            fn(x, function (err, y) {
+                r = r.concat(y || []);
+                cb(err);
+            });
+        }, function (err) {
+            callback(err, r);
+        });
+    };
+    async.concat = doParallel(_concat);
+    async.concatSeries = doSeries(_concat);
+
+    async.whilst = function (test, iterator, callback) {
+        if (test()) {
+            iterator(function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                async.whilst(test, iterator, callback);
+            });
+        }
+        else {
+            callback();
+        }
+    };
+
+    async.doWhilst = function (iterator, test, callback) {
+        iterator(function (err) {
+            if (err) {
+                return callback(err);
+            }
+            if (test()) {
+                async.doWhilst(iterator, test, callback);
+            }
+            else {
+                callback();
+            }
+        });
+    };
+
+    async.until = function (test, iterator, callback) {
+        if (!test()) {
+            iterator(function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                async.until(test, iterator, callback);
+            });
+        }
+        else {
+            callback();
+        }
+    };
+
+    async.doUntil = function (iterator, test, callback) {
+        iterator(function (err) {
+            if (err) {
+                return callback(err);
+            }
+            if (!test()) {
+                async.doUntil(iterator, test, callback);
+            }
+            else {
+                callback();
+            }
+        });
+    };
+
+    async.queue = function (worker, concurrency) {
+        if (concurrency === undefined) {
+            concurrency = 1;
+        }
+        function _insert(q, data, pos, callback) {
+          if(data.constructor !== Array) {
+              data = [data];
+          }
+          _each(data, function(task) {
+              var item = {
+                  data: task,
+                  callback: typeof callback === 'function' ? callback : null
+              };
+
+              if (pos) {
+                q.tasks.unshift(item);
+              } else {
+                q.tasks.push(item);
+              }
+
+              if (q.saturated && q.tasks.length === concurrency) {
+                  q.saturated();
+              }
+              async.setImmediate(q.process);
+          });
+        }
+
+        var workers = 0;
+        var q = {
+            tasks: [],
+            concurrency: concurrency,
+            saturated: null,
+            empty: null,
+            drain: null,
+            push: function (data, callback) {
+              _insert(q, data, false, callback);
+            },
+            unshift: function (data, callback) {
+              _insert(q, data, true, callback);
+            },
+            process: function () {
+                if (workers < q.concurrency && q.tasks.length) {
+                    var task = q.tasks.shift();
+                    if (q.empty && q.tasks.length === 0) {
+                        q.empty();
+                    }
+                    workers += 1;
+                    var next = function () {
+                        workers -= 1;
+                        if (task.callback) {
+                            task.callback.apply(task, arguments);
+                        }
+                        if (q.drain && q.tasks.length + workers === 0) {
+                            q.drain();
+                        }
+                        q.process();
+                    };
+                    var cb = only_once(next);
+                    worker(task.data, cb);
+                }
+            },
+            length: function () {
+                return q.tasks.length;
+            },
+            running: function () {
+                return workers;
+            }
+        };
+        return q;
+    };
+
+    async.cargo = function (worker, payload) {
+        var working     = false,
+            tasks       = [];
+
+        var cargo = {
+            tasks: tasks,
+            payload: payload,
+            saturated: null,
+            empty: null,
+            drain: null,
+            push: function (data, callback) {
+                if(data.constructor !== Array) {
+                    data = [data];
+                }
+                _each(data, function(task) {
+                    tasks.push({
+                        data: task,
+                        callback: typeof callback === 'function' ? callback : null
+                    });
+                    if (cargo.saturated && tasks.length === payload) {
+                        cargo.saturated();
+                    }
+                });
+                async.setImmediate(cargo.process);
+            },
+            process: function process() {
+                if (working) return;
+                if (tasks.length === 0) {
+                    if(cargo.drain) cargo.drain();
+                    return;
+                }
+
+                var ts = typeof payload === 'number'
+                            ? tasks.splice(0, payload)
+                            : tasks.splice(0);
+
+                var ds = _map(ts, function (task) {
+                    return task.data;
+                });
+
+                if(cargo.empty) cargo.empty();
+                working = true;
+                worker(ds, function () {
+                    working = false;
+
+                    var args = arguments;
+                    _each(ts, function (data) {
+                        if (data.callback) {
+                            data.callback.apply(null, args);
+                        }
+                    });
+
+                    process();
+                });
+            },
+            length: function () {
+                return tasks.length;
+            },
+            running: function () {
+                return working;
+            }
+        };
+        return cargo;
+    };
+
+    var _console_fn = function (name) {
+        return function (fn) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            fn.apply(null, args.concat([function (err) {
+                var args = Array.prototype.slice.call(arguments, 1);
+                if (typeof console !== 'undefined') {
+                    if (err) {
+                        if (console.error) {
+                            console.error(err);
+                        }
+                    }
+                    else if (console[name]) {
+                        _each(args, function (x) {
+                            console[name](x);
+                        });
+                    }
+                }
+            }]));
+        };
+    };
+    async.log = _console_fn('log');
+    async.dir = _console_fn('dir');
+    /*async.info = _console_fn('info');
+    async.warn = _console_fn('warn');
+    async.error = _console_fn('error');*/
+
+    async.memoize = function (fn, hasher) {
+        var memo = {};
+        var queues = {};
+        hasher = hasher || function (x) {
+            return x;
+        };
+        var memoized = function () {
+            var args = Array.prototype.slice.call(arguments);
+            var callback = args.pop();
+            var key = hasher.apply(null, args);
+            if (key in memo) {
+                callback.apply(null, memo[key]);
+            }
+            else if (key in queues) {
+                queues[key].push(callback);
+            }
+            else {
+                queues[key] = [callback];
+                fn.apply(null, args.concat([function () {
+                    memo[key] = arguments;
+                    var q = queues[key];
+                    delete queues[key];
+                    for (var i = 0, l = q.length; i < l; i++) {
+                      q[i].apply(null, arguments);
+                    }
+                }]));
+            }
+        };
+        memoized.memo = memo;
+        memoized.unmemoized = fn;
+        return memoized;
+    };
+
+    async.unmemoize = function (fn) {
+      return function () {
+        return (fn.unmemoized || fn).apply(null, arguments);
+      };
+    };
+
+    async.times = function (count, iterator, callback) {
+        var counter = [];
+        for (var i = 0; i < count; i++) {
+            counter.push(i);
+        }
+        return async.map(counter, iterator, callback);
+    };
+
+    async.timesSeries = function (count, iterator, callback) {
+        var counter = [];
+        for (var i = 0; i < count; i++) {
+            counter.push(i);
+        }
+        return async.mapSeries(counter, iterator, callback);
+    };
+
+    async.compose = function (/* functions... */) {
+        var fns = Array.prototype.reverse.call(arguments);
+        return function () {
+            var that = this;
+            var args = Array.prototype.slice.call(arguments);
+            var callback = args.pop();
+            async.reduce(fns, args, function (newargs, fn, cb) {
+                fn.apply(that, newargs.concat([function () {
+                    var err = arguments[0];
+                    var nextargs = Array.prototype.slice.call(arguments, 1);
+                    cb(err, nextargs);
+                }]))
+            },
+            function (err, results) {
+                callback.apply(that, [err].concat(results));
+            });
+        };
+    };
+
+    var _applyEach = function (eachfn, fns /*args...*/) {
+        var go = function () {
+            var that = this;
+            var args = Array.prototype.slice.call(arguments);
+            var callback = args.pop();
+            return eachfn(fns, function (fn, cb) {
+                fn.apply(that, args.concat([cb]));
+            },
+            callback);
+        };
+        if (arguments.length > 2) {
+            var args = Array.prototype.slice.call(arguments, 2);
+            return go.apply(this, args);
+        }
+        else {
+            return go;
+        }
+    };
+    async.applyEach = doParallel(_applyEach);
+    async.applyEachSeries = doSeries(_applyEach);
+
+    async.forever = function (fn, callback) {
+        function next(err) {
+            if (err) {
+                if (callback) {
+                    return callback(err);
+                }
+                throw err;
+            }
+            fn(next);
+        }
+        next();
+    };
+
+    // AMD / RequireJS
+    if (typeof define !== 'undefined' && define.amd) {
+        define([], function () {
+            return async;
+        });
+    }
+    // Node.js
+    else if (typeof module !== 'undefined' && module.exports) {
+        module.exports = async;
+    }
+    // included directly via <script> tag
+    else {
+        root.async = async;
+    }
+
+}());
+
+})(require("__browserify_process"))
+},{"__browserify_process":3}],39:[function(require,module,exports){
 (function(process){const stream = require('stream')
     , util   = require('util')
 
@@ -7563,7 +9264,7 @@ module.exports = function (buffer) {
 }
 
 })(require("__browserify_process"))
-},{"stream":10,"util":3,"__browserify_process":5}],11:[function(require,module,exports){
+},{"stream":9,"util":1,"__browserify_process":3}],19:[function(require,module,exports){
 (function(){var assert = require('assert');
 exports.Buffer = Buffer;
 exports.SlowBuffer = Buffer;
@@ -8647,7 +10348,7 @@ Buffer.prototype.writeDoubleBE = function(value, offset, noAssert) {
 };
 
 })()
-},{"assert":32,"./buffer_ieee754":34,"base64-js":36}],21:[function(require,module,exports){
+},{"assert":35,"./buffer_ieee754":38,"base64-js":40}],28:[function(require,module,exports){
 (function(Buffer){/* Copyright (c) 2012-2013 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
  * MIT +no-false-attribs License <https://github.com/rvagg/node-levelup/blob/master/LICENSE>
@@ -8819,7 +10520,7 @@ module.exports.create = function (options, db, iteratorFactory) {
 }
 
 })(require("__browserify_Buffer").Buffer)
-},{"stream":10,"util":3,"./errors":20,"./read-stream-state":19,"./util":23,"simple-bufferstream":35,"xtend":24,"__browserify_Buffer":14}],22:[function(require,module,exports){
+},{"stream":9,"util":1,"./errors":27,"./read-stream-state":26,"./util":30,"simple-bufferstream":39,"xtend":18,"__browserify_Buffer":21}],29:[function(require,module,exports){
 /* Copyright (c) 2012-2013 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
  * MIT +no-false-attribs License
@@ -8989,7 +10690,7 @@ WriteStream.prototype.toString = function () {
 module.exports.create = function (options, db) {
   return new WriteStream(options, db)
 }
-},{"stream":10,"util":3,"./util":23,"concat-stream":37,"xtend":24}],37:[function(require,module,exports){
+},{"stream":9,"util":1,"./util":30,"concat-stream":41,"xtend":18}],41:[function(require,module,exports){
 (function(Buffer){var stream = require('stream')
 var util = require('util')
 
@@ -9042,7 +10743,7 @@ module.exports = function(cb) {
 module.exports.ConcatStream = ConcatStream
 
 })(require("__browserify_Buffer").Buffer)
-},{"stream":10,"util":3,"__browserify_Buffer":14}],23:[function(require,module,exports){
+},{"stream":9,"util":1,"__browserify_Buffer":21}],30:[function(require,module,exports){
 (function(process,global,Buffer){/* Copyright (c) 2012-2013 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
  * MIT +no-false-attribs License
@@ -9175,755 +10876,42 @@ module.exports = {
 }
 
 })(require("__browserify_process"),self,require("__browserify_Buffer").Buffer)
-},{"leveldown/package":13,"semver":13,"leveldown":13,"../package.json":17,"./errors":20,"xtend":24,"__browserify_process":5,"__browserify_Buffer":14}],30:[function(require,module,exports){
-var Variable = require("./variable")
-  , Transform = require("./streamwrapper").Transform
-  , CallbackStream = require("callback-stream")
-  , wrapCallback = require("./utilities").wrapCallback;
+},{"leveldown":20,"leveldown/package":20,"semver":20,"../package.json":24,"./errors":27,"xtend":18,"__browserify_process":3,"__browserify_Buffer":21}],18:[function(require,module,exports){
+var Keys = require("object-keys")
+var isObject = require("is-object")
 
-function NavigatorStream(options) {
-  if (!(this instanceof NavigatorStream)) {
-    return new NavigatorStream(options);
-  }
+module.exports = extend
 
-  options.objectMode = true;
+function extend() {
+    var target = {}
 
-  Transform.call(this, options);
+    for (var i = 0; i < arguments.length; i++) {
+        var source = arguments[i]
 
-  this._lastElement = options._lastElement;
-}
-
-NavigatorStream.prototype = Object.create(
-  Transform.prototype,
-  { constructor: { value: NavigatorStream } }
-);
-
-NavigatorStream.prototype._transform = function(data, encoding, done) {
-  var value = data[this._lastElement.name] || this._lastElement;
-  this.push(value);
-  done();
-};
-
-function Navigator(options) {
-  if (!(this instanceof Navigator)) {
-    return new Navigator(options);
-  }
-
-  this.db = options.db;
-  this._conditions = [];
-  this._initialContext = {};
-
-  var count = 0;
-  this._nextVar = function() {
-    return this.db.v("x" + count++);
-  };
-
-  this.go(options.start);
-}
-
-function arch(varKey, lastKey) {
-  return function(predicate) {
-    var triple = {
-      predicate: predicate
-    };
-
-    triple[varKey] = this._nextVar();
-    triple[lastKey] = this._lastElement;
-
-    this._conditions.push(triple);
-
-    this._lastElement = triple[varKey];
-
-    return this;
-  };
-}
-
-Navigator.prototype.archOut = arch("object", "subject");
-Navigator.prototype.archIn = arch("subject", "object");
-
-Navigator.prototype.bind  = function (value) {
-  this._initialContext[this._lastElement.name] = value;
-  return this;
-};
-
-Navigator.prototype.as = function (name) {
-  this._lastElement.name = name;
-  return this;
-};
-
-Navigator.prototype.go = function (vertex) {
-  if (!vertex) {
-    vertex = this._nextVar();
-  }
-  this._lastElement = vertex;
-  return this;
-};
-
-Navigator.prototype.triples = wrapCallback("triplesStream");
-
-Navigator.prototype.triplesStream = function (pattern) {
-
-  var stream = null;
-
-  var options = {
-    context: this._initialContext,
-    materialized: pattern
-  };
-  stream = this.db.joinStream(this._conditions, options);
-
-  return stream;
-};
-
-Navigator.prototype.contexts = Navigator.prototype.triples;
-Navigator.prototype.contextsStream = Navigator.prototype.triplesStream;
-
-Navigator.prototype.valuesStream = function () {
-  var stream, options;
-  
-  stream = new NavigatorStream({
-    _lastElement: this._lastElement
-  });
-
-  if (this._conditions.length === 0) {
-    stream.end({});
-    return stream;
-  }
-
-  options = { context: this._initialContext };
-
-  this.db.joinStream(this._conditions, options).
-    pipe(stream);
-
-  return stream;
-};
-
-Navigator.prototype.values = function (cb) {
-  var that = this
-    , stream = this.valuesStream()
-    , collect = function(err, results) {
-        if (err) {
-          cb(err);
-          return;
+        if (!isObject(source)) {
+            continue
         }
 
-        results = results.reduce(function(acc, result) {
-          if (acc.indexOf(result) < 0) {
-            acc.push(result);
-          }
-          return acc;
-        }, []);
+        var keys = Keys(source)
 
-        cb(null, results);
-      };
-
-  stream.pipe(new CallbackStream({
-    objectMode: true
-  }, collect));
-
-  return this;
-};
-
-module.exports = Navigator;
-
-},{"./variable":12,"./streamwrapper":26,"./utilities":28,"callback-stream":38}],28:[function(require,module,exports){
-
-var CallbackStream = require("callback-stream")
-  , Variable       = require("./variable")
-  , defs = {
-      spo: ["subject", "predicate", "object"],
-      sop: ["subject", "object", "predicate"],
-      pos: ["predicate", "object", "subject"],
-      pso: ["predicate", "subject", "object"],
-      ops: ["object", "predicate", "subject"],
-      osp: ["object", "subject", "predicate"]
-    };
-
-module.exports.defs = defs;
-
-function wrapCallback(method) {
-  return function(query, cb) {
-    var args = Array.prototype.slice.call(arguments, 0)
-      , callback = args.pop()
-      , stream = null;
-
-    stream = this[method].apply(this, args);
-
-    stream.pipe(new CallbackStream({ objectMode: true }, callback));
-  };
-}
-
-module.exports.wrapCallback = wrapCallback;
-
-function genKey(key, triple) {
-  return [key].concat(defs[key].map(function(t) {
-    return triple[t];
-  })).filter(function(e) {
-    return e !== null && e !== undefined;
-  }).join("::");
-}
-
-module.exports.genKey = genKey;
-
-function genKeys(triple) {
-  return Object.keys(defs).map(function(key) {
-    return genKey(key, triple);
-  });
-}
-
-module.exports.genKeys = genKeys;
-
-function possibleIndexes(types) {
-  var result = Object.keys(defs).filter(function(key) {
-    var matches = 0;
-    return defs[key].every(function (e, i) {
-      if (types.indexOf(e) >= 0) {
-        matches++;
-        return true;
-      }
-      
-      if (matches === types.length) {
-        return true;
-      }
-    });
-  });
-
-  result.sort();
-
-  return result;
-}
-
-module.exports.possibleIndexes = possibleIndexes;
-
-function findIndex(types, preferiteIndex) {
-  var result = possibleIndexes(types)
-    , index
-    , there;
-
-  there = result.some(function(r) {
-    return r === preferiteIndex;
-  });
-
-  if (preferiteIndex && there) {
-    index = preferiteIndex;
-  } else {
-    index = result[0];
-  }
-
-  return index;
-}
-
-module.exports.findIndex = findIndex;
-
-function createQuery(pattern, options) {
-  var types = Object.keys(pattern)
-    , preferiteIndex = (options || {}).index
-    , index = findIndex(types, preferiteIndex)
-    , key = genKey(index, pattern)
-    , query = {
-        start: key,
-        end: key + "\xff",
-        fillCache: true
-      };
-
-  return query;
-}
-
-module.exports.createQuery = createQuery;
-
-function genActions(action, triple) {
-  var json = JSON.stringify(triple);
-  return genKeys(triple).map(function(key) {
-    return { type: action, key: key, value: json };
-  });
-}
-
-module.exports.genActions = genActions;
-
-function materializer(pattern, data) {
-  return Object.keys(pattern)
-               .reduce(function(result, key) {
-
-    if (pattern[key] instanceof Variable) {
-      result[key] = data[pattern[key].name];
-    } else {
-      result[key] = pattern[key];
+        for (var j = 0; j < keys.length; j++) {
+            var name = keys[j]
+            target[name] = source[name]
+        }
     }
 
-    return result;
-  }, {});
+    return target
 }
 
-module.exports.materializer = materializer;
-
-var objectMask = function(criteria, object) {
-  return Object.keys(object).
-    filter(function(key) {
-      return defs.spo.indexOf(key) >= 0;
-    }).
-    filter(function(key) {
-      return criteria(object, key);
-    }).
-    reduce(function(acc, key) {
-      acc[key] = object[key];
-      return acc;
-    },
-  {});
-};
-
-module.exports.queryMask = objectMask.bind(null, function(triple, key) {
-  return typeof triple[key] !== "object";
-});
-
-module.exports.variablesMask = objectMask.bind(null, function(triple, key) {
-  return triple[key] instanceof Variable;
-});
-
-},{"./variable":12,"callback-stream":38}],39:[function(require,module,exports){
-
-var Transform = require("./streamwrapper").Transform
-  , Variable = require("./variable")
-  , utilities = require("./utilities")
-  , queryMask = utilities.queryMask
-  , variablesMask = utilities.variablesMask
-  , maskUpdater
-  , matcher;
-
-function JoinStream(options) {
-  if (!(this instanceof JoinStream)) {
-    return new JoinStream(options);
-  }
-
-  options.objectMode = true;
-
-  Transform.call(this, options);
-  
-  this.triple = options.triple;
-  this.matcher = matcher(options.triple);
-  this.mask = queryMask(options.triple);
-  this.maskUpdater = maskUpdater(options.triple);
-  this.db = options.db;
-  this._index = options.index;
-
-  var that = this;
-  this.once("pipe", function(source) {
-    source.on("error", function(err) {
-      that.emit("error", err);
-    });
-  });
-}
-
-JoinStream.prototype = Object.create(
-  Transform.prototype,
-  { constructor: { value: JoinStream } }
-);
-
-JoinStream.prototype._transform = function(context, encoding, done) {
-
-  var that = this;
-
-  var newMask = this.maskUpdater(context, this.mask);
-  var readStream = this.db.getStream(newMask, { index: this._index });
-
-  readStream.on("data", function(triple) {
-    var newContext = that.matcher(context, triple);
-
-    if (newContext) {
-      that.push(newContext);
-    }
-  });
-
-  readStream.on("error", function(err) {
-    that.emit("error", err);
-  });
-
-  readStream.on("end", done);
-};
-
-module.exports = JoinStream;
-
-matcher = function(pattern) {
-  var variables = variablesMask(pattern);
-  return function(context, triple) {
-    var bindable = Object.keys(variables).every(function(key) {
-      var variable = variables[key];
-      return variable.isBindable(context, triple[key]);
-    });
-
-    if (!bindable) {
-      return false;
-    }
-  
-    return Object.keys(variables).reduce(function(newContext, key) {
-      var variable = variables[key];
-      return variable.bind(newContext, triple[key]);
-    }, context);
-  };
-};
-
-maskUpdater = function(pattern) {
-  var variables = variablesMask(pattern);
-  return function(context, mask) {
-    return Object.keys(variables).reduce(function(newMask, key) {
-      var variable = variables[key];
-      if (variable.isBound(context)) {
-        newMask[key] = context[variable.name];
-      }
-      return newMask;
-    }, Object.keys(mask).reduce(function(acc, key) {
-      acc[key] = mask[key];
-      return acc;
-    }, {}));
-  };
-};
-
-},{"./streamwrapper":26,"./variable":12,"./utilities":28}],40:[function(require,module,exports){
-
-var Transform = require("./streamwrapper").Transform
-  , Variable = require("./variable")
-  , queryMask = require("./utilities").queryMask
-  , variablesMask = require("./utilities").variablesMask
-  , maskUpdater
-  , matcher
-  , materializer = require("./utilities").materializer
-  , createQuery = require("./utilities").createQuery
-  , genKey = require("./utilities").genKey
-  , genKeys = require("./utilities").genKeys;
-
-var counter = 0;
-
-function SortJoinStream(options) {
-  if (!(this instanceof SortJoinStream)) {
-    return new SortJoinStream(options);
-  }
-
-  options.objectMode = true;
-
-  Transform.call(this, options);
-  
-  this.triple = options.triple;
-  this.matcher = matcher(options.triple);
-  this.db = options.db;
-
-  var that = this;
-  this.once("pipe", function(source) {
-    source.on("error", function(err) {
-      that.emit("error", err);
-    });
-  });
-
-  this._queryMask = queryMask(options.triple);
-
-  this.index = options.index;
-
-  this._previousTriple = null;
-  this._lastDone = null;
-  this._restart();
-}
-
-SortJoinStream.prototype = Object.create(
-  Transform.prototype,
-  { constructor: { value: SortJoinStream } }
-);
-
-SortJoinStream.prototype._restart = function() {
-  var that = this;
-
-  this._readStream = this.db.getStream(this._queryMask, { index: this.index });
-
-  this._readStream.on("error", function(err) {
-    that.emit("error", err);
-  });
-
-  this._readStream.on("end", function() {
-    that._readStream = null;
-    that._execLastDone();
-  });
-
-  this._readStream.on("readable", function() {
-    if (that._toNextTriple) {
-      that._toNextTriple();
-    }
-  });
-};
-
-SortJoinStream.prototype._execLastDone = function() {
-  var that = this;
-  if(that._lastDone) {
-    var func = that._lastDone;
-    that._toNextTriple = null;
-    that._lastDone = null;
-    func();
-  }
-};
-
-SortJoinStream.prototype._flush = function(cb) {
-  var that = this;
-
-  this._execLastDone();
-
-  if (this._readStream && this._readStream.readable) {
-    that._readStream.destroy();
-  }
-
-  cb();
-};
-
-SortJoinStream.prototype._nextTriple = function(cb, skip) {
-  var that = this
-    , triple
-    , callCallback = function() {
-        if (!that._previousTriple && that._readStream) {
-          that._previousTriple = that._readStream.read();
-        } else if (!that._readStream && that._lastDone) {
-          that._execLastDone();
-        }
-        that._toNextTriple = null;
-
-        if (that._previousTriple) {
-          cb(that._previousTriple);
-        } else {
-          that._toNextTriple = callCallback;
-        }
-      };
-
-  if (skip) {
-    that._previousTriple = null;
-  }
-
-  callCallback();
-};
-
-
-SortJoinStream.prototype._transform = function(context, encoding, done) {
-
-  if (!this._readStream && !this._previousTriple) {
-    done();
-    return;
-  }
-
-  var that = this
-
-    , reCount = this.count++
-
-    , matched = false
-
-    , doRead = function(triple) {
-
-        var newContext = that.matcher(context, triple)
-          , key
-          , otherKey;
-
-        key = genKey(that.index, materializer(that.triple, context)) + "::\xff";
-
-        if (newContext) {
-          that.push(newContext);
-          that._nextTriple(doRead, true);
-          return;
-        }
-
-        key = genKey(that.index, materializer(that.triple, context)) + "::\xff";
-        otherKey = genKey(that.index, triple);
-
-        if (key >= otherKey) {
-          that._nextTriple(doRead, true);
-        } else {
-          that._lastDone = null;
-          that._toNextTriple = null;
-          done();
-        }
-      };
-
-  this._lastDone = done;
-  this._nextTriple(doRead);
-};
-
-module.exports = SortJoinStream;
-
-matcher = function(pattern) {
-  var variables = variablesMask(pattern);
-  return function(context, triple) {
-    var bindable = Object.keys(variables).every(function(key) {
-      var variable = variables[key];
-      return variable.isBindable(context, triple[key]);
-    });
-
-    if (!bindable) {
-      return false;
-    }
-  
-    return Object.keys(variables).reduce(function(newContext, key) {
-      var variable = variables[key];
-      return variable.bind(newContext, triple[key]);
-    }, context);
-  };
-};
-
-maskUpdater = function(pattern) {
-  var variables = variablesMask(pattern);
-  return function(context, mask) {
-    return Object.keys(variables).reduce(function(newMask, key) {
-      var variable = variables[key];
-      if (variable.isBound(context)) {
-        newMask[key] = context[variable.name];
-      }
-      return newMask;
-    }, Object.keys(mask).reduce(function(acc, key) {
-      acc[key] = mask[key];
-      return acc;
-    }, {}));
-  };
-};
-
-},{"./streamwrapper":26,"./variable":12,"./utilities":28}],26:[function(require,module,exports){
-module.exports = require("readable-stream");
-
-},{"readable-stream":41}],31:[function(require,module,exports){
-
-var utilities = require("./utilities")
-  , queryMask = utilities.queryMask
-  , variablesMask = utilities.variablesMask
-  , JoinStream = require("./joinstream")
-  , SortJoinStream = require("./sortjoinstream")
-  , doSortQueryPlan
-  , async = require("async");
-
-function queryplanner(db, options) {
-  return function planner(query, callback) {
-    // dupes!
-    var result = [].concat(query);
-
-    async.each(query, function(q, cb) {
-      var newq = queryMask(q)
-        , range = utilities.createQuery(newq)
-        , result = function(err, size) {
-            if (err) {
-              callback(err);
-              return;
-            }
-            q.size = size;
-            cb();
-          };
-     
-      try {
-        db.approximateSize(range.start, range.end, result);
-      } catch(err) {
-        result(null, Object.keys(variablesMask(q)).length);
-      }
-
-    }, function(err) {
-      if (err) {
-        callback(err);
-        return;
-      }
-
-      result.sort(function compare(a, b) {
-        if (a.size < b.size) {
-          return -1;
-        }
-        if (a.size > b.size) {
-          return 1;
-        }
-        return 0;
-      });
-
-      result.forEach(function(q) {
-        delete q.size;
-      });
-
-      if (options.joinAlgorithm === "sort" && result.length > 1) {
-        result.reduce(doSortQueryPlan);
-      }
-
-      result.forEach(function(q) {
-        if (!q.stream) {
-          q.stream = JoinStream;
-        }
-      });
-
-      callback(null, result);
-    });
-  };
-}
-
-doSortQueryPlan = function(first, second) {
-  if (first === null || first.stream === JoinStream) {
-    return null;
-  }
-
-  var firstQueryMask = utilities.queryMask(first)
-    , secondQueryMask = utilities.queryMask(second)
-    , firstVariablesMask = utilities.variablesMask(first)
-    , secondVariablesMask = utilities.variablesMask(second)
-
-    , firstVariables = Object.keys(firstVariablesMask).map(function(key) {
-        return firstVariablesMask[key];
-      })
-
-    , secondVariables = Object.keys(secondVariablesMask).map(function(key) {
-        return secondVariablesMask[key];
-      })
-      
-    , variableKey = function(obj, variable) {
-        return Object.keys(obj).filter(function(key) {
-          return obj[key].name === variable.name;
-        })[0];
-      }
-
-    , commonVariables = firstVariables.filter(function(firstVar) {
-        return secondVariables.some(function(secondVar) {
-          return firstVar.name === secondVar.name;
-        });
-      })
-    , firstIndexArray = Object.keys(firstQueryMask)
-    , secondIndexArray = Object.keys(secondQueryMask)
-    , firstIndexes
-    , secondIndexes;
-
-  if (commonVariables.length === 0) {
-    return null;
-  }
-
-  first.stream = first.stream ? first.stream : JoinStream;
-
-  firstIndexArray.sort();
-  secondIndexArray.sort();
-
-  commonVariables.sort(function(a, b) {
-    if (a.name < b.name) {
-      return -1;
-    } else if (a.name > b.name) {
-      return 1;
-    } else {
-      return 0;
-    }
-  });
-
-  commonVariables.forEach(function(commonVar) {
-    firstIndexArray.push(variableKey(firstVariablesMask, commonVar));
-    secondIndexArray.push(variableKey(secondVariablesMask, commonVar));
-  });
-
-  firstIndexes = orderedPossibleIndex(firstIndexArray);
-  secondIndexes = orderedPossibleIndex(secondIndexArray);
-
-  first.index = first.index || firstIndexes[0];
-  second.index = secondIndexes[0];
-  second.stream = SortJoinStream;
-
-  return second;
-}
-
-function orderedPossibleIndex(keys) {
-  return Object.keys(utilities.defs).filter(function(index) {
-    return keys.every(function(key, pos) {
-      return utilities.defs[index][pos] === key;
-    });
-  });
-}
-
-module.exports = queryplanner;
-
-},{"./utilities":28,"./joinstream":39,"./sortjoinstream":40,"async":42}],36:[function(require,module,exports){
+},{"object-keys":42,"is-object":43}],34:[function(require,module,exports){
+exports = module.exports = require('./lib/_stream_readable.js');
+exports.Readable = exports;
+exports.Writable = require('./lib/_stream_writable.js');
+exports.Duplex = require('./lib/_stream_duplex.js');
+exports.Transform = require('./lib/_stream_transform.js');
+exports.PassThrough = require('./lib/_stream_passthrough.js');
+
+},{"./lib/_stream_readable.js":44,"./lib/_stream_writable.js":45,"./lib/_stream_duplex.js":46,"./lib/_stream_transform.js":47,"./lib/_stream_passthrough.js":48}],40:[function(require,module,exports){
 (function (exports) {
 	'use strict';
 
@@ -10009,7 +10997,7 @@ module.exports = queryplanner;
 	module.exports.fromByteArray = uint8ToBase64;
 }());
 
-},{}],33:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 (function(){var all = module.exports.all = [
  {
   "errno": -1,
@@ -10438,1062 +11426,14 @@ module.exports.code = {
 module.exports.custom = require("./custom")(module.exports)
 
 })()
-},{"./custom":43}],24:[function(require,module,exports){
-var Keys = require("object-keys")
-var isObject = require("is-object")
-
-module.exports = extend
-
-function extend() {
-    var target = {}
-
-    for (var i = 0; i < arguments.length; i++) {
-        var source = arguments[i]
-
-        if (!isObject(source)) {
-            continue
-        }
-
-        var keys = Keys(source)
-
-        for (var j = 0; j < keys.length; j++) {
-            var name = keys[j]
-            target[name] = source[name]
-        }
-    }
-
-    return target
-}
-
-},{"object-keys":44,"is-object":45}],42:[function(require,module,exports){
-(function(process){/*global setImmediate: false, setTimeout: false, console: false */
-(function () {
-
-    var async = {};
-
-    // global on the server, window in the browser
-    var root, previous_async;
-
-    root = this;
-    if (root != null) {
-      previous_async = root.async;
-    }
-
-    async.noConflict = function () {
-        root.async = previous_async;
-        return async;
-    };
-
-    function only_once(fn) {
-        var called = false;
-        return function() {
-            if (called) throw new Error("Callback was already called.");
-            called = true;
-            fn.apply(root, arguments);
-        }
-    }
-
-    //// cross-browser compatiblity functions ////
-
-    var _each = function (arr, iterator) {
-        if (arr.forEach) {
-            return arr.forEach(iterator);
-        }
-        for (var i = 0; i < arr.length; i += 1) {
-            iterator(arr[i], i, arr);
-        }
-    };
-
-    var _map = function (arr, iterator) {
-        if (arr.map) {
-            return arr.map(iterator);
-        }
-        var results = [];
-        _each(arr, function (x, i, a) {
-            results.push(iterator(x, i, a));
-        });
-        return results;
-    };
-
-    var _reduce = function (arr, iterator, memo) {
-        if (arr.reduce) {
-            return arr.reduce(iterator, memo);
-        }
-        _each(arr, function (x, i, a) {
-            memo = iterator(memo, x, i, a);
-        });
-        return memo;
-    };
-
-    var _keys = function (obj) {
-        if (Object.keys) {
-            return Object.keys(obj);
-        }
-        var keys = [];
-        for (var k in obj) {
-            if (obj.hasOwnProperty(k)) {
-                keys.push(k);
-            }
-        }
-        return keys;
-    };
-
-    //// exported async module functions ////
-
-    //// nextTick implementation with browser-compatible fallback ////
-    if (typeof process === 'undefined' || !(process.nextTick)) {
-        if (typeof setImmediate === 'function') {
-            async.nextTick = function (fn) {
-                // not a direct alias for IE10 compatibility
-                setImmediate(fn);
-            };
-            async.setImmediate = async.nextTick;
-        }
-        else {
-            async.nextTick = function (fn) {
-                setTimeout(fn, 0);
-            };
-            async.setImmediate = async.nextTick;
-        }
-    }
-    else {
-        async.nextTick = process.nextTick;
-        if (typeof setImmediate !== 'undefined') {
-            async.setImmediate = setImmediate;
-        }
-        else {
-            async.setImmediate = async.nextTick;
-        }
-    }
-
-    async.each = function (arr, iterator, callback) {
-        callback = callback || function () {};
-        if (!arr.length) {
-            return callback();
-        }
-        var completed = 0;
-        _each(arr, function (x) {
-            iterator(x, only_once(function (err) {
-                if (err) {
-                    callback(err);
-                    callback = function () {};
-                }
-                else {
-                    completed += 1;
-                    if (completed >= arr.length) {
-                        callback(null);
-                    }
-                }
-            }));
-        });
-    };
-    async.forEach = async.each;
-
-    async.eachSeries = function (arr, iterator, callback) {
-        callback = callback || function () {};
-        if (!arr.length) {
-            return callback();
-        }
-        var completed = 0;
-        var iterate = function () {
-            iterator(arr[completed], function (err) {
-                if (err) {
-                    callback(err);
-                    callback = function () {};
-                }
-                else {
-                    completed += 1;
-                    if (completed >= arr.length) {
-                        callback(null);
-                    }
-                    else {
-                        iterate();
-                    }
-                }
-            });
-        };
-        iterate();
-    };
-    async.forEachSeries = async.eachSeries;
-
-    async.eachLimit = function (arr, limit, iterator, callback) {
-        var fn = _eachLimit(limit);
-        fn.apply(null, [arr, iterator, callback]);
-    };
-    async.forEachLimit = async.eachLimit;
-
-    var _eachLimit = function (limit) {
-
-        return function (arr, iterator, callback) {
-            callback = callback || function () {};
-            if (!arr.length || limit <= 0) {
-                return callback();
-            }
-            var completed = 0;
-            var started = 0;
-            var running = 0;
-
-            (function replenish () {
-                if (completed >= arr.length) {
-                    return callback();
-                }
-
-                while (running < limit && started < arr.length) {
-                    started += 1;
-                    running += 1;
-                    iterator(arr[started - 1], function (err) {
-                        if (err) {
-                            callback(err);
-                            callback = function () {};
-                        }
-                        else {
-                            completed += 1;
-                            running -= 1;
-                            if (completed >= arr.length) {
-                                callback();
-                            }
-                            else {
-                                replenish();
-                            }
-                        }
-                    });
-                }
-            })();
-        };
-    };
-
-
-    var doParallel = function (fn) {
-        return function () {
-            var args = Array.prototype.slice.call(arguments);
-            return fn.apply(null, [async.each].concat(args));
-        };
-    };
-    var doParallelLimit = function(limit, fn) {
-        return function () {
-            var args = Array.prototype.slice.call(arguments);
-            return fn.apply(null, [_eachLimit(limit)].concat(args));
-        };
-    };
-    var doSeries = function (fn) {
-        return function () {
-            var args = Array.prototype.slice.call(arguments);
-            return fn.apply(null, [async.eachSeries].concat(args));
-        };
-    };
-
-
-    var _asyncMap = function (eachfn, arr, iterator, callback) {
-        var results = [];
-        arr = _map(arr, function (x, i) {
-            return {index: i, value: x};
-        });
-        eachfn(arr, function (x, callback) {
-            iterator(x.value, function (err, v) {
-                results[x.index] = v;
-                callback(err);
-            });
-        }, function (err) {
-            callback(err, results);
-        });
-    };
-    async.map = doParallel(_asyncMap);
-    async.mapSeries = doSeries(_asyncMap);
-    async.mapLimit = function (arr, limit, iterator, callback) {
-        return _mapLimit(limit)(arr, iterator, callback);
-    };
-
-    var _mapLimit = function(limit) {
-        return doParallelLimit(limit, _asyncMap);
-    };
-
-    // reduce only has a series version, as doing reduce in parallel won't
-    // work in many situations.
-    async.reduce = function (arr, memo, iterator, callback) {
-        async.eachSeries(arr, function (x, callback) {
-            iterator(memo, x, function (err, v) {
-                memo = v;
-                callback(err);
-            });
-        }, function (err) {
-            callback(err, memo);
-        });
-    };
-    // inject alias
-    async.inject = async.reduce;
-    // foldl alias
-    async.foldl = async.reduce;
-
-    async.reduceRight = function (arr, memo, iterator, callback) {
-        var reversed = _map(arr, function (x) {
-            return x;
-        }).reverse();
-        async.reduce(reversed, memo, iterator, callback);
-    };
-    // foldr alias
-    async.foldr = async.reduceRight;
-
-    var _filter = function (eachfn, arr, iterator, callback) {
-        var results = [];
-        arr = _map(arr, function (x, i) {
-            return {index: i, value: x};
-        });
-        eachfn(arr, function (x, callback) {
-            iterator(x.value, function (v) {
-                if (v) {
-                    results.push(x);
-                }
-                callback();
-            });
-        }, function (err) {
-            callback(_map(results.sort(function (a, b) {
-                return a.index - b.index;
-            }), function (x) {
-                return x.value;
-            }));
-        });
-    };
-    async.filter = doParallel(_filter);
-    async.filterSeries = doSeries(_filter);
-    // select alias
-    async.select = async.filter;
-    async.selectSeries = async.filterSeries;
-
-    var _reject = function (eachfn, arr, iterator, callback) {
-        var results = [];
-        arr = _map(arr, function (x, i) {
-            return {index: i, value: x};
-        });
-        eachfn(arr, function (x, callback) {
-            iterator(x.value, function (v) {
-                if (!v) {
-                    results.push(x);
-                }
-                callback();
-            });
-        }, function (err) {
-            callback(_map(results.sort(function (a, b) {
-                return a.index - b.index;
-            }), function (x) {
-                return x.value;
-            }));
-        });
-    };
-    async.reject = doParallel(_reject);
-    async.rejectSeries = doSeries(_reject);
-
-    var _detect = function (eachfn, arr, iterator, main_callback) {
-        eachfn(arr, function (x, callback) {
-            iterator(x, function (result) {
-                if (result) {
-                    main_callback(x);
-                    main_callback = function () {};
-                }
-                else {
-                    callback();
-                }
-            });
-        }, function (err) {
-            main_callback();
-        });
-    };
-    async.detect = doParallel(_detect);
-    async.detectSeries = doSeries(_detect);
-
-    async.some = function (arr, iterator, main_callback) {
-        async.each(arr, function (x, callback) {
-            iterator(x, function (v) {
-                if (v) {
-                    main_callback(true);
-                    main_callback = function () {};
-                }
-                callback();
-            });
-        }, function (err) {
-            main_callback(false);
-        });
-    };
-    // any alias
-    async.any = async.some;
-
-    async.every = function (arr, iterator, main_callback) {
-        async.each(arr, function (x, callback) {
-            iterator(x, function (v) {
-                if (!v) {
-                    main_callback(false);
-                    main_callback = function () {};
-                }
-                callback();
-            });
-        }, function (err) {
-            main_callback(true);
-        });
-    };
-    // all alias
-    async.all = async.every;
-
-    async.sortBy = function (arr, iterator, callback) {
-        async.map(arr, function (x, callback) {
-            iterator(x, function (err, criteria) {
-                if (err) {
-                    callback(err);
-                }
-                else {
-                    callback(null, {value: x, criteria: criteria});
-                }
-            });
-        }, function (err, results) {
-            if (err) {
-                return callback(err);
-            }
-            else {
-                var fn = function (left, right) {
-                    var a = left.criteria, b = right.criteria;
-                    return a < b ? -1 : a > b ? 1 : 0;
-                };
-                callback(null, _map(results.sort(fn), function (x) {
-                    return x.value;
-                }));
-            }
-        });
-    };
-
-    async.auto = function (tasks, callback) {
-        callback = callback || function () {};
-        var keys = _keys(tasks);
-        if (!keys.length) {
-            return callback(null);
-        }
-
-        var results = {};
-
-        var listeners = [];
-        var addListener = function (fn) {
-            listeners.unshift(fn);
-        };
-        var removeListener = function (fn) {
-            for (var i = 0; i < listeners.length; i += 1) {
-                if (listeners[i] === fn) {
-                    listeners.splice(i, 1);
-                    return;
-                }
-            }
-        };
-        var taskComplete = function () {
-            _each(listeners.slice(0), function (fn) {
-                fn();
-            });
-        };
-
-        addListener(function () {
-            if (_keys(results).length === keys.length) {
-                callback(null, results);
-                callback = function () {};
-            }
-        });
-
-        _each(keys, function (k) {
-            var task = (tasks[k] instanceof Function) ? [tasks[k]]: tasks[k];
-            var taskCallback = function (err) {
-                var args = Array.prototype.slice.call(arguments, 1);
-                if (args.length <= 1) {
-                    args = args[0];
-                }
-                if (err) {
-                    var safeResults = {};
-                    _each(_keys(results), function(rkey) {
-                        safeResults[rkey] = results[rkey];
-                    });
-                    safeResults[k] = args;
-                    callback(err, safeResults);
-                    // stop subsequent errors hitting callback multiple times
-                    callback = function () {};
-                }
-                else {
-                    results[k] = args;
-                    async.setImmediate(taskComplete);
-                }
-            };
-            var requires = task.slice(0, Math.abs(task.length - 1)) || [];
-            var ready = function () {
-                return _reduce(requires, function (a, x) {
-                    return (a && results.hasOwnProperty(x));
-                }, true) && !results.hasOwnProperty(k);
-            };
-            if (ready()) {
-                task[task.length - 1](taskCallback, results);
-            }
-            else {
-                var listener = function () {
-                    if (ready()) {
-                        removeListener(listener);
-                        task[task.length - 1](taskCallback, results);
-                    }
-                };
-                addListener(listener);
-            }
-        });
-    };
-
-    async.waterfall = function (tasks, callback) {
-        callback = callback || function () {};
-        if (tasks.constructor !== Array) {
-          var err = new Error('First argument to waterfall must be an array of functions');
-          return callback(err);
-        }
-        if (!tasks.length) {
-            return callback();
-        }
-        var wrapIterator = function (iterator) {
-            return function (err) {
-                if (err) {
-                    callback.apply(null, arguments);
-                    callback = function () {};
-                }
-                else {
-                    var args = Array.prototype.slice.call(arguments, 1);
-                    var next = iterator.next();
-                    if (next) {
-                        args.push(wrapIterator(next));
-                    }
-                    else {
-                        args.push(callback);
-                    }
-                    async.setImmediate(function () {
-                        iterator.apply(null, args);
-                    });
-                }
-            };
-        };
-        wrapIterator(async.iterator(tasks))();
-    };
-
-    var _parallel = function(eachfn, tasks, callback) {
-        callback = callback || function () {};
-        if (tasks.constructor === Array) {
-            eachfn.map(tasks, function (fn, callback) {
-                if (fn) {
-                    fn(function (err) {
-                        var args = Array.prototype.slice.call(arguments, 1);
-                        if (args.length <= 1) {
-                            args = args[0];
-                        }
-                        callback.call(null, err, args);
-                    });
-                }
-            }, callback);
-        }
-        else {
-            var results = {};
-            eachfn.each(_keys(tasks), function (k, callback) {
-                tasks[k](function (err) {
-                    var args = Array.prototype.slice.call(arguments, 1);
-                    if (args.length <= 1) {
-                        args = args[0];
-                    }
-                    results[k] = args;
-                    callback(err);
-                });
-            }, function (err) {
-                callback(err, results);
-            });
-        }
-    };
-
-    async.parallel = function (tasks, callback) {
-        _parallel({ map: async.map, each: async.each }, tasks, callback);
-    };
-
-    async.parallelLimit = function(tasks, limit, callback) {
-        _parallel({ map: _mapLimit(limit), each: _eachLimit(limit) }, tasks, callback);
-    };
-
-    async.series = function (tasks, callback) {
-        callback = callback || function () {};
-        if (tasks.constructor === Array) {
-            async.mapSeries(tasks, function (fn, callback) {
-                if (fn) {
-                    fn(function (err) {
-                        var args = Array.prototype.slice.call(arguments, 1);
-                        if (args.length <= 1) {
-                            args = args[0];
-                        }
-                        callback.call(null, err, args);
-                    });
-                }
-            }, callback);
-        }
-        else {
-            var results = {};
-            async.eachSeries(_keys(tasks), function (k, callback) {
-                tasks[k](function (err) {
-                    var args = Array.prototype.slice.call(arguments, 1);
-                    if (args.length <= 1) {
-                        args = args[0];
-                    }
-                    results[k] = args;
-                    callback(err);
-                });
-            }, function (err) {
-                callback(err, results);
-            });
-        }
-    };
-
-    async.iterator = function (tasks) {
-        var makeCallback = function (index) {
-            var fn = function () {
-                if (tasks.length) {
-                    tasks[index].apply(null, arguments);
-                }
-                return fn.next();
-            };
-            fn.next = function () {
-                return (index < tasks.length - 1) ? makeCallback(index + 1): null;
-            };
-            return fn;
-        };
-        return makeCallback(0);
-    };
-
-    async.apply = function (fn) {
-        var args = Array.prototype.slice.call(arguments, 1);
-        return function () {
-            return fn.apply(
-                null, args.concat(Array.prototype.slice.call(arguments))
-            );
-        };
-    };
-
-    var _concat = function (eachfn, arr, fn, callback) {
-        var r = [];
-        eachfn(arr, function (x, cb) {
-            fn(x, function (err, y) {
-                r = r.concat(y || []);
-                cb(err);
-            });
-        }, function (err) {
-            callback(err, r);
-        });
-    };
-    async.concat = doParallel(_concat);
-    async.concatSeries = doSeries(_concat);
-
-    async.whilst = function (test, iterator, callback) {
-        if (test()) {
-            iterator(function (err) {
-                if (err) {
-                    return callback(err);
-                }
-                async.whilst(test, iterator, callback);
-            });
-        }
-        else {
-            callback();
-        }
-    };
-
-    async.doWhilst = function (iterator, test, callback) {
-        iterator(function (err) {
-            if (err) {
-                return callback(err);
-            }
-            if (test()) {
-                async.doWhilst(iterator, test, callback);
-            }
-            else {
-                callback();
-            }
-        });
-    };
-
-    async.until = function (test, iterator, callback) {
-        if (!test()) {
-            iterator(function (err) {
-                if (err) {
-                    return callback(err);
-                }
-                async.until(test, iterator, callback);
-            });
-        }
-        else {
-            callback();
-        }
-    };
-
-    async.doUntil = function (iterator, test, callback) {
-        iterator(function (err) {
-            if (err) {
-                return callback(err);
-            }
-            if (!test()) {
-                async.doUntil(iterator, test, callback);
-            }
-            else {
-                callback();
-            }
-        });
-    };
-
-    async.queue = function (worker, concurrency) {
-        if (concurrency === undefined) {
-            concurrency = 1;
-        }
-        function _insert(q, data, pos, callback) {
-          if(data.constructor !== Array) {
-              data = [data];
-          }
-          _each(data, function(task) {
-              var item = {
-                  data: task,
-                  callback: typeof callback === 'function' ? callback : null
-              };
-
-              if (pos) {
-                q.tasks.unshift(item);
-              } else {
-                q.tasks.push(item);
-              }
-
-              if (q.saturated && q.tasks.length === concurrency) {
-                  q.saturated();
-              }
-              async.setImmediate(q.process);
-          });
-        }
-
-        var workers = 0;
-        var q = {
-            tasks: [],
-            concurrency: concurrency,
-            saturated: null,
-            empty: null,
-            drain: null,
-            push: function (data, callback) {
-              _insert(q, data, false, callback);
-            },
-            unshift: function (data, callback) {
-              _insert(q, data, true, callback);
-            },
-            process: function () {
-                if (workers < q.concurrency && q.tasks.length) {
-                    var task = q.tasks.shift();
-                    if (q.empty && q.tasks.length === 0) {
-                        q.empty();
-                    }
-                    workers += 1;
-                    var next = function () {
-                        workers -= 1;
-                        if (task.callback) {
-                            task.callback.apply(task, arguments);
-                        }
-                        if (q.drain && q.tasks.length + workers === 0) {
-                            q.drain();
-                        }
-                        q.process();
-                    };
-                    var cb = only_once(next);
-                    worker(task.data, cb);
-                }
-            },
-            length: function () {
-                return q.tasks.length;
-            },
-            running: function () {
-                return workers;
-            }
-        };
-        return q;
-    };
-
-    async.cargo = function (worker, payload) {
-        var working     = false,
-            tasks       = [];
-
-        var cargo = {
-            tasks: tasks,
-            payload: payload,
-            saturated: null,
-            empty: null,
-            drain: null,
-            push: function (data, callback) {
-                if(data.constructor !== Array) {
-                    data = [data];
-                }
-                _each(data, function(task) {
-                    tasks.push({
-                        data: task,
-                        callback: typeof callback === 'function' ? callback : null
-                    });
-                    if (cargo.saturated && tasks.length === payload) {
-                        cargo.saturated();
-                    }
-                });
-                async.setImmediate(cargo.process);
-            },
-            process: function process() {
-                if (working) return;
-                if (tasks.length === 0) {
-                    if(cargo.drain) cargo.drain();
-                    return;
-                }
-
-                var ts = typeof payload === 'number'
-                            ? tasks.splice(0, payload)
-                            : tasks.splice(0);
-
-                var ds = _map(ts, function (task) {
-                    return task.data;
-                });
-
-                if(cargo.empty) cargo.empty();
-                working = true;
-                worker(ds, function () {
-                    working = false;
-
-                    var args = arguments;
-                    _each(ts, function (data) {
-                        if (data.callback) {
-                            data.callback.apply(null, args);
-                        }
-                    });
-
-                    process();
-                });
-            },
-            length: function () {
-                return tasks.length;
-            },
-            running: function () {
-                return working;
-            }
-        };
-        return cargo;
-    };
-
-    var _console_fn = function (name) {
-        return function (fn) {
-            var args = Array.prototype.slice.call(arguments, 1);
-            fn.apply(null, args.concat([function (err) {
-                var args = Array.prototype.slice.call(arguments, 1);
-                if (typeof console !== 'undefined') {
-                    if (err) {
-                        if (console.error) {
-                            console.error(err);
-                        }
-                    }
-                    else if (console[name]) {
-                        _each(args, function (x) {
-                            console[name](x);
-                        });
-                    }
-                }
-            }]));
-        };
-    };
-    async.log = _console_fn('log');
-    async.dir = _console_fn('dir');
-    /*async.info = _console_fn('info');
-    async.warn = _console_fn('warn');
-    async.error = _console_fn('error');*/
-
-    async.memoize = function (fn, hasher) {
-        var memo = {};
-        var queues = {};
-        hasher = hasher || function (x) {
-            return x;
-        };
-        var memoized = function () {
-            var args = Array.prototype.slice.call(arguments);
-            var callback = args.pop();
-            var key = hasher.apply(null, args);
-            if (key in memo) {
-                callback.apply(null, memo[key]);
-            }
-            else if (key in queues) {
-                queues[key].push(callback);
-            }
-            else {
-                queues[key] = [callback];
-                fn.apply(null, args.concat([function () {
-                    memo[key] = arguments;
-                    var q = queues[key];
-                    delete queues[key];
-                    for (var i = 0, l = q.length; i < l; i++) {
-                      q[i].apply(null, arguments);
-                    }
-                }]));
-            }
-        };
-        memoized.memo = memo;
-        memoized.unmemoized = fn;
-        return memoized;
-    };
-
-    async.unmemoize = function (fn) {
-      return function () {
-        return (fn.unmemoized || fn).apply(null, arguments);
-      };
-    };
-
-    async.times = function (count, iterator, callback) {
-        var counter = [];
-        for (var i = 0; i < count; i++) {
-            counter.push(i);
-        }
-        return async.map(counter, iterator, callback);
-    };
-
-    async.timesSeries = function (count, iterator, callback) {
-        var counter = [];
-        for (var i = 0; i < count; i++) {
-            counter.push(i);
-        }
-        return async.mapSeries(counter, iterator, callback);
-    };
-
-    async.compose = function (/* functions... */) {
-        var fns = Array.prototype.reverse.call(arguments);
-        return function () {
-            var that = this;
-            var args = Array.prototype.slice.call(arguments);
-            var callback = args.pop();
-            async.reduce(fns, args, function (newargs, fn, cb) {
-                fn.apply(that, newargs.concat([function () {
-                    var err = arguments[0];
-                    var nextargs = Array.prototype.slice.call(arguments, 1);
-                    cb(err, nextargs);
-                }]))
-            },
-            function (err, results) {
-                callback.apply(that, [err].concat(results));
-            });
-        };
-    };
-
-    var _applyEach = function (eachfn, fns /*args...*/) {
-        var go = function () {
-            var that = this;
-            var args = Array.prototype.slice.call(arguments);
-            var callback = args.pop();
-            return eachfn(fns, function (fn, cb) {
-                fn.apply(that, args.concat([cb]));
-            },
-            callback);
-        };
-        if (arguments.length > 2) {
-            var args = Array.prototype.slice.call(arguments, 2);
-            return go.apply(this, args);
-        }
-        else {
-            return go;
-        }
-    };
-    async.applyEach = doParallel(_applyEach);
-    async.applyEachSeries = doSeries(_applyEach);
-
-    async.forever = function (fn, callback) {
-        function next(err) {
-            if (err) {
-                if (callback) {
-                    return callback(err);
-                }
-                throw err;
-            }
-            fn(next);
-        }
-        next();
-    };
-
-    // AMD / RequireJS
-    if (typeof define !== 'undefined' && define.amd) {
-        define([], function () {
-            return async;
-        });
-    }
-    // Node.js
-    else if (typeof module !== 'undefined' && module.exports) {
-        module.exports = async;
-    }
-    // included directly via <script> tag
-    else {
-        root.async = async;
-    }
-
-}());
-
-})(require("__browserify_process"))
-},{"__browserify_process":5}],43:[function(require,module,exports){
-function init (name, message, cause) {
-  this.name      = name
-  // can be passed just a 'cause'
-  this.cause     = typeof message != 'string' ? message : cause
-  this.message   = !!message && typeof message != 'string' ? message.message : message
-}
-
-// generic prototype, not intended to be actually used - helpful for `instanceof`
-function CustomError (message, cause) {
-  Error.call(this)
-  if (Error.captureStackTrace)
-    Error.captureStackTrace(this, arguments.callee)
-  init.call(this, 'CustomError', message, cause)
-}
-
-CustomError.prototype = new Error()
-
-function createError (errno, name, proto) {
-  var err = function (message, cause) {
-    init.call(this, name, message, cause)
-    //TODO: the specificity here is stupid, errno should be available everywhere
-    if (name == 'FilesystemError') {
-      this.code    = this.cause.code
-      this.path    = this.cause.path
-      this.errno   = this.cause.errno
-      this.message =
-        (errno.errno[this.cause.errno]
-          ? errno.errno[this.cause.errno].description
-          : this.cause.message)
-        + (this.cause.path ? ' [' + this.cause.path + ']' : '')
-    }
-    Error.call(this)
-    if (Error.captureStackTrace)
-      Error.captureStackTrace(this, arguments.callee)
-  }
-  err.prototype = !!proto ? new proto() : new CustomError()
-  return err
-}
-
-module.exports = function (errno) {
-  var ce = function (name, proto) {
-    return createError(errno, name, proto)
-  }
-  return {
-      CustomError     : CustomError
-    , FilesystemError : ce('FilesystemError')
-    , createError     : ce
-  }
-}
-
-},{}],45:[function(require,module,exports){
+},{"./custom":49}],43:[function(require,module,exports){
 module.exports = isObject
 
 function isObject(x) {
     return typeof x === "object" && x !== null
 }
 
-},{}],41:[function(require,module,exports){
-exports = module.exports = require('./lib/_stream_readable.js');
-exports.Readable = exports;
-exports.Writable = require('./lib/_stream_writable.js');
-exports.Duplex = require('./lib/_stream_duplex.js');
-exports.Transform = require('./lib/_stream_transform.js');
-exports.PassThrough = require('./lib/_stream_passthrough.js');
-
-},{"./lib/_stream_readable.js":46,"./lib/_stream_writable.js":47,"./lib/_stream_duplex.js":48,"./lib/_stream_transform.js":49,"./lib/_stream_passthrough.js":50}],44:[function(require,module,exports){
-module.exports = Object.keys || require('./shim');
-
-
-},{"./shim":51}],46:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 (function(process,Buffer){// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -12372,7 +12312,62 @@ function endReadable(stream) {
 }
 
 })(require("__browserify_process"),require("__browserify_Buffer").Buffer)
-},{"events":4,"stream":10,"util":3,"string_decoder":52,"__browserify_process":5,"__browserify_Buffer":14}],38:[function(require,module,exports){
+},{"events":2,"stream":9,"util":1,"string_decoder":50,"__browserify_process":3,"__browserify_Buffer":21}],49:[function(require,module,exports){
+function init (name, message, cause) {
+  this.name      = name
+  // can be passed just a 'cause'
+  this.cause     = typeof message != 'string' ? message : cause
+  this.message   = !!message && typeof message != 'string' ? message.message : message
+}
+
+// generic prototype, not intended to be actually used - helpful for `instanceof`
+function CustomError (message, cause) {
+  Error.call(this)
+  if (Error.captureStackTrace)
+    Error.captureStackTrace(this, arguments.callee)
+  init.call(this, 'CustomError', message, cause)
+}
+
+CustomError.prototype = new Error()
+
+function createError (errno, name, proto) {
+  var err = function (message, cause) {
+    init.call(this, name, message, cause)
+    //TODO: the specificity here is stupid, errno should be available everywhere
+    if (name == 'FilesystemError') {
+      this.code    = this.cause.code
+      this.path    = this.cause.path
+      this.errno   = this.cause.errno
+      this.message =
+        (errno.errno[this.cause.errno]
+          ? errno.errno[this.cause.errno].description
+          : this.cause.message)
+        + (this.cause.path ? ' [' + this.cause.path + ']' : '')
+    }
+    Error.call(this)
+    if (Error.captureStackTrace)
+      Error.captureStackTrace(this, arguments.callee)
+  }
+  err.prototype = !!proto ? new proto() : new CustomError()
+  return err
+}
+
+module.exports = function (errno) {
+  var ce = function (name, proto) {
+    return createError(errno, name, proto)
+  }
+  return {
+      CustomError     : CustomError
+    , FilesystemError : ce('FilesystemError')
+    , createError     : ce
+  }
+}
+
+},{}],42:[function(require,module,exports){
+module.exports = Object.keys || require('./shim');
+
+
+},{"./shim":51}],31:[function(require,module,exports){
 
 var Writable = require("stream").Writable
 
@@ -12415,7 +12410,7 @@ CallbackStream.prototype._write = function(data, encoding, done) {
 
 module.exports = CallbackStream
 
-},{"stream":10,"readable-stream":53}],52:[function(require,module,exports){
+},{"stream":9,"readable-stream":52}],50:[function(require,module,exports){
 (function(Buffer){var StringDecoder = exports.StringDecoder = function(encoding) {
   this.encoding = (encoding || 'utf8').toLowerCase().replace(/[-_]/, '');
   switch (this.encoding) {
@@ -12579,7 +12574,7 @@ function base64DetectIncompleteChar(buffer) {
 }
 
 })(require("__browserify_Buffer").Buffer)
-},{"__browserify_Buffer":14}],47:[function(require,module,exports){
+},{"__browserify_Buffer":21}],45:[function(require,module,exports){
 (function(process,Buffer){// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -12929,7 +12924,7 @@ function endWritable(stream, state, cb) {
 }
 
 })(require("__browserify_process"),require("__browserify_Buffer").Buffer)
-},{"util":3,"assert":32,"stream":10,"./_stream_duplex":48,"__browserify_process":5,"__browserify_Buffer":14}],48:[function(require,module,exports){
+},{"util":1,"assert":35,"stream":9,"./_stream_duplex":46,"__browserify_process":3,"__browserify_Buffer":21}],46:[function(require,module,exports){
 (function(process){// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -13001,7 +12996,7 @@ function onend() {
 }
 
 })(require("__browserify_process"))
-},{"util":3,"./_stream_readable":46,"./_stream_writable":47,"__browserify_process":5}],49:[function(require,module,exports){
+},{"util":1,"./_stream_readable":44,"./_stream_writable":45,"__browserify_process":3}],47:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -13209,7 +13204,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"util":3,"./_stream_duplex":48}],50:[function(require,module,exports){
+},{"util":1,"./_stream_duplex":46}],48:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -13252,7 +13247,7 @@ PassThrough.prototype._transform = function(chunk, encoding, cb) {
   cb(null, chunk);
 };
 
-},{"util":3,"./_stream_transform":49}],53:[function(require,module,exports){
+},{"util":1,"./_stream_transform":47}],52:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Readable = exports;
 exports.Writable = require('./lib/_stream_writable.js');
@@ -13260,53 +13255,7 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_readable.js":54,"./lib/_stream_writable.js":55,"./lib/_stream_duplex.js":56,"./lib/_stream_transform.js":57,"./lib/_stream_passthrough.js":58}],51:[function(require,module,exports){
-(function () {
-	"use strict";
-
-	// modified from https://github.com/kriskowal/es5-shim
-	var has = Object.prototype.hasOwnProperty,
-		is = require('is'),
-		forEach = require('foreach'),
-		hasDontEnumBug = !({'toString': null}).propertyIsEnumerable('toString'),
-		dontEnums = [
-			"toString",
-			"toLocaleString",
-			"valueOf",
-			"hasOwnProperty",
-			"isPrototypeOf",
-			"propertyIsEnumerable",
-			"constructor"
-		],
-		keysShim;
-
-	keysShim = function keys(object) {
-		if (!is.object(object) && !is.array(object)) {
-			throw new TypeError("Object.keys called on a non-object");
-		}
-
-		var name, theKeys = [];
-		for (name in object) {
-			if (has.call(object, name)) {
-				theKeys.push(name);
-			}
-		}
-
-		if (hasDontEnumBug) {
-			forEach(dontEnums, function (dontEnum) {
-				if (has.call(object, dontEnum)) {
-					theKeys.push(dontEnum);
-				}
-			});
-		}
-		return theKeys;
-	};
-
-	module.exports = keysShim;
-}());
-
-
-},{"is":59,"foreach":60}],54:[function(require,module,exports){
+},{"./lib/_stream_readable.js":53,"./lib/_stream_writable.js":54,"./lib/_stream_duplex.js":55,"./lib/_stream_transform.js":56,"./lib/_stream_passthrough.js":57}],53:[function(require,module,exports){
 (function(process,Buffer){// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -14185,7 +14134,53 @@ function endReadable(stream) {
 }
 
 })(require("__browserify_process"),require("__browserify_Buffer").Buffer)
-},{"events":4,"stream":10,"util":3,"string_decoder":52,"__browserify_process":5,"__browserify_Buffer":14}],59:[function(require,module,exports){
+},{"events":2,"stream":9,"util":1,"string_decoder":50,"__browserify_process":3,"__browserify_Buffer":21}],51:[function(require,module,exports){
+(function () {
+	"use strict";
+
+	// modified from https://github.com/kriskowal/es5-shim
+	var has = Object.prototype.hasOwnProperty,
+		is = require('is'),
+		forEach = require('foreach'),
+		hasDontEnumBug = !({'toString': null}).propertyIsEnumerable('toString'),
+		dontEnums = [
+			"toString",
+			"toLocaleString",
+			"valueOf",
+			"hasOwnProperty",
+			"isPrototypeOf",
+			"propertyIsEnumerable",
+			"constructor"
+		],
+		keysShim;
+
+	keysShim = function keys(object) {
+		if (!is.object(object) && !is.array(object)) {
+			throw new TypeError("Object.keys called on a non-object");
+		}
+
+		var name, theKeys = [];
+		for (name in object) {
+			if (has.call(object, name)) {
+				theKeys.push(name);
+			}
+		}
+
+		if (hasDontEnumBug) {
+			forEach(dontEnums, function (dontEnum) {
+				if (has.call(object, dontEnum)) {
+					theKeys.push(dontEnum);
+				}
+			});
+		}
+		return theKeys;
+	};
+
+	module.exports = keysShim;
+}());
+
+
+},{"is":58,"foreach":59}],58:[function(require,module,exports){
 
 /**!
  * is
@@ -14889,7 +14884,7 @@ is.string = function (value) {
 };
 
 
-},{}],60:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 
 var hasOwn = Object.prototype.hasOwnProperty;
 
@@ -14912,7 +14907,7 @@ module.exports = function forEach (obj, fn, ctx) {
 };
 
 
-},{}],55:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 (function(process,Buffer){// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -15262,7 +15257,7 @@ function endWritable(stream, state, cb) {
 }
 
 })(require("__browserify_process"),require("__browserify_Buffer").Buffer)
-},{"util":3,"assert":32,"stream":10,"./_stream_duplex":56,"__browserify_process":5,"__browserify_Buffer":14}],56:[function(require,module,exports){
+},{"util":1,"assert":35,"stream":9,"./_stream_duplex":55,"__browserify_process":3,"__browserify_Buffer":21}],55:[function(require,module,exports){
 (function(process){// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -15334,7 +15329,7 @@ function onend() {
 }
 
 })(require("__browserify_process"))
-},{"util":3,"./_stream_readable":54,"./_stream_writable":55,"__browserify_process":5}],57:[function(require,module,exports){
+},{"util":1,"./_stream_readable":53,"./_stream_writable":54,"__browserify_process":3}],56:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -15542,7 +15537,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"util":3,"./_stream_duplex":56}],58:[function(require,module,exports){
+},{"util":1,"./_stream_duplex":55}],57:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -15585,6 +15580,6 @@ PassThrough.prototype._transform = function(chunk, encoding, cb) {
   cb(null, chunk);
 };
 
-},{"util":3,"./_stream_transform":57}]},{},[1])(1)
+},{"util":1,"./_stream_transform":56}]},{},[15])(15)
 });
 ;
