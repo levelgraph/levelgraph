@@ -36,7 +36,8 @@
     "uglify-js": "~2.3.6",
     "browserify": "~2.23.1",
     "level-js": "~1.0.7",
-    "levelup": "~0.10.0"
+    "levelup": "~0.10.0",
+    "leveldown": "~0.6.2"
   },
   "dependencies": {
     "xtend": "~2.0.3",
