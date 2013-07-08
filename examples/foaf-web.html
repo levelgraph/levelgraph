@@ -3,11 +3,8 @@
 <body>
 <script src="../build/levelgraph.js"></script>
 <script>
-var Leveljs = require("level-js");
-var levelup = require("levelup");
-var levelgraph = require("levelgraph");
 
-db = levelgraph(levelup("test", { db: function(l) { return new Leveljs(l); } }));
+var db = levelgraph("test");
 db.put([{
   subject: "matteo",
   predicate: "friend",
