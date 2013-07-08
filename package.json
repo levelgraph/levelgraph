@@ -32,7 +32,11 @@
     "sinon": "~1.4.2",
     "sinon-chai": "~2.1.2",
     "jshint": "~1.1.0",
-    "level-test": "~1.4.0"
+    "level-test": "~1.4.0",
+    "uglify-js": "~2.3.6",
+    "browserify": "~2.23.1",
+    "level-js": "~1.0.7",
+    "levelup": "~0.10.0"
   },
   "dependencies": {
     "xtend": "~2.0.3",
@@ -51,7 +55,9 @@
   "testling": {
     "browsers": [
       "ie/10..latest",
-      "firefox/16..latest", "chrome/24..latest", "opera/15..latest"
+      "firefox/16..latest",
+      "chrome/24..latest",
+      "opera/15..latest"
     ],
     "harness": "mocha",
     "files": "test/*.js"
