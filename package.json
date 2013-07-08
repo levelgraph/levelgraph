@@ -48,7 +48,7 @@
   "peerDependencies": {
     "level": "~0.9.0",
     "levelup": "~0.10.0",
-    "level-js": "~1.0.6"
+    "level-js": "~1.0.7"
   },
   "browser": {
     "./lib/streamwrapper.js": "./lib/browserstreamwrapper.js"
