@@ -17,9 +17,10 @@ C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
 Following this approach, __LevelGraph__ uses six indices for every triple,
 in order to access them as fast as it is possible.
 
-[![Build Status](https://travis-ci.org/mcollina/node-levelgraph.png)](https://travis-ci.org/mcollina/node-levelgraph)
-[![Project Status](http://githubkanban.herokuapp.com/images/mcollina_node-levelgraph.png)](http://bit.ly/ZJ9Qta)
-[![browser support](http://ci.testling.com/mcollina/node-levelgraph.png)](http://ci.testling.com/mcollina/node-levelgraph)
+[![Build Status](https://travis-ci.org/mcollina/levelgraph.png)](https://travis-ci.org/mcollina/levelgraph)
+[![Project
+Status](http://githubkanban.herokuapp.com/images/mcollina_levelgraph.png)](http://huboard.com/mcollina/levelgraph/board)
+[![browser support](http://ci.testling.com/mcollina/levelgraph.png)](http://ci.testling.com/mcollina/levelgraph)
 
 ## Install on Node.js
 
@@ -34,7 +35,7 @@ If you need it, just open a pull request.
 ## Install in the Browser
 
 Just download
-[levelgraph.min.js](https://github.com/mcollina/node-levelgraph/blob/master/build/levelgraph.min.js)
+[levelgraph.min.js](https://github.com/mcollina/levelgraph/blob/master/build/levelgraph.min.js)
 and you are done!
 
 ## Usage
@@ -368,7 +369,7 @@ Here are some ideas:
 * [x] Added a Sort-Join algorithm.
 * [ ] Add more database operators (grouping, filtering).
 * [x] Browser support
-  [#10](https://github.com/mcollina/node-levelgraph/issues/10)
+  [#10](https://github.com/mcollina/levelgraph/issues/10)
 * [ ] Live Joins 
   [#3](https://github.com/mcollina/node-levelgraph/issues/3)
 
