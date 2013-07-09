@@ -7,7 +7,8 @@ __LevelGraph__ is a Graph Database. Unlike many other graph database,
 __LevelGraph__ is built on the uber-fast key-value store
 [LevelDB](http://code.google.com/p/leveldb/) through the powerful
 [LevelUp](https://github.com/rvagg/node-levelup) library.
-You can use it inside your node.js application.
+You can use it inside your node.js application or in any
+IndexedDB-powered Browser. PhoneGap support coming soon (late fall).
 
 __LevelGraph__ loosely follows the __Hexastore__ approach as presente in the article:
 [Hexastore: sextuple indexing for semantic web data management
@@ -18,8 +19,9 @@ in order to access them as fast as it is possible.
 
 [![Build Status](https://travis-ci.org/mcollina/node-levelgraph.png)](https://travis-ci.org/mcollina/node-levelgraph)
 [![Project Status](http://githubkanban.herokuapp.com/images/mcollina_node-levelgraph.png)](http://bit.ly/ZJ9Qta)
+[![browser support](http://ci.testling.com/mcollina/node-levelgraph.png)](http://ci.testling.com/mcollina/node-levelgraph)
 
-## Install
+## Install on Node.js
 
 ```
 npm install levelgraph --save
@@ -31,11 +33,13 @@ If you need it, just open a pull request.
 
 ## Usage
 
+The LevelGraph API remains the same for Node.js and the browsers,
+however the initialization change slightly.
+
 Initializing a database is very easy:
 ```
-var levelup = require("level");
-var levelgraph = require("levelgraph");
-var db = levelgraph(levelup("yourdb"));
+var levelgraph = require("levelgraph"); // not needed in the Browser
+var db = levelgraph("yourdb");
 ```
 
 ### Get and Put
@@ -314,6 +318,37 @@ stream.on("close", function() {
 });
 ```
 
+## LevelUp integration
+
+LevelGraph allows to leverage the full power of all
+[LevelUp](https://github.com/rvagg/node-levelup) plugins.
+
+Initializing a database with LevelUp support is very easy:
+```
+var levelup = require("level");
+var levelgraph = require("levelgraph");
+var db = levelgraph(levelup("yourdb"));
+```
+
+## Browserify
+
+You can use [browserify](https://github.com/substack/node-browserify) to bundle your module and all the dependencies, including levelgraph, into a single script-tag friendly js file for use in webpages. For the convenience of people unfamiliar with browserify, a pre-bundled version of levelgraph is included in the build folder.
+
+Simply `require("levelgraph")` in your browser modules and use [level.js](https://github.com/maxogden/level.js) instead of `level`:
+
+```
+var levelgraph = require("levelgraph");
+var leveljs = require("level-js");
+var levelup = require("levelup");
+var factory = function (location) { return new leveljs(location) };
+
+var db = levelgraph(levelup("yourdb", { db: factory }));
+```
+
+### Testling
+
+Follow the [Testling install instructions](https://github.com/substack/testling#install) and run `testling` in the levelgraph directory to run the test suite against a headless browser using level.js
+
 ## TODO
 
 There are plenty of things that this library is missing.
@@ -326,7 +361,7 @@ Here are some ideas:
 * [x] Support for Query Planning in JOIN.
 * [x] Added a Sort-Join algorithm.
 * [ ] Add more database operators (grouping, filtering).
-* [ ] Browser support
+* [x] Browser support
   [#10](https://github.com/mcollina/node-levelgraph/issues/10)
 * [ ] Live Joins 
   [#3](https://github.com/mcollina/node-levelgraph/issues/3)
