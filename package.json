@@ -1,17 +1,17 @@
 {
   "name": "levelgraph",
   "version": "0.6.0",
-  "description": "A graph database built on top of LevelUp",
+  "description": "A graph database for Node.js and the browser built on top of LevelUp",
   "main": "index.js",
   "scripts": {
     "test": "make bail"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mcollina/node-levelgraph.git"
+    "url": "https://github.com/mcollina/levelgraph.git"
   },
   "bugs": {
-    "url": "http://github.com/mcollina/node-levelgraph/issues"
+    "url": "http://github.com/mcollina/levelgraph/issues"
   },
   "keywords": [
     "leveldb",
