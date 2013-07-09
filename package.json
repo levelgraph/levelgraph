@@ -1,6 +1,6 @@
 {
   "name": "levelgraph",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "description": "A graph database built on top of LevelUp",
   "main": "index.js",
   "scripts": {

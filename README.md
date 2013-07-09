@@ -31,6 +31,12 @@ At the moment it requires node v0.10.x, but the port to node v0.8.x
 should be straighforward.
 If you need it, just open a pull request.
 
+## Install in the Browser
+
+Just download
+[levelgraph.min.js](https://github.com/mcollina/node-levelgraph/blob/master/build/levelgraph.min.js)
+and you are done!
+
 ## Usage
 
 The LevelGraph API remains the same for Node.js and the browsers,

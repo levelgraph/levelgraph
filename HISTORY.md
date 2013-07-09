@@ -2,6 +2,11 @@
 History
 ======
 
+## 0.6.0
+
+* Browser and browserify support.
+* Removed the usage of setImmediate.
+
 ## 0.5.3
 
 * Fixed installation instructions in the README,
