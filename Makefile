@@ -11,4 +11,12 @@ jshint:
 	find lib -name "*.js" -print0 | xargs -0 ./node_modules/.bin/jshint
 	find test -name "*.js" -print0 | xargs -0 ./node_modules/.bin/jshint
 
+browserify:
+	rm -rf build
+	mkdir build
+	./node_modules/.bin/browserify ./lib/levelgraph.js -s levelgraph -r level-js -r levelup > build/levelgraph.js
+	./node_modules/.bin/uglifyjs build/levelgraph.js > build/levelgraph.min.js
+	gzip -c build/levelgraph.min.js > build/levelgraph.min.js.gz
+	du -h build/*
+
 .PHONY: test
