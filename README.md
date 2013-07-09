@@ -7,7 +7,8 @@ __LevelGraph__ is a Graph Database. Unlike many other graph database,
 __LevelGraph__ is built on the uber-fast key-value store
 [LevelDB](http://code.google.com/p/leveldb/) through the powerful
 [LevelUp](https://github.com/rvagg/node-levelup) library.
-You can use it inside your node.js application.
+You can use it inside your node.js application or in any
+IndexedDB-powered Browser. PhoneGap support coming soon (late fall).
 
 __LevelGraph__ loosely follows the __Hexastore__ approach as presente in the article:
 [Hexastore: sextuple indexing for semantic web data management
@@ -20,7 +21,7 @@ in order to access them as fast as it is possible.
 [![Project Status](http://githubkanban.herokuapp.com/images/mcollina_node-levelgraph.png)](http://bit.ly/ZJ9Qta)
 [![browser support](http://ci.testling.com/mcollina/node-levelgraph.png)](http://ci.testling.com/mcollina/node-levelgraph)
 
-## Install
+## Install on Node.js
 
 ```
 npm install levelgraph --save
@@ -32,11 +33,13 @@ If you need it, just open a pull request.
 
 ## Usage
 
+The LevelGraph API remains the same for Node.js and the browsers,
+however the initialization change slightly.
+
 Initializing a database is very easy:
 ```
-var levelup = require("level");
-var levelgraph = require("levelgraph");
-var db = levelgraph(levelup("yourdb"));
+var levelgraph = require("levelgraph"); // not needed in the Browser
+var db = levelgraph("yourdb");
 ```
 
 ### Get and Put
@@ -313,6 +316,18 @@ stream.end(t2);
 stream.on("close", function() {
   // do something, the writes are done
 });
+```
+
+## LevelUp integration
+
+LevelGraph allows to leverage the full power of all
+[LevelUp](https://github.com/rvagg/node-levelup) plugins.
+
+Initializing a database with LevelUp support is very easy:
+```
+var levelup = require("level");
+var levelgraph = require("levelgraph");
+var db = levelgraph(levelup("yourdb"));
 ```
 
 ## Browserify
