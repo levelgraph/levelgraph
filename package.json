@@ -46,7 +46,6 @@
     "readable-stream": "~1.0.2"
   },
   "peerDependencies": {
-    "level": "~0.9.0",
     "levelup": "~0.10.0",
     "level-js": "~1.0.7"
   },
