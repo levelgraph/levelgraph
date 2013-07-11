@@ -2,6 +2,11 @@
 History
 ======
 
+## 0.6.1
+
+* Bumped level peerDependency to 0.10.0.
+* Renamed repo into levelgraph from node-levelgraph.
+
 ## 0.6.0
 
 * Browser and browserify support.
