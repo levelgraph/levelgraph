@@ -36,7 +36,7 @@
     "uglify-js": "~2.3.6",
     "browserify": "~2.23.1",
     "level-js": "~1.0.7",
-    "levelup": "~0.10.0",
+    "levelup": "~0.12.0",
     "leveldown": "~0.6.2"
   },
   "dependencies": {
@@ -46,20 +46,19 @@
     "readable-stream": "~1.0.2"
   },
   "peerDependencies": {
-    "level": "~0.10.0",
-    "levelup": "~0.10.0",
+    "level": "~0.12.0",
+    "levelup": "~0.12.0",
     "level-js": "~1.0.7"
   },
   "browser": {
     "./lib/streamwrapper.js": "./lib/browserstreamwrapper.js"
   },
   "testling": {
-    "browsers": [
-      "ie/10..latest",
-      "firefox/16..latest",
-      "chrome/24..latest",
-      "opera/15..latest"
-    ],
+    "browsers": {
+      "iexplore": [10],
+      "firefox": [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+      "chrome": [23, 24, 25]
+    },
     "harness": "mocha",
     "files": "test/*.js"
   }
