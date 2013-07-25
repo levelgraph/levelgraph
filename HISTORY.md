@@ -2,6 +2,10 @@
 History
 ======
 
+## 0.6.2
+
+* Bumped level peerDependency to 0.12.0.
+
 ## 0.6.1
 
 * Bumped level peerDependency to 0.10.0.
