@@ -2,6 +2,11 @@
 History
 ======
 
+## 0.6.3
+
+* Widened level and levelup peerDependencies starting from 0.10.0 to
+  0.13.0 included.
+
 ## 0.6.2
 
 * Bumped level peerDependency to 0.12.0.
