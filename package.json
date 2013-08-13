@@ -32,7 +32,7 @@
     "sinon": "~1.4.2",
     "sinon-chai": "~2.1.2",
     "jshint": "~1.1.0",
-    "level-test": "~1.4.0",
+    "level-test": "~1.5.1",
     "uglify-js": "~2.3.6",
     "browserify": "~2.23.1",
     "level-js": "~1.0.7",
@@ -55,9 +55,26 @@
   },
   "testling": {
     "browsers": {
-      "iexplore": [10],
-      "firefox": [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
-      "chrome": [23, 24, 25]
+      "iexplore": [
+        10
+      ],
+      "firefox": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "chrome": [
+        23,
+        24,
+        25
+      ]
     },
     "harness": "mocha",
     "files": "test/*.js"
