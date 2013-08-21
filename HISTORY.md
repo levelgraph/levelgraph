@@ -2,6 +2,10 @@
 History
 ======
 
+## 0.6.4
+
+* Support up to levelup 0.14.0.
+
 ## 0.6.3
 
 * Widened level and levelup peerDependencies starting from 0.10.0 to
