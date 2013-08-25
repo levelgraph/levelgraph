@@ -36,8 +36,8 @@
     "uglify-js": "~2.3.6",
     "browserify": "~2.23.1",
     "level-js": "~1.0.7",
-    "levelup": "~0.14.0",
-    "leveldown": "~0.7.0"
+    "levelup": "~0.15.0",
+    "leveldown": "~0.8.0"
   },
   "dependencies": {
     "xtend": "~2.0.3",
@@ -46,8 +46,8 @@
     "readable-stream": "~1.0.2"
   },
   "peerDependencies": {
-    "level": ">= 0.10.0 < 0.15.0",
-    "levelup": ">= 0.10.0 < 0.15.0",
+    "level": ">= 0.10.0 < 0.16.0",
+    "levelup": ">= 0.10.0 < 0.16.0",
     "level-js": "~1.0.7"
   },
   "browser": {
