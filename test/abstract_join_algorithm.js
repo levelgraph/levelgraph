@@ -1,5 +1,5 @@
 
-var levelgraph = require("../");
+var levelgraph = require("../lib/levelgraph");
 var level = require("level-test")();
 
 module.exports = function(joinAlgorithm) {

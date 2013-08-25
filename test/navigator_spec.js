@@ -1,5 +1,5 @@
 
-var levelgraph = require("../")
+var levelgraph = require("../lib/levelgraph")
   , level = require("level-test")();
 
 describe("navigator", function() {
