@@ -2,6 +2,11 @@
 History
 ======
 
+## 0.6.5
+
+* Support up to levelup 0.15.0.
+* Removed useless index.js.
+
 ## 0.6.4
 
 * Support up to levelup 0.14.0.
