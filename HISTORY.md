@@ -2,6 +2,10 @@
 History
 ======
 
+## 0.6.6
+
+* Fixed package.json entry point.
+
 ## 0.6.5
 
 * Support up to levelup 0.15.0.
