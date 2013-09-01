@@ -1,6 +1,5 @@
 
 var level = require("level-test")()
-  , LevelWriteStream = require("level-writestream")
   , levelgraph = require("../")
 
   , up = level()
@@ -11,24 +10,34 @@ var level = require("level-test")()
 
   , startTime = new Date()
   , endTime
+  
+  , ws
 
   , doBench = function() {
       if(--counts === 0) {
-        endTime = new Date();
-        var totalTime = endTime - startTime;
-        console.log("total time", totalTime);
-        console.log("writes/s", startCounts / totalTime * 1000);
+        ws.end();
         return;
       }
 
-      var triple = { 
+      var triple = {
         subject: "s" + counts,
         predicate: "p" + counts,
         object: "o" + counts
       };
 
-      db.put(triple, doBench);
+      ws.write(triple);
+      if (counts % 10 === 0) {
+        setImmediate(doBench);
+      } else {
+        doBench();
+      }
     };
 
-LevelWriteStream(up);
+ws = db.putStream();
+ws.on("close", function() {
+  endTime = new Date();
+  var totalTime = endTime - startTime;
+  console.log("total time", totalTime);
+  console.log("writes/s", startCounts / totalTime * 1000);
+});
 doBench();

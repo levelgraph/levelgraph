@@ -43,7 +43,8 @@
     "xtend": "~2.0.3",
     "callback-stream": "~1.0.0",
     "async": "~0.2.8",
-    "readable-stream": "~1.0.2"
+    "readable-stream": "~1.0.2",
+    "level-writestream": "~0.1.0"
   },
   "peerDependencies": {
     "level": ">= 0.10.0 < 0.16.0",
