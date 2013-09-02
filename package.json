@@ -56,10 +56,10 @@
   },
   "testling": {
     "browsers": [
-      "ie/8..latest",
+      "ie/10..latest",
       "firefox/17..latest",
       "firefox/nightly",
-      "chrome/22..latest",
+      "chrome/23..latest",
       "chrome/canary",
       "opera/12..latest",
       "opera/next"
