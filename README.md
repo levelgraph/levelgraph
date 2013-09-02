@@ -76,6 +76,19 @@ stream.on("data", function(data) {
 stream.on("end", done);
 ```
 
+#### Triple Properties
+
+LevelGraph support adding properties to triples with very
+little overhead (a part from storage costs), it is very easy:
+```
+var triple = { subject: "a", predicate: "b", object: "c", "someStuff": 42 };
+db.put(triple, function() {
+  db.get({ subject: "a" }, function(err, list) {
+    expect(list).to.eql([triple]);
+  });
+});
+```
+
 ### Multiple Puts
 
 __LevelGraph__ also supports adding putting multiple triples:
