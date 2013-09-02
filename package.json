@@ -55,28 +55,15 @@
     "./lib/streamwrapper.js": "./lib/browserstreamwrapper.js"
   },
   "testling": {
-    "browsers": {
-      "iexplore": [
-        10
-      ],
-      "firefox": [
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19
-      ],
-      "chrome": [
-        23,
-        24,
-        25
-      ]
-    },
+    "browsers": [
+      "ie/8..latest",
+      "firefox/17..latest",
+      "firefox/nightly",
+      "chrome/22..latest",
+      "chrome/canary",
+      "opera/12..latest",
+      "opera/next"
+    ],
     "harness": "mocha",
     "files": "test/*.js"
   }
