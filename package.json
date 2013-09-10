@@ -48,7 +48,8 @@
     "level-js": "~1.0.7"
   },
   "browser": {
-    "./lib/streamwrapper.js": "./lib/browserstreamwrapper.js"
+    "./lib/streamwrapper.js": "./lib/browserstreamwrapper.js",
+    "./lib/getdb.js": "./lib/getdb-browser.js"
   },
   "testling": {
     "browsers": [
