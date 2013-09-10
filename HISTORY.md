@@ -2,6 +2,11 @@
 History
 ======
 
+## 0.6.8
+
+* Better browserify build.
+* Depending on LevelDOWN directly.
+
 ## 0.6.7
 
 * LevelUp 0.16.0.
