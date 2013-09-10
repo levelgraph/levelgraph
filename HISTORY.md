@@ -2,6 +2,11 @@
 History
 ======
 
+## 0.6.7
+
+* LevelUp 0.16.0.
+* Fixed browserify build.
+
 ## 0.6.6
 
 * Fixed package.json entry point.
