@@ -42,11 +42,9 @@
     "callback-stream": "~1.0.0",
     "async": "~0.2.8",
     "readable-stream": "~1.0.2",
-    "level-writestream": "~0.1.0"
-  },
-  "peerDependencies": {
-    "level": ">= 0.10.0 < 0.17.0",
+    "level-writestream": "~0.1.0",
     "levelup": ">= 0.10.0 < 0.17.0",
+    "leveldown": "> 0.7.0 < 0.9.0",
     "level-js": "~1.0.7"
   },
   "browser": {
