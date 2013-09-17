@@ -3,6 +3,10 @@ LevelGraph
 
 ![Logo](https://github.com/mcollina/node-levelgraph/raw/master/logo.png)
 
+[![NPM](https://nodei.co/npm/levelgraph.png)](https://nodei.co/npm/levelgraph/)
+
+[![NPM](https://nodei.co/npm-dl/levelgraph.png)](https://nodei.co/npm/levelgraph/)
+
 __LevelGraph__ is a Graph Database. Unlike many other graph database,
 __LevelGraph__ is built on the uber-fast key-value store
 [LevelDB](http://code.google.com/p/leveldb/) through the powerful
