@@ -22,8 +22,6 @@ Following this approach, __LevelGraph__ uses six indices for every triple,
 in order to access them as fast as it is possible.
 
 [![Build Status](https://travis-ci.org/mcollina/levelgraph.png)](https://travis-ci.org/mcollina/levelgraph)
-[![Project
-Status](http://badge.waffle.io/mcollina/levelgraph.png)](http://waffle.io/mcollina/levelgraph)
 [![browser support](http://ci.testling.com/mcollina/levelgraph.png)](http://ci.testling.com/mcollina/levelgraph)
 
 ## Install on Node.js
