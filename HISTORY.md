@@ -2,6 +2,11 @@
 History
 ======
 
+## 0.6.9
+
+* Get now returns exact matches
+  [#38](https://github.com/mcollina/levelgraph/issues/38).
+
 ## 0.6.8
 
 * Better browserify build.
