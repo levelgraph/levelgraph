@@ -98,6 +98,18 @@ describe("a basic triple store", function() {
     db.put([t1, t2], done);
   });
 
+  it("should get only triples with exact match of subjects", function(done) {
+    var t1 = { subject: "a1", predicate: "b", object: "c" }
+      , t2 = { subject: "a", predicate: "b", object: "d" };
+    db.put([t1, t2], function() {
+      db.get({ subject: "a" }, function(err, matched) {
+        expect(matched.length).to.eql(1);
+        expect(matched[0]).to.eql(t2);
+        done();
+      });
+    });
+  });
+
   describe("with two triple inserted with the same predicate", function() {
 
     var triple1
