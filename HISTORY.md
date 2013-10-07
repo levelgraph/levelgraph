@@ -2,6 +2,12 @@
 History
 ======
 
+## 0.6.10
+
+* Do not include vim undo files in the package.
+* Added support for LevelUp 0.17
+* Added support for LevelDown 0.9
+
 ## 0.6.9
 
 * Get now returns exact matches
