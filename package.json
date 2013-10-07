@@ -53,12 +53,12 @@
   },
   "testling": {
     "browsers": [
-      "ie/10..latest",
-      "firefox/17..latest",
+      "ie/latest",
+      "firefox/latest",
       "firefox/nightly",
-      "chrome/23..latest",
+      "chrome/latest",
       "chrome/canary",
-      "opera/12..latest",
+      "opera/latest",
       "opera/next"
     ],
     "harness": "mocha",
