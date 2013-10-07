@@ -35,7 +35,7 @@
     "level-test": "~1.5.1",
     "uglify-js": "~2.3.6",
     "browserify": "~2.29.1",
-    "levelup": "0.16.0"
+    "levelup": "0.17.0"
   },
   "dependencies": {
     "xtend": "~2.1.1",
@@ -43,8 +43,8 @@
     "async": "~0.2.8",
     "readable-stream": ">= 1.0.2 < 2.0.0",
     "level-writestream": "~0.1.0",
-    "levelup": ">= 0.10.0 < 0.17.0",
-    "leveldown": "> 0.7.0 < 0.9.0",
+    "levelup": ">= 0.10.0 < 0.18.0",
+    "leveldown": "> 0.7.0 < 0.10.0",
     "level-js": "~1.0.7"
   },
   "browser": {
