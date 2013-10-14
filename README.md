@@ -24,6 +24,8 @@ in order to access them as fast as it is possible.
 [![Build Status](https://travis-ci.org/mcollina/levelgraph.png)](https://travis-ci.org/mcollina/levelgraph)
 [![browser support](http://ci.testling.com/mcollina/levelgraph.png)](http://ci.testling.com/mcollina/levelgraph)
 
+**LevelGraph** is an **OPEN Open Source Project**, see the <a href="#contributing">Contributing</a> section to find out what this means.
+
 ## Install on Node.js
 
 ```
@@ -394,21 +396,13 @@ Here are some ideas:
 * [ ] Live Joins 
   [#3](https://github.com/mcollina/node-levelgraph/issues/3)
 
-## Contributing to LevelGraph 
+## Contributing
 
-* Check out the latest master to make sure the feature hasn't been
-  implemented or the bug hasn't been fixed yet
-* Check out the issue tracker to make sure someone already hasn't
-  requested it and/or contributed it
-* Fork the project
-* Start a feature/bugfix branch
-* Commit and push until you are happy with your contribution
-* Make sure to add tests for it. This is important so I don't break it
-  in a future version unintentionally.
-* Please try not to mess with the Makefile and package.json. If you
-  want to have your own version, or is otherwise necessary, that is
-  fine, but please isolate to its own commit so I can cherry-pick around
-  it.
+LevelGraph is an **OPEN Open Source Project**. This means that:
+
+> Individuals making significant and valuable contributions are given commit-access to the project to contribute as they see fit. This project is more like an open wiki than a standard guarded open source project.
+
+See the [CONTRIBUTING.md](https://github.com/rvagg/node-levelup/blob/master/CONTRIBUTING.md) file for more details.
 
 ## Credits
 
