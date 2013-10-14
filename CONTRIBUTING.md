@@ -1,4 +1,4 @@
-# LevelUP is an OPEN Open Source Project
+# LevelGraph is an OPEN Open Source Project
 
 -----------------------------------------
 
