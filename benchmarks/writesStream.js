@@ -25,12 +25,12 @@ var level = require("level-test")()
         object: "o" + counts
       };
 
-      ws.write(triple);
-      if (counts % 10 === 0) {
-        setImmediate(doBench);
-      } else {
-        doBench();
-      }
+      ws.write(triple, function() {
+        if (counts % 100)
+          setImmediate(doBench);
+        else
+          doBench();
+      });
     };
 
 ws = db.putStream();

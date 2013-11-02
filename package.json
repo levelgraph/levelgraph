@@ -45,7 +45,8 @@
     "level-writestream": "~0.1.0",
     "levelup": ">= 0.10.0 < 0.18.0",
     "leveldown": "> 0.7.0 < 0.10.0",
-    "level-js": "~1.0.7"
+    "level-js": "~1.0.7",
+    "level-ws": "git://github.com/Level/level-ws.git#chained-batch"
   },
   "browser": {
     "./lib/streamwrapper.js": "./lib/browserstreamwrapper.js",
