@@ -44,7 +44,7 @@
     "readable-stream": ">= 1.0.2 < 2.0.0",
     "level-writestream": "~0.1.0",
     "levelup": ">= 0.10.0 < 0.18.0",
-    "leveldown": "> 0.7.0 < 0.10.0",
+    "leveldown": "git://github.com/rvagg/node-leveldown.git#0.9.3-wip",
     "level-js": "~1.0.7",
     "level-ws": "git://github.com/Level/level-ws.git#chained-batch"
   },
