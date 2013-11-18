@@ -60,7 +60,8 @@
   },
   "browser": {
     "./lib/streamwrapper.js": "./lib/browserstreamwrapper.js",
-    "./lib/getdb.js": "./lib/getdb-browser.js"
+    "./lib/getdb.js": "./lib/getdb-browser.js",
+    "level-writestream": false
   },
   "testling": {
     "browsers": [
