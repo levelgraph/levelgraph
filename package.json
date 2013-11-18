@@ -4,7 +4,9 @@
   "description": "A graph database for Node.js and the browser built on top of LevelUp",
   "main": "lib/levelgraph.js",
   "scripts": {
-    "test": "make bail"
+    "test": "make bail",
+    "jshint-lib": "jshint lib/*.js",
+    "jshint-test": "jshint test/*.js"
   },
   "repository": {
     "type": "git",
@@ -13,6 +15,11 @@
   "bugs": {
     "url": "http://github.com/mcollina/levelgraph/issues"
   },
+  "pre-commit": [
+    "jshint-lib",
+    "jshint-test",
+    "test"
+  ],
   "keywords": [
     "leveldb",
     "graph",
@@ -31,11 +38,12 @@
     "chai": "~1.6.0",
     "sinon": "~1.4.2",
     "sinon-chai": "~2.1.2",
-    "jshint": "~1.1.0",
-    "level-test": "~1.5.1",
+    "jshint": "~2.3.0",
+    "level-test": "~1.5.2",
     "uglify-js": "~2.3.6",
     "browserify": "~2.29.1",
-    "levelup": "0.17.0"
+    "levelup": "~0.18.0",
+    "pre-commit": "0.0.4"
   },
   "dependencies": {
     "xtend": "~2.1.1",

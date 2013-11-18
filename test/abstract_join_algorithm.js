@@ -81,7 +81,7 @@ module.exports = function(joinAlgorithm) {
 
       contexts.forEach(function(context, i) {
         var found = Object.keys(contexts).every(function(v) {
-          return context[v] == data[v];
+          return context[v] === data[v];
         });
         if (found) {
           contextIndex = i;
