@@ -4,7 +4,9 @@
   "description": "A graph database for Node.js and the browser built on top of LevelUp",
   "main": "lib/levelgraph.js",
   "scripts": {
-    "test": "make bail",
+    "test": "mocha --recursive --bail --reporter spec test",
+    "testling": "testling -u",
+    "ci": "mocha --recursive --bail --watch test",
     "jshint-lib": "jshint lib/*.js",
     "jshint-test": "jshint test/*.js"
   },
@@ -41,9 +43,10 @@
     "jshint": "~2.3.0",
     "level-test": "~1.5.2",
     "uglify-js": "~2.3.6",
-    "browserify": "~2.29.1",
+    "browserify": "~2.35.4",
     "levelup": "~0.18.0",
-    "pre-commit": "0.0.4"
+    "pre-commit": "0.0.4",
+    "testling": "~1.5.3"
   },
   "dependencies": {
     "xtend": "~2.1.1",
