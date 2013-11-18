@@ -2,6 +2,13 @@
 History
 ======
 
+## 0.6.11
+
+* Fixed memory leak by upgrading to LevelUp 0.18 and LevelDown 0.10.
+* Upgraded all testing dependencies.
+* Formatting to proper jshint.
+* Firefox support.
+
 ## 0.6.10
 
 * Do not include vim undo files in the package.
