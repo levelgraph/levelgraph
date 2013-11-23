@@ -67,11 +67,8 @@
     "browsers": [
       "ie/latest",
       "firefox/latest",
-      "firefox/nightly",
       "chrome/latest",
-      "chrome/canary",
-      "opera/latest",
-      "opera/next"
+      "opera/latest"
     ],
     "harness": "mocha",
     "files": "test/*.js"
