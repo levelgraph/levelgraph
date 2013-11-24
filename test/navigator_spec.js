@@ -100,36 +100,36 @@ describe("navigator", function() {
       });
   });
 
-  it("should return the contexts", 
+  it("should return the solutions", 
      function(done) {
     db.nav("daniele").archOut("friend").as("a").
-      contexts(function(err, contexts) {
-        expect(contexts).to.eql([{ a: "marco" }, { a: "matteo" }]);
+      solutions(function(err, solutions) {
+        expect(solutions).to.eql([{ a: "marco" }, { a: "matteo" }]);
         done();
       });
   });
 
-  it("should return the context as a stream", 
+  it("should return the solution as a stream", 
      function(done) {
 
-    var contexts = [{ a: "marco" }, { a: "matteo" }]
+    var solutions = [{ a: "marco" }, { a: "matteo" }]
 
       , stream = db.nav("daniele")
                    .archOut("friend")
                    .as("a")
-                   .contextsStream();
+                   .solutionsStream();
 
     stream.on("data", function(data) {
-      expect(data).to.eql(contexts.shift());
+      expect(data).to.eql(solutions.shift());
     });
 
     stream.on("end", done);
   });
 
-  it("should return no context if no condition is specified",
+  it("should return no solution if no condition is specified",
      function(done) {
-    db.nav("daniele").contexts(function(err, contexts) {
-      expect(contexts).to.eql([]);
+    db.nav("daniele").solutions(function(err, solutions) {
+      expect(solutions).to.eql([]);
       done();
     });
   });
@@ -200,9 +200,9 @@ describe("navigator", function() {
       .go("matteo")
       .archOut("friend")
       .as("b")
-      .contexts(function(err, contexts) {
+      .solutions(function(err, solutions) {
 
-      expect(contexts).to.eql([{
+      expect(solutions).to.eql([{
         a: "daniele",
         b: "daniele"
       }, {
@@ -221,9 +221,9 @@ describe("navigator", function() {
       .archOut("friend")
       .as("b")
       .bind("matteo")
-      .contexts(function(err, contexts) {
+      .solutions(function(err, solutions) {
 
-        expect(contexts).to.eql([{
+        expect(solutions).to.eql([{
           a: "daniele",
           b: "matteo"
         }, {
@@ -233,5 +233,15 @@ describe("navigator", function() {
 
         done();
       });
+  });
+
+  it("should alias solutions to contexts", function() {
+    var nav = db.nav("marco");
+    expect(nav.contexts).to.eql(nav.solutions);
+  });
+
+  it("should alias solutionStream to contextStream", function() {
+    var nav = db.nav("marco");
+    expect(nav.contextStream).to.eql(nav.solutionStream);
   });
 });

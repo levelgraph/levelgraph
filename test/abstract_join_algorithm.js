@@ -44,8 +44,8 @@ module.exports = function(joinAlgorithm) {
     });
   });
 
-  it("should return the two contexts through the joinStream interface", function(done) {
-    var contexts = [{ x: "daniele" }, { x: "lucio" }]
+  it("should return the two solutions through the joinStream interface", function(done) {
+    var solutions = [{ x: "daniele" }, { x: "lucio" }]
       , stream = db.joinStream([{
           subject: db.v("x"),
           predicate: "friend",
@@ -57,14 +57,14 @@ module.exports = function(joinAlgorithm) {
         }]);
 
     stream.on("data", function(data) {
-      expect(data).to.eql(contexts.shift());
+      expect(data).to.eql(solutions.shift());
     });
 
     stream.on("end", done);
   });
 
   it("should allow to find mutual friends", function(done) {
-    var contexts = [{ x: "daniele", y: "matteo" }, { x: "matteo", y: "daniele" }]
+    var solutions = [{ x: "daniele", y: "matteo" }, { x: "matteo", y: "daniele" }]
 
       , stream = db.joinStream([{
           subject: db.v("x"),
@@ -77,30 +77,30 @@ module.exports = function(joinAlgorithm) {
         }]);
 
     stream.on("data", function(data) {
-      var contextIndex = -1;
+      var solutionIndex = -1;
 
-      contexts.forEach(function(context, i) {
-        var found = Object.keys(contexts).every(function(v) {
-          return context[v] === data[v];
+      solutions.forEach(function(solution, i) {
+        var found = Object.keys(solutions).every(function(v) {
+          return solution[v] === data[v];
         });
         if (found) {
-          contextIndex = i;
+          solutionIndex = i;
         }
       });
 
-      if (contextIndex !== -1) {
-        contexts.splice(contextIndex, 1);
+      if (solutionIndex !== -1) {
+        solutions.splice(solutionIndex, 1);
       }
     });
 
     stream.on("end", function() {
-      expect(contexts).to.have.property("length", 0);
+      expect(solutions).to.have.property("length", 0);
       done();
     });
   });
 
   it("should allow to intersect common friends", function(done) {
-    var contexts = [{ x: "marco" }, { x: "matteo" }]
+    var solutions = [{ x: "marco" }, { x: "matteo" }]
       , stream = db.joinStream([{
           subject: "lucio",
           predicate: "friend",
@@ -112,17 +112,17 @@ module.exports = function(joinAlgorithm) {
         }]);
 
     stream.on("data", function(data) {
-      expect(data).to.eql(contexts.shift());
+      expect(data).to.eql(solutions.shift());
     });
 
     stream.on("end", function() {
-      expect(contexts).to.have.property("length", 0);
+      expect(solutions).to.have.property("length", 0);
       done();
     });
   });
 
   it("should support the friend of a friend scenario", function(done) {
-    var contexts = [{ x: "daniele", y: "marco" }]
+    var solutions = [{ x: "daniele", y: "marco" }]
       , stream = db.joinStream([{
           subject: "matteo",
           predicate: "friend",
@@ -138,11 +138,11 @@ module.exports = function(joinAlgorithm) {
         }]);
 
     stream.on("data", function(data) {
-      expect(data).to.eql(contexts.shift());
+      expect(data).to.eql(solutions.shift());
     });
 
     stream.on("end", function() {
-      expect(contexts).to.have.property("length", 0);
+      expect(solutions).to.have.property("length", 0);
       done();
     });
   });
@@ -178,7 +178,7 @@ module.exports = function(joinAlgorithm) {
 
   it("should support a friend-of-a-friend-of-a-friend scenario", function(done) {
 
-    var contexts = [{ x: "daniele", y: "marco", z: "davide" }, { x: "daniele", y: "matteo", z: "daniele" }]
+    var solutions = [{ x: "daniele", y: "marco", z: "davide" }, { x: "daniele", y: "matteo", z: "daniele" }]
 
       , stream = db.joinStream([{
           subject: "matteo",
@@ -195,11 +195,11 @@ module.exports = function(joinAlgorithm) {
         }]);
 
     stream.on("data", function(data) {
-      expect(data).to.eql(contexts.shift());
+      expect(data).to.eql(solutions.shift());
     });
 
     stream.on("end", function() {
-      expect(contexts).to.have.property("length", 0);
+      expect(solutions).to.have.property("length", 0);
       done();
     });
   });

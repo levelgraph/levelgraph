@@ -21,15 +21,15 @@ describe("Variable", function() {
       instance = new Variable("x");
     });
 
-    it("should return true if there is a key in the context", function() {
+    it("should return true if there is a key in the solution", function() {
       expect(instance.isBound({ x: "hello" })).to.equal(true);
     });
 
-    it("should return false if there is no key in the context", function() {
+    it("should return false if there is no key in the solution", function() {
       expect(instance.isBound({})).to.equal(false);
     });
 
-    it("should return false if there is another key in the context", function() {
+    it("should return false if there is another key in the solution", function() {
       expect(instance.isBound({ hello: "world" })).to.equal(false);
     });
   });
@@ -43,18 +43,18 @@ describe("Variable", function() {
     });
 
     it("should return a different object", function() {
-      var context = {};
-      expect(instance.bind(context, "hello")).to.not.be.equal(context);
+      var solution = {};
+      expect(instance.bind(solution, "hello")).to.not.be.equal(solution);
     });
 
-    it("should set an element in the context", function() {
-      var context = {};
-      expect(instance.bind(context, "hello")).to.be.deep.equal({ x: "hello" });
+    it("should set an element in the solution", function() {
+      var solution = {};
+      expect(instance.bind(solution, "hello")).to.be.deep.equal({ x: "hello" });
     });
 
     it("should copy values", function() {
-      var context = { y: "world" };
-      expect(instance.bind(context, "hello")).to.be.deep.equal({ x: "hello", y: "world" });
+      var solution = { y: "world" };
+      expect(instance.bind(solution, "hello")).to.be.deep.equal({ x: "hello", y: "world" });
     });
   });
 

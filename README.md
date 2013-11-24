@@ -180,7 +180,7 @@ db.put([{
 });
 ```
 
-It also allows to generate a stream of triples, instead of a context:
+It also allows to generate a stream of triples, instead of a solution:
 ```
   db.join([{
     subject: db.v("a"),
@@ -230,7 +230,7 @@ between vertexes in our graph.
 Here is an example, using the same dataset as before:
 ```
     db.nav("matteo").archIn("friend").archOut("friend").
-      contexts(function(err, results) {
+      solutions(function(err, results) {
       // prints:
       // [ { x0: 'daniele', x1: 'marco' },
       //   { x0: 'daniele', x1: 'matteo' },
@@ -272,7 +272,7 @@ It allows to see just the last reached vertex:
 Variable names can also be specified, like so:
 ```
 db.nav("marco").archIn("friend").as("a").archOut("friend").archOut("friend").as("a").
-      contexts(function(err, friends) {
+      solutions(function(err, friends) {
  
   console.log(friends); // will print [{ a: "daniele" }]
 });
@@ -311,9 +311,9 @@ db.nav("matteo").archOut("friend").bind("lucio").archOut("friend").bind("marco")
 It is also possible to change the current vertex:
 ```
 db.nav("marco").archIn("friend").as("a").go("matteo").archOut("friend").as("b").
-      contexts(function(err, contexts) {
+      solutions(function(err, solutions) {
 
-   //  contexs is: [{
+   //  solutions is: [{
    //    a: "daniele",
    //    b: "daniele"
    //   }, {
