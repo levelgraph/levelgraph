@@ -1,7 +1,7 @@
-var levelgraph = require("../lib/levelgraph")
-  , level = require("level-test")();
+var levelgraph = require('../lib/levelgraph')
+  , level = require('level-test')();
 
-describe("a basic triple store", function() {
+describe('a basic triple store', function() {
 
   var db;
 
@@ -13,15 +13,15 @@ describe("a basic triple store", function() {
     db.close(done);
   });
 
-  it("should put some more data inside a triple", function(done) {
-    var triple = { subject: "a", predicate: "b", object: "c", "someStuff": 42 };
+  it('should put some more data inside a triple', function(done) {
+    var triple = { subject: 'a', predicate: 'b', object: 'c', 'someStuff': 42 };
     db.put(triple, done);
   });
 
-  it("should return the inserted data", function(done) {
-    var triple = { subject: "a", predicate: "b", object: "c", "someStuff": 42 };
+  it('should return the inserted data', function(done) {
+    var triple = { subject: 'a', predicate: 'b', object: 'c', 'someStuff': 42 };
     db.put(triple, function() {
-      db.get({ subject: "a" }, function(err, list) {
+      db.get({ subject: 'a' }, function(err, list) {
         expect(list).to.eql([triple]);
         done();
       });
