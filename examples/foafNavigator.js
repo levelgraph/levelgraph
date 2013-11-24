@@ -41,7 +41,7 @@ tmp.dir(function(err, dir) {
       console.log(results);
     });
 
-    db.join([{
+    db.search([{
       subject: db.v("x0"),
       predicate: 'friend',
       object: 'matteo'
