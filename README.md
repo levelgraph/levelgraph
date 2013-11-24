@@ -104,9 +104,9 @@ db.put([triple1, triple2],  function(err) {
 });
 ```
 
-### Joins
+### searches
 
-__LevelGraph__ also supports joins:
+__LevelGraph__ also supports searches:
 ```
 db.put([{
   subject: "matteo",
@@ -134,7 +134,7 @@ db.put([{
   object: "davide"
 }], function () {
 
-  var stream = db.joinStream([{
+  var stream = db.searchestream([{
     subject: "matteo",
     predicate: "friend",
     object: db.v("x")
@@ -161,7 +161,7 @@ db.put([{
  ...
 }], function () {
 
-  db.join([{
+  db.search([{
     subject: "matteo",
     predicate: "friend",
     object: db.v("x")
@@ -182,7 +182,7 @@ db.put([{
 
 It also allows to generate a stream of triples, instead of a solution:
 ```
-  db.join([{
+  db.search([{
     subject: db.v("a"),
     predicate: "friend",
     object: db.v("x")
@@ -224,8 +224,8 @@ db.del(triple, function(err) {
 
 The Navigator API is a fluent API for LevelGraph, loosely inspired by
 [Gremlin](http://markorodriguez.com/2011/06/15/graph-pattern-matching-with-gremlin-1-1/)
-It allows to specify joins in a much more compact way and navigate
-between vertexes in our graph.
+It allows to specify how to search our graph in a much more compact way and navigate
+between vertexes.
 
 Here is an example, using the same dataset as before:
 ```
@@ -242,7 +242,7 @@ Here is an example, using the same dataset as before:
 
 The above example match the same triples of:
 ```
-    db.join([{
+    db.search([{
       subject: db.v("x0"),
       predicate: 'friend',
       object: 'matteo'
@@ -286,7 +286,7 @@ db.nav("matteo").archIn("friend").bind("lucio").archOut("friend").bind("marco").
 });
 ```
 
-A materialized join can also be produced, like so:
+A materialized search can also be produced, like so:
 ```
 db.nav("matteo").archOut("friend").bind("lucio").archOut("friend").bind("marco").
       triples({:
@@ -387,13 +387,13 @@ pull-request__.
 
 Here are some ideas:
 
-* [x] Return the matching triples in the JOIN results.
-* [x] Support for Query Planning in JOIN.
+* [x] Return the matching triples in the search results.
+* [x] Support for Query Planning in search.
 * [x] Added a Sort-Join algorithm.
 * [ ] Add more database operators (grouping, filtering).
 * [x] Browser support
   [#10](https://github.com/mcollina/levelgraph/issues/10)
-* [ ] Live Joins 
+* [ ] Live searches 
   [#3](https://github.com/mcollina/node-levelgraph/issues/3)
 
 ## Contributing

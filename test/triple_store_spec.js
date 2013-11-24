@@ -214,4 +214,12 @@ describe('a basic triple store', function() {
       });
     });
   });
+
+  it('should alias searchStream to joinStream', function() {
+    expect(db.joinStream).to.eql(db.searchStream);
+  });
+
+  it('should alias search to join', function() {
+    expect(db.join).to.eql(db.search);
+  });
 });

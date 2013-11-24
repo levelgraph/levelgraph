@@ -16,7 +16,7 @@ module.exports = function(joinAlgorithm) {
   });
 
   it('should do a join with one results', function(done) {
-    db.join([{
+    db.search([{
       subject: db.v('x'),
       predicate: 'friend',
       object: 'daniele'
@@ -28,7 +28,7 @@ module.exports = function(joinAlgorithm) {
   });
 
   it('should a join with two results', function(done) {
-    db.join([{
+    db.search([{
       subject: db.v('x'),
       predicate: 'friend',
       object: 'marco'
@@ -44,9 +44,9 @@ module.exports = function(joinAlgorithm) {
     });
   });
 
-  it('should return the two solutions through the joinStream interface', function(done) {
+  it('should return the two solutions through the searchStream interface', function(done) {
     var solutions = [{ x: 'daniele' }, { x: 'lucio' }]
-      , stream = db.joinStream([{
+      , stream = db.searchStream([{
           subject: db.v('x'),
           predicate: 'friend',
           object: 'marco'
@@ -66,7 +66,7 @@ module.exports = function(joinAlgorithm) {
   it('should allow to find mutual friends', function(done) {
     var solutions = [{ x: 'daniele', y: 'matteo' }, { x: 'matteo', y: 'daniele' }]
 
-      , stream = db.joinStream([{
+      , stream = db.searchStream([{
           subject: db.v('x'),
           predicate: 'friend',
           object: db.v('y')
@@ -101,7 +101,7 @@ module.exports = function(joinAlgorithm) {
 
   it('should allow to intersect common friends', function(done) {
     var solutions = [{ x: 'marco' }, { x: 'matteo' }]
-      , stream = db.joinStream([{
+      , stream = db.searchStream([{
           subject: 'lucio',
           predicate: 'friend',
           object: db.v('x')
@@ -123,7 +123,7 @@ module.exports = function(joinAlgorithm) {
 
   it('should support the friend of a friend scenario', function(done) {
     var solutions = [{ x: 'daniele', y: 'marco' }]
-      , stream = db.joinStream([{
+      , stream = db.searchStream([{
           subject: 'matteo',
           predicate: 'friend',
           object: db.v('x')
@@ -148,7 +148,7 @@ module.exports = function(joinAlgorithm) {
   });
 
   it('should return triples from a join aka materialized API', function(done) {
-    db.join([{
+    db.search([{
       subject: db.v('x'),
       predicate: 'friend',
       object: 'marco'
@@ -180,7 +180,7 @@ module.exports = function(joinAlgorithm) {
 
     var solutions = [{ x: 'daniele', y: 'marco', z: 'davide' }, { x: 'daniele', y: 'matteo', z: 'daniele' }]
 
-      , stream = db.joinStream([{
+      , stream = db.searchStream([{
           subject: 'matteo',
           predicate: 'friend',
           object: db.v('x')
@@ -211,7 +211,7 @@ module.exports = function(joinAlgorithm) {
          , object: 'abcde'
         }] 
 
-      , stream = db.joinStream([{
+      , stream = db.searchStream([{
           subject: 'matteo',
           predicate: 'friend',
           object: db.v('x')
