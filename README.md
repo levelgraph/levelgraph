@@ -22,7 +22,8 @@ Following this approach, __LevelGraph__ uses six indices for every triple,
 in order to access them as fast as it is possible.
 
 [![Build Status](https://travis-ci.org/mcollina/levelgraph.png)](https://travis-ci.org/mcollina/levelgraph)
-[![browser support](http://ci.testling.com/mcollina/levelgraph.png)](http://ci.testling.com/mcollina/levelgraph)
+[![Browser support](https://saucelabs.com/browser-matrix/matteocollina.svg)](https://saucelabs.com/u/matteocollina)
+
 
 **LevelGraph** is an **OPEN Open Source Project**, see the <a href="#contributing">Contributing</a> section to find out what this means.
 
