@@ -1,4 +1,4 @@
-LevelGraph
+LevelGraph&nbsp;&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/levelgraph.png)](https://travis-ci.org/mcollina/levelgraph)
 ===========
 
 ![Logo](https://github.com/mcollina/node-levelgraph/raw/master/logo.png)
@@ -6,6 +6,8 @@ LevelGraph
 [![NPM](https://nodei.co/npm/levelgraph.png)](https://nodei.co/npm/levelgraph/)
 
 [![NPM](https://nodei.co/npm-dl/levelgraph.png)](https://nodei.co/npm/levelgraph/)
+
+[![Browser support](https://saucelabs.com/browser-matrix/matteocollina.svg)](https://saucelabs.com/u/matteocollina)
 
 __LevelGraph__ is a Graph Database. Unlike many other graph database,
 __LevelGraph__ is built on the uber-fast key-value store
@@ -20,10 +22,6 @@ C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
 2008](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.140.8776&rep=rep1&type=pdf).
 Following this approach, __LevelGraph__ uses six indices for every triple,
 in order to access them as fast as it is possible.
-
-[![Build Status](https://travis-ci.org/mcollina/levelgraph.png)](https://travis-ci.org/mcollina/levelgraph)
-[![Browser support](https://saucelabs.com/browser-matrix/matteocollina.svg)](https://saucelabs.com/u/matteocollina)
-
 
 **LevelGraph** is an **OPEN Open Source Project**, see the <a href="#contributing">Contributing</a> section to find out what this means.
 
