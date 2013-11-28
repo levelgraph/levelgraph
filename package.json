@@ -5,6 +5,7 @@
   "main": "lib/levelgraph.js",
   "scripts": {
     "test": "mocha --recursive --bail --reporter spec test",
+    "zuul": "zuul test",
     "testling": "testling -u",
     "ci": "mocha --recursive --bail --watch test",
     "jshint-lib": "jshint lib/*.js",
@@ -46,7 +47,8 @@
     "browserify": "~2.35.4",
     "levelup": "~0.18.0",
     "pre-commit": "0.0.4",
-    "testling": "~1.5.3"
+    "testling": "~1.5.3",
+    "zuul": "~1.0.4"
   },
   "dependencies": {
     "xtend": "~2.1.1",

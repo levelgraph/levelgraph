@@ -1,3 +1,10 @@
 language: node_js
 node_js:
-  - 0.10
+- 0.1
+script:
+- npm test
+- npm run zuul
+env:
+  global:
+  - secure: Cuq9z31FxXAqpeT8cg58PK1qVSu6GQ6oVRRS5HqLRPxVPdz6yZSsM8VbDP+fC4EMeLihdnjTxQ4QoxGHhpNZjY2P+lX5nCZMvclW7lU7puuXOn0EAzFMMLFZiz28w1HyZSudDfyKN9jN15mYxEqUyJIqMIn6sLVnaCu/Okq8XbQ=
+  - secure: JXzIvZc65DZopPS0GeQcTS5DheXzX9LF11d+P/aDEOdo4UsR9Pm74OjIu7xHbs1U4MiO5fJXBqMfdZLDcgc/VJx5goeJfv4pUyGCucghbP+cDKgRhN+FYME2CZ5QCLaXFKwxzXLpAKM+Ag5K/mzW4eWMXSwztI+YFVvjC9RhWSk=
