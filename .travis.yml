@@ -2,7 +2,8 @@ language: node_js
 node_js:
 - 0.1
 script:
-- npm test
+- npm run coverage
+- npm run publish-coverage
 - npm run zuul
 env:
   global:

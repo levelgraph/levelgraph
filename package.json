@@ -7,6 +7,8 @@
     "test": "mocha --recursive --bail --reporter spec test",
     "zuul": "zuul test",
     "testling": "testling -u",
+    "coverage": "rm -rf coverage; istanbul cover _mocha -- --recursive --reporter spec --bail",
+    "publish-coverage": "cat coverage/lcov.info | coveralls",
     "ci": "mocha --recursive --bail --watch test",
     "jshint-lib": "jshint lib/*.js",
     "jshint-test": "jshint test/*.js"
@@ -48,7 +50,9 @@
     "levelup": "~0.18.0",
     "pre-commit": "0.0.4",
     "testling": "~1.5.3",
-    "zuul": "~1.0.4"
+    "zuul": "~1.0.4",
+    "coveralls": "~2.5.0",
+    "istanbul": "~0.1.45"
   },
   "dependencies": {
     "xtend": "~2.1.1",
