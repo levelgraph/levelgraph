@@ -373,11 +373,11 @@ var db = levelgraph(levelup("yourdb", { db: factory }));
 
 Follow the [Testling install instructions](https://github.com/substack/testling#install) and run `testling` in the levelgraph directory to run the test suite against a headless browser using level.js
 
-## N3/Turtle/RDF support
+## RDF support
 
-__LevelGraph__ does not support loading and storing N3/turtle/RDF out of
-the box, but the functionality is provided by
-[LevelGraph-N3](https://github.com/mcollina/levelgraph-n3).
+__LevelGraph__ does not support out of the box loading serialized RDF or storing it. Such functionality is provided by extensions:
+* [LevelGraph-N3](https://github.com/mcollina/levelgraph-n3) - __N3/Turtle__
+* [LevelGraph-JSONLD](https://github.com/mcollina/levelgraph-jsonld) - __JSON-LD__
 
 ## TODO
 
