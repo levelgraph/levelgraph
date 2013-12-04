@@ -382,7 +382,7 @@ __LevelGraph__ does not support out of the box loading serialized RDF or storing
 ## Extensions
 
 You can use multiple extensions at the same time. Just check if one depends on another one
-to nest them in correct other! *(LevelGraph-N3 and LevelGraph-JSONLD are
+to nest them in correct order! *(LevelGraph-N3 and LevelGraph-JSONLD are
 independent)*
 
 ```javascript
