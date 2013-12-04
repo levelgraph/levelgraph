@@ -379,6 +379,22 @@ __LevelGraph__ does not support out of the box loading serialized RDF or storing
 * [LevelGraph-N3](https://github.com/mcollina/levelgraph-n3) - __N3/Turtle__
 * [LevelGraph-JSONLD](https://github.com/mcollina/levelgraph-jsonld) - __JSON-LD__
 
+## Extensions
+
+You can use multiple extensions at the same time. Just check if one depends on another one
+to nest them in correct other! *(LevelGraph-N3 and LevelGraph-JSONLD are
+independent)*
+
+```javascript
+var lg = require('levelgraph');
+var lgN3 = require('levelgraph-n3');
+var lgJSONLD = require('levelgraph-jsonld');
+
+var db = lgJSONLD(lgN3(lg("yourdb")));
+// gives same result as
+var db = lgN3(lgJSONLD(lg("yourdb")));
+```
+
 ## TODO
 
 There are plenty of things that this library is missing.
@@ -395,6 +411,10 @@ Here are some ideas:
   [#10](https://github.com/mcollina/levelgraph/issues/10)
 * [ ] Live Joins 
   [#3](https://github.com/mcollina/node-levelgraph/issues/3)
+* Extensions
+  * [ ] RDFa
+  * [ ] RDF/XML
+  * [ ] Microdata
 
 ## Contributing
 
