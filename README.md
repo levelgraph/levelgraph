@@ -373,11 +373,27 @@ var db = levelgraph(levelup("yourdb", { db: factory }));
 
 Follow the [Testling install instructions](https://github.com/substack/testling#install) and run `testling` in the levelgraph directory to run the test suite against a headless browser using level.js
 
-## N3/Turtle/RDF support
+## RDF support
 
-__LevelGraph__ does not support loading and storing N3/turtle/RDF out of
-the box, but the functionality is provided by
-[LevelGraph-N3](https://github.com/mcollina/levelgraph-n3).
+__LevelGraph__ does not support out of the box loading serialized RDF or storing it. Such functionality is provided by extensions:
+* [LevelGraph-N3](https://github.com/mcollina/levelgraph-n3) - __N3/Turtle__
+* [LevelGraph-JSONLD](https://github.com/mcollina/levelgraph-jsonld) - __JSON-LD__
+
+## Extensions
+
+You can use multiple extensions at the same time. Just check if one depends on another one
+to nest them in correct order! *(LevelGraph-N3 and LevelGraph-JSONLD are
+independent)*
+
+```javascript
+var lg = require('levelgraph');
+var lgN3 = require('levelgraph-n3');
+var lgJSONLD = require('levelgraph-jsonld');
+
+var db = lgJSONLD(lgN3(lg("yourdb")));
+// gives same result as
+var db = lgN3(lgJSONLD(lg("yourdb")));
+```
 
 ## TODO
 
@@ -395,6 +411,10 @@ Here are some ideas:
   [#10](https://github.com/mcollina/levelgraph/issues/10)
 * [ ] Live Joins 
   [#3](https://github.com/mcollina/node-levelgraph/issues/3)
+* Extensions
+  * [ ] RDFa
+  * [ ] RDF/XML
+  * [ ] Microdata
 
 ## Contributing
 
