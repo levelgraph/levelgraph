@@ -2,6 +2,10 @@
 History
 ======
 
+## 0.6.12
+
+* README update [#44](https://github.com/mcollina/levelgraph/pull/44).
+
 ## 0.6.11
 
 * Fixed memory leak by upgrading to LevelUp 0.18 and LevelDown 0.10.
