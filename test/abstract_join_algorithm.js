@@ -240,4 +240,37 @@ module.exports = function(joinAlgorithm) {
       done();
     });
   });
+
+  it('should support filtering inside a condition', function(done) {
+    db.search([{
+      subject: db.v('x'),
+      predicate: 'friend',
+      object: 'daniele',
+      filter: function(triple) { return triple.subject !== 'matteo'; }
+    }], function(err, results) {
+      expect(results).to.have.length(0);
+      done();
+    });
+  });
+
+  it('should support filtering inside a second-level condition', function(done) {
+    db.search([{
+      subject: 'matteo',
+      predicate: 'friend',
+      object: db.v('y'),
+    }, {
+      subject: db.v('y'),
+      predicate: 'friend',
+      object: db.v('x'),
+      filter: function(triple) { 
+        return triple.object !== 'matteo';
+      }
+    }], function(err, results) {
+      expect(results).to.eql([{
+        'y': 'daniele',
+        'x': 'marco'
+      }]);
+      done();
+    });
+  });
 };
