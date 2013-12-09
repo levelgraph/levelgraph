@@ -262,8 +262,10 @@ db.search({
 }, {
     filter: function filter(solution, callback) {
       if (solution.x !== 'daniele') {
+        // confirm the solution
         callback(null, solution);
       } else {
+        // refute the solution
         callback(null);
       }
     }
@@ -271,6 +273,39 @@ db.search({
   // results will not contain any solutions that
   // have { x: 'daniele' }
 });
+```
+
+Thanks to solultion filtering, it is possible to implement a negation:
+```
+db.search({
+    subject: 'matteo'
+  , predicate: 'friend'
+  , object: db.v('x')
+}, {
+    filter: function filter(solution, callback) {
+      db.get({
+          subject: solution.x
+        , predicate: 'friend'
+        , object: 'marco'
+      }, function (err, results) {
+        if (err) {
+          callback(err);
+          return;
+        }
+        if (results.length > 0) {
+          // confirm the solution
+          callback(null, solution);
+        } else {
+          // refute the solution
+          callback();
+        }
+      });
+    }
+}, function process(err, solutions) { 
+  // results will not contain any solutions that
+  // do not satisfy the filter
+});
+```
 ```
 
 The heavier method is filtering solutions, so we recommend filtering the
