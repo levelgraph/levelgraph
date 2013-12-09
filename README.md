@@ -219,6 +219,63 @@ db.del(triple, function(err) {
 });
 ```
 
+### Filtering
+
+__LevelGraph__ supports filtering of triples when calling `get()`
+ and solutions when calling `search()`, and streams are supported too.
+
+It is possible to filter the matching triples during a `get()`:
+```
+db.get({
+    subject: 'matteo'
+  , predicate: 'friend'
+  , filter: function filter(triple) {
+      return triple.object !== 'daniele';
+    }
+}, function process(err, results) { 
+  // results will not contain any triples that
+  // have 'daniele' as object
+});
+```
+
+Moreover, it is possible to filter the triples during a `search()`
+```
+db.search({
+    subject: 'matteo'
+  , predicate: 'friend'
+  , object: db.v('x')
+  , filter: function filter(triple) {
+      return triple.object !== 'daniele';
+    }
+}, function process(err, solutions) { 
+  // results will not contain any solutions that
+  // have { x: 'daniele' }
+});
+```
+
+Finally, __LevelGraph__ supports filtering full solutions:
+```
+db.search({
+    subject: 'matteo'
+  , predicate: 'friend'
+  , object: db.v('x')
+}, {
+    filter: function filter(solution, callback) {
+      if (solution.x !== 'daniele') {
+        callback(null, solution);
+      } else {
+        callback(null);
+      }
+    }
+}, function process(err, solutions) { 
+  // results will not contain any solutions that
+  // have { x: 'daniele' }
+});
+```
+
+The heavier method is filtering solutions, so we recommend filtering the
+triples whenever possible.
+
 ## Navigator API
 
 The Navigator API is a fluent API for LevelGraph, loosely inspired by
