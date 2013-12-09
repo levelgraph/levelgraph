@@ -273,4 +273,30 @@ module.exports = function(joinAlgorithm) {
       done();
     });
   });
+
+  it('should support solution filtering', function(done) {
+    db.search([{
+      subject: 'matteo',
+      predicate: 'friend',
+      object: db.v('y'),
+    }, {
+      subject: db.v('y'),
+      predicate: 'friend',
+      object: db.v('x')
+    }], {
+      filter: function(context, callback) { 
+        if (context.x !== 'matteo') {
+          callback(null, context);
+        } else {
+          callback(null);
+        }
+      }
+    }, function(err, results) {
+      expect(results).to.eql([{
+        'y': 'daniele',
+        'x': 'marco'
+      }]);
+      done();
+    });
+  });
 };
