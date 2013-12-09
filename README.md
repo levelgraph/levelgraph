@@ -306,7 +306,6 @@ db.search({
   // do not satisfy the filter
 });
 ```
-```
 
 The heavier method is filtering solutions, so we recommend filtering the
 triples whenever possible.
