@@ -219,6 +219,97 @@ db.del(triple, function(err) {
 });
 ```
 
+### Filtering
+
+__LevelGraph__ supports filtering of triples when calling `get()`
+ and solutions when calling `search()`, and streams are supported too.
+
+It is possible to filter the matching triples during a `get()`:
+```
+db.get({
+    subject: 'matteo'
+  , predicate: 'friend'
+  , filter: function filter(triple) {
+      return triple.object !== 'daniele';
+    }
+}, function process(err, results) { 
+  // results will not contain any triples that
+  // have 'daniele' as object
+});
+```
+
+Moreover, it is possible to filter the triples during a `search()`
+```
+db.search({
+    subject: 'matteo'
+  , predicate: 'friend'
+  , object: db.v('x')
+  , filter: function filter(triple) {
+      return triple.object !== 'daniele';
+    }
+}, function process(err, solutions) { 
+  // results will not contain any solutions that
+  // have { x: 'daniele' }
+});
+```
+
+Finally, __LevelGraph__ supports filtering full solutions:
+```
+db.search({
+    subject: 'matteo'
+  , predicate: 'friend'
+  , object: db.v('x')
+}, {
+    filter: function filter(solution, callback) {
+      if (solution.x !== 'daniele') {
+        // confirm the solution
+        callback(null, solution);
+      } else {
+        // refute the solution
+        callback(null);
+      }
+    }
+}, function process(err, solutions) { 
+  // results will not contain any solutions that
+  // have { x: 'daniele' }
+});
+```
+
+Thanks to solultion filtering, it is possible to implement a negation:
+```
+db.search({
+    subject: 'matteo'
+  , predicate: 'friend'
+  , object: db.v('x')
+}, {
+    filter: function filter(solution, callback) {
+      db.get({
+          subject: solution.x
+        , predicate: 'friend'
+        , object: 'marco'
+      }, function (err, results) {
+        if (err) {
+          callback(err);
+          return;
+        }
+        if (results.length > 0) {
+          // confirm the solution
+          callback(null, solution);
+        } else {
+          // refute the solution
+          callback();
+        }
+      });
+    }
+}, function process(err, solutions) { 
+  // results will not contain any solutions that
+  // do not satisfy the filter
+});
+```
+
+The heavier method is filtering solutions, so we recommend filtering the
+triples whenever possible.
+
 ## Navigator API
 
 The Navigator API is a fluent API for LevelGraph, loosely inspired by
