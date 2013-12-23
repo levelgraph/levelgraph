@@ -1,6 +1,7 @@
 
 var levelgraph = require('../lib/levelgraph')
-  , level = require('level-test')();
+  , level = require('level-test')()
+  , osenv = require('osenv');
 
 describe('a basic triple store', function() {
 
@@ -237,5 +238,22 @@ describe('a basic triple store', function() {
         done();
       });
     });
+  });
+});
+
+describe('deferred open support', function() {
+  
+  var db;
+
+  afterEach(function(done) {
+    db.close(done);
+  });
+
+  it('should call the callback if a level is passed', function(done) {
+    db = levelgraph(level(), done);
+  });
+
+  it('should call the callback if a level is not passed', function(done) {
+    db = levelgraph(osenv.tmpdir() + '_levelDeferred1', done);
   });
 });

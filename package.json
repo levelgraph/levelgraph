@@ -1,6 +1,6 @@
 {
   "name": "levelgraph",
-  "version": "0.6.11",
+  "version": "0.6.12",
   "description": "A graph database for Node.js and the browser built on top of LevelUp",
   "main": "lib/levelgraph.js",
   "scripts": {
@@ -52,7 +52,8 @@
     "testling": "~1.5.3",
     "zuul": "~1.0.4",
     "coveralls": "~2.5.0",
-    "istanbul": "~0.1.45"
+    "istanbul": "~0.1.45",
+    "osenv": "0.0.3"
   },
   "dependencies": {
     "xtend": "~2.1.1",
