@@ -46,7 +46,8 @@
     "browserify": "~2.35.4",
     "levelup": "~0.18.0",
     "pre-commit": "0.0.4",
-    "testling": "~1.5.3"
+    "testling": "~1.5.3",
+    "osenv": "0.0.3"
   },
   "dependencies": {
     "xtend": "~2.1.1",
