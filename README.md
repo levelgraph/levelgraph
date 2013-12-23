@@ -92,6 +92,18 @@ db.put(triple, function() {
 });
 ```
 
+#### Limit and Offset
+
+It is possible to implement pagination of get results by using
+`'offset'` and `'limit'`, like so:
+
+```
+db.get({ subject: "a", limit: 4, offset: 2}, function(err, list) {
+  expect(list).to.eql([triple]);
+  done();
+});
+```
+
 ### Multiple Puts
 
 __LevelGraph__ also supports adding putting multiple triples:
@@ -103,7 +115,7 @@ db.put([triple1, triple2],  function(err) {
 });
 ```
 
-### searches
+### Searches
 
 __LevelGraph__ also supports searches:
 ```
@@ -154,6 +166,8 @@ db.put([{
 });
 ```
 
+#### Search Streams
+
 It also support a similar API without streams:
 ```
 db.put([{
@@ -178,6 +192,8 @@ db.put([{
   });
 });
 ```
+
+#### Triple Generation 
 
 It also allows to generate a stream of triples, instead of a solution:
 ```
@@ -207,6 +223,27 @@ It also allows to generate a stream of triples, instead of a solution:
     //   object: "daniele"
     // }
   });
+```
+
+#### Limit and Offset
+
+It is possible to implement pagination of search results by using
+`'offset'` and `'limit'`, like so:
+
+```
+db.search([{
+    subject: db.v("a"),
+    predicate: "friend",
+    object: db.v("x")
+  }, {
+    subject: db.v("x"),
+    predicate: "friend",
+    object: db.v("y")
+  }], { limit: 4, offset: 2 }, function(err, list) {
+
+  expect(list).to.eql([triple]);
+  done();
+});
 ```
 
 ### Deleting
