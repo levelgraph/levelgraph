@@ -99,9 +99,9 @@ describe('a basic triple store', function() {
       });
     });
 
-    it('should not return the triple if limit 0 is used', function(done) {
+    it('should get the triple if limit 0 is used', function(done) {
       db.get({ limit: 0 }, function(err, list) {
-        expect(list).to.eql([]);
+        expect(list).to.eql([triple]);
         done();
       });
     });
