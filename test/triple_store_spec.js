@@ -256,4 +256,11 @@ describe('deferred open support', function() {
   it('should call the callback if a level is not passed', function(done) {
     db = levelgraph(osenv.tmpdir() + '_levelDeferred1', done);
   });
+
+  it('should call the callback with a levelgrap', function(done) {
+    db = levelgraph(level(), function(err, graphdb) {
+      expect(graphdb).to.be.equal(db);
+      done();
+    });
+  });
 });
