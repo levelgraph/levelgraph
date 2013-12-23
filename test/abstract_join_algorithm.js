@@ -299,4 +299,52 @@ module.exports = function(joinAlgorithm) {
       done();
     });
   });
+
+  it('should return only one solution with limit 1', function(done) {
+    db.search([{
+      subject: db.v('x'),
+      predicate: 'friend',
+      object: 'marco'
+    }, {
+      subject: db.v('x'),
+      predicate: 'friend',
+      object: 'matteo'
+    }], { limit: 1 }, function(err, results) {
+      expect(results).to.have.property('length', 1);
+      expect(results[0]).to.have.property('x', 'daniele');
+      done();
+    });
+  });
+
+  it('should return only one solution with limit 1 (bis)', function(done) {
+    db.search([{
+      subject: 'lucio',
+      predicate: 'friend',
+      object: db.v('x')
+    }, {
+      subject: 'daniele',
+      predicate: 'friend',
+      object: db.v('x')
+    }], { limit: 1 }, function(err, results) {
+      expect(results).to.have.property('length', 1);
+      expect(results[0]).to.have.property('x', 'marco');
+      done();
+    });
+  });
+
+  it('should return skip the first solution with offset 1', function(done) {
+    db.search([{
+      subject: db.v('x'),
+      predicate: 'friend',
+      object: 'marco'
+    }, {
+      subject: db.v('x'),
+      predicate: 'friend',
+      object: 'matteo'
+    }], { offset: 1 }, function(err, results) {
+      expect(results).to.have.property('length', 1);
+      expect(results[0]).to.have.property('x', 'lucio');
+      done();
+    });
+  });
 };

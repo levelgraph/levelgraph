@@ -91,6 +91,34 @@ describe('a basic triple store', function() {
       });
       stream.on('end', done);
     });
+
+    it('should get the triple if limit 1 is used', function(done) {
+      db.get({ limit: 1 }, function(err, list) {
+        expect(list).to.eql([triple]);
+        done();
+      });
+    });
+
+    it('should get the triple if limit 0 is used', function(done) {
+      db.get({ limit: 0 }, function(err, list) {
+        expect(list).to.eql([triple]);
+        done();
+      });
+    });
+
+    it('should get the triple if offset 0 is used', function(done) {
+      db.get({ offset: 0 }, function(err, list) {
+        expect(list).to.eql([triple]);
+        done();
+      });
+    });
+
+    it('should not get the triple if offset 1 is used', function(done) {
+      db.get({ offset: 1 }, function(err, list) {
+        expect(list).to.eql([]);
+        done();
+      });
+    });
   });
 
   it('should put an array of triples', function(done) {
@@ -148,6 +176,61 @@ describe('a basic triple store', function() {
     it('should return both triples through the getStream interface', function(done) {
       var triples = [triple1, triple2]
         , stream = db.getStream({ predicate: 'b' });
+      stream.on('data', function(data) {
+        expect(data).to.eql(triples.shift());
+      });
+
+      stream.on('end', done);
+    });
+
+    it('should return only one triple with limit 1', function(done) {
+      db.get({ predicate: 'b', limit: 1 }, function(err, list) {
+        expect(list).to.eql([triple1]);
+        done();
+      });
+    });
+
+    it('should return two triples with limit 2', function(done) {
+      db.get({ predicate: 'b', limit: 2 }, function(err, list) {
+        expect(list).to.eql([triple1, triple2]);
+        done();
+      });
+    });
+
+    it('should return three triples with limit 3', function(done) {
+      db.get({ predicate: 'b', limit: 3 }, function(err, list) {
+        expect(list).to.eql([triple1, triple2]);
+        done();
+      });
+    });
+
+    it('should support limit over streams', function(done) {
+      var triples = [triple1]
+        , stream = db.getStream({ predicate: 'b', limit: 1 });
+      stream.on('data', function(data) {
+        expect(data).to.eql(triples.shift());
+      });
+
+      stream.on('end', done);
+    });
+
+    it('should return only one triple with offset 1', function(done) {
+      db.get({ predicate: 'b', offset: 1 }, function(err, list) {
+        expect(list).to.eql([triple2]);
+        done();
+      });
+    });
+
+    it('should return only no triples with offset 2', function(done) {
+      db.get({ predicate: 'b', offset: 2 }, function(err, list) {
+        expect(list).to.eql([]);
+        done();
+      });
+    });
+
+    it('should support offset over streams', function(done) {
+      var triples = [triple2]
+        , stream = db.getStream({ predicate: 'b', offset: 1 });
       stream.on('data', function(data) {
         expect(data).to.eql(triples.shift());
       });
