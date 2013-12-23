@@ -331,4 +331,20 @@ module.exports = function(joinAlgorithm) {
       done();
     });
   });
+
+  it('should return skip the first solution with offset 1', function(done) {
+    db.search([{
+      subject: db.v('x'),
+      predicate: 'friend',
+      object: 'marco'
+    }, {
+      subject: db.v('x'),
+      predicate: 'friend',
+      object: 'matteo'
+    }], { offset: 1 }, function(err, results) {
+      expect(results).to.have.property('length', 1);
+      expect(results[0]).to.have.property('x', 'lucio');
+      done();
+    });
+  });
 };
