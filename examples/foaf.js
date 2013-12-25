@@ -36,7 +36,7 @@ tmp.dir(function(err, dir) {
     object: "davide"
   }], function () {
 
-    var stream = db.joinStream([{
+    var stream = db.searchStream([{
       subject: "matteo",
       predicate: "friend",
       object: db.v("x")

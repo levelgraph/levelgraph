@@ -1,4 +1,4 @@
-LevelGraph
+LevelGraph&nbsp;&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/levelgraph.png)](https://travis-ci.org/mcollina/levelgraph)&nbsp;[![Coverage Status](https://coveralls.io/repos/mcollina/levelgraph/badge.png)](https://coveralls.io/r/mcollina/levelgraph)
 ===========
 
 ![Logo](https://github.com/mcollina/node-levelgraph/raw/master/logo.png)
@@ -6,6 +6,8 @@ LevelGraph
 [![NPM](https://nodei.co/npm/levelgraph.png)](https://nodei.co/npm/levelgraph/)
 
 [![NPM](https://nodei.co/npm-dl/levelgraph.png)](https://nodei.co/npm/levelgraph/)
+
+[![Browser support](https://saucelabs.com/browser-matrix/matteocollina.svg)](https://saucelabs.com/u/matteocollina)
 
 __LevelGraph__ is a Graph Database. Unlike many other graph database,
 __LevelGraph__ is built on the uber-fast key-value store
@@ -20,9 +22,6 @@ C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
 2008](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.140.8776&rep=rep1&type=pdf).
 Following this approach, __LevelGraph__ uses six indices for every triple,
 in order to access them as fast as it is possible.
-
-[![Build Status](https://travis-ci.org/mcollina/levelgraph.png)](https://travis-ci.org/mcollina/levelgraph)
-[![browser support](http://ci.testling.com/mcollina/levelgraph.png)](http://ci.testling.com/mcollina/levelgraph)
 
 **LevelGraph** is an **OPEN Open Source Project**, see the <a href="#contributing">Contributing</a> section to find out what this means.
 
@@ -93,6 +92,18 @@ db.put(triple, function() {
 });
 ```
 
+#### Limit and Offset
+
+It is possible to implement pagination of get results by using
+`'offset'` and `'limit'`, like so:
+
+```
+db.get({ subject: "a", limit: 4, offset: 2}, function(err, list) {
+  expect(list).to.eql([triple]);
+  done();
+});
+```
+
 ### Multiple Puts
 
 __LevelGraph__ also supports adding putting multiple triples:
@@ -104,9 +115,9 @@ db.put([triple1, triple2],  function(err) {
 });
 ```
 
-### Joins
+### Searches
 
-__LevelGraph__ also supports joins:
+__LevelGraph__ also supports searches:
 ```
 db.put([{
   subject: "matteo",
@@ -134,7 +145,7 @@ db.put([{
   object: "davide"
 }], function () {
 
-  var stream = db.joinStream([{
+  var stream = db.searchestream([{
     subject: "matteo",
     predicate: "friend",
     object: db.v("x")
@@ -155,13 +166,15 @@ db.put([{
 });
 ```
 
+#### Search Streams
+
 It also support a similar API without streams:
 ```
 db.put([{
  ...
 }], function () {
 
-  db.join([{
+  db.search([{
     subject: "matteo",
     predicate: "friend",
     object: db.v("x")
@@ -180,9 +193,11 @@ db.put([{
 });
 ```
 
-It also allows to generate a stream of triples, instead of a context:
+#### Triple Generation 
+
+It also allows to generate a stream of triples, instead of a solution:
 ```
-  db.join([{
+  db.search([{
     subject: db.v("a"),
     predicate: "friend",
     object: db.v("x")
@@ -210,6 +225,27 @@ It also allows to generate a stream of triples, instead of a context:
   });
 ```
 
+#### Limit and Offset
+
+It is possible to implement pagination of search results by using
+`'offset'` and `'limit'`, like so:
+
+```
+db.search([{
+    subject: db.v("a"),
+    predicate: "friend",
+    object: db.v("x")
+  }, {
+    subject: db.v("x"),
+    predicate: "friend",
+    object: db.v("y")
+  }], { limit: 4, offset: 2 }, function(err, list) {
+
+  expect(list).to.eql([triple]);
+  done();
+});
+```
+
 ### Deleting
 
 Deleting is easy too:
@@ -220,17 +256,108 @@ db.del(triple, function(err) {
 });
 ```
 
+### Filtering
+
+__LevelGraph__ supports filtering of triples when calling `get()`
+ and solutions when calling `search()`, and streams are supported too.
+
+It is possible to filter the matching triples during a `get()`:
+```
+db.get({
+    subject: 'matteo'
+  , predicate: 'friend'
+  , filter: function filter(triple) {
+      return triple.object !== 'daniele';
+    }
+}, function process(err, results) { 
+  // results will not contain any triples that
+  // have 'daniele' as object
+});
+```
+
+Moreover, it is possible to filter the triples during a `search()`
+```
+db.search({
+    subject: 'matteo'
+  , predicate: 'friend'
+  , object: db.v('x')
+  , filter: function filter(triple) {
+      return triple.object !== 'daniele';
+    }
+}, function process(err, solutions) { 
+  // results will not contain any solutions that
+  // have { x: 'daniele' }
+});
+```
+
+Finally, __LevelGraph__ supports filtering full solutions:
+```
+db.search({
+    subject: 'matteo'
+  , predicate: 'friend'
+  , object: db.v('x')
+}, {
+    filter: function filter(solution, callback) {
+      if (solution.x !== 'daniele') {
+        // confirm the solution
+        callback(null, solution);
+      } else {
+        // refute the solution
+        callback(null);
+      }
+    }
+}, function process(err, solutions) { 
+  // results will not contain any solutions that
+  // have { x: 'daniele' }
+});
+```
+
+Thanks to solultion filtering, it is possible to implement a negation:
+```
+db.search({
+    subject: 'matteo'
+  , predicate: 'friend'
+  , object: db.v('x')
+}, {
+    filter: function filter(solution, callback) {
+      db.get({
+          subject: solution.x
+        , predicate: 'friend'
+        , object: 'marco'
+      }, function (err, results) {
+        if (err) {
+          callback(err);
+          return;
+        }
+        if (results.length > 0) {
+          // confirm the solution
+          callback(null, solution);
+        } else {
+          // refute the solution
+          callback();
+        }
+      });
+    }
+}, function process(err, solutions) { 
+  // results will not contain any solutions that
+  // do not satisfy the filter
+});
+```
+
+The heavier method is filtering solutions, so we recommend filtering the
+triples whenever possible.
+
 ## Navigator API
 
 The Navigator API is a fluent API for LevelGraph, loosely inspired by
 [Gremlin](http://markorodriguez.com/2011/06/15/graph-pattern-matching-with-gremlin-1-1/)
-It allows to specify joins in a much more compact way and navigate
-between vertexes in our graph.
+It allows to specify how to search our graph in a much more compact way and navigate
+between vertexes.
 
 Here is an example, using the same dataset as before:
 ```
     db.nav("matteo").archIn("friend").archOut("friend").
-      contexts(function(err, results) {
+      solutions(function(err, results) {
       // prints:
       // [ { x0: 'daniele', x1: 'marco' },
       //   { x0: 'daniele', x1: 'matteo' },
@@ -242,7 +369,7 @@ Here is an example, using the same dataset as before:
 
 The above example match the same triples of:
 ```
-    db.join([{
+    db.search([{
       subject: db.v("x0"),
       predicate: 'friend',
       object: 'matteo'
@@ -272,7 +399,7 @@ It allows to see just the last reached vertex:
 Variable names can also be specified, like so:
 ```
 db.nav("marco").archIn("friend").as("a").archOut("friend").archOut("friend").as("a").
-      contexts(function(err, friends) {
+      solutions(function(err, friends) {
  
   console.log(friends); // will print [{ a: "daniele" }]
 });
@@ -286,7 +413,7 @@ db.nav("matteo").archIn("friend").bind("lucio").archOut("friend").bind("marco").
 });
 ```
 
-A materialized join can also be produced, like so:
+A materialized search can also be produced, like so:
 ```
 db.nav("matteo").archOut("friend").bind("lucio").archOut("friend").bind("marco").
       triples({:
@@ -311,9 +438,9 @@ db.nav("matteo").archOut("friend").bind("lucio").archOut("friend").bind("marco")
 It is also possible to change the current vertex:
 ```
 db.nav("marco").archIn("friend").as("a").go("matteo").archOut("friend").as("b").
-      contexts(function(err, contexts) {
+      solutions(function(err, solutions) {
 
-   //  contexs is: [{
+   //  solutions is: [{
    //    a: "daniele",
    //    b: "daniele"
    //   }, {
@@ -403,13 +530,13 @@ pull-request__.
 
 Here are some ideas:
 
-* [x] Return the matching triples in the JOIN results.
-* [x] Support for Query Planning in JOIN.
+* [x] Return the matching triples in the search results.
+* [x] Support for Query Planning in search.
 * [x] Added a Sort-Join algorithm.
 * [ ] Add more database operators (grouping, filtering).
 * [x] Browser support
   [#10](https://github.com/mcollina/levelgraph/issues/10)
-* [ ] Live Joins 
+* [ ] Live searches 
   [#3](https://github.com/mcollina/node-levelgraph/issues/3)
 * Extensions
   * [ ] RDFa

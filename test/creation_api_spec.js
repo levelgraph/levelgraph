@@ -1,8 +1,8 @@
 
-var levelgraph = require("../lib/levelgraph")
-  , level = require("level-test")();
+var levelgraph = require('../lib/levelgraph')
+  , level = require('level-test')();
 
-describe("creation api", function() {
+describe('creation api', function() {
 
   var db;
 
@@ -13,11 +13,11 @@ describe("creation api", function() {
     }
   });
 
-  it("should create a db passing a levelup instance", function() {
+  it('should create a db passing a levelup instance', function() {
     db = levelgraph(level());
   });
 
-  it("should create a db passing a string", function() {
-    db = levelgraph("/tmp/hello");
+  it('should create a db passing a string', function() {
+    db = levelgraph('/tmp/hello');
   });
 });

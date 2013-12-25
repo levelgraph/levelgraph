@@ -5,7 +5,10 @@
   "main": "lib/levelgraph.js",
   "scripts": {
     "test": "mocha --recursive --bail --reporter spec test",
+    "zuul": "zuul test",
     "testling": "testling -u",
+    "coverage": "rm -rf coverage; istanbul cover _mocha -- --recursive --reporter spec --bail",
+    "publish-coverage": "cat coverage/lcov.info | coveralls",
     "ci": "mocha --recursive --bail --watch test",
     "jshint-lib": "jshint lib/*.js",
     "jshint-test": "jshint test/*.js"
@@ -46,13 +49,17 @@
     "browserify": "~2.35.4",
     "levelup": "~0.18.0",
     "pre-commit": "0.0.4",
-    "testling": "~1.5.3"
+    "testling": "~1.5.3",
+    "zuul": "~1.0.4",
+    "coveralls": "~2.5.0",
+    "istanbul": "~0.1.45",
+    "osenv": "0.0.3"
   },
   "dependencies": {
     "xtend": "~2.1.1",
     "callback-stream": "~1.0.0",
     "async": "~0.2.9",
-    "readable-stream": ">= 1.0.2 < 2.0.0",
+    "readable-stream": "~ 1.0.2",
     "level-writestream": "~0.1.1",
     "levelup": ">= 0.10.0 < 0.19.0",
     "leveldown": "> 0.7.0 < 0.11.0",
