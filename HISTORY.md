@@ -2,6 +2,20 @@
 History
 ======
 
+## 0.7.0
+
+* Rename the term context into solution,
+  as it's more clear [#31](https://github.com/mcollina/levelgraph/pull/31).
+* Rename `join()` to `search()`.
+* Move from " to '.
+* Introduce filtering in `search()` and `get()` [#49](https://github.com/mcollina/levelgraph/pull/49).
+* Introduce a `'limit'` and `'offset'` option in `search()` and `get()`
+  [#49](https://github.com/mcollina/levelgraph/pull/49).
+* Callback to avoid deferred open #46.
+  [#46](https://github.com/mcollina/levelgraph/pull/46).
+* Saucelabs testing.
+* Performance optimization of searches.
+
 ## 0.6.12
 
 * README update [#44](https://github.com/mcollina/levelgraph/pull/44).
