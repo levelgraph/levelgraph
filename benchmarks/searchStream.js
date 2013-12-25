@@ -33,7 +33,7 @@ var level = require("level-test")()
 
   , doReads = function() {
 
-      var stream = db.joinStream([{
+      var stream = db.searchStream([{
           subject: db.v("a")
         , predicate: "p"
         , object: db.v("b")
