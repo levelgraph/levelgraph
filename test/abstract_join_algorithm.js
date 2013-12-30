@@ -27,7 +27,7 @@ module.exports = function(joinAlgorithm) {
     });
   });
 
-  it('should a join with two results', function(done) {
+  it('should do a join with two results', function(done) {
     db.search([{
       subject: db.v('x'),
       predicate: 'friend',
@@ -40,6 +40,25 @@ module.exports = function(joinAlgorithm) {
       expect(results).to.have.property('length', 2);
       expect(results[0]).to.have.property('x', 'daniele');
       expect(results[1]).to.have.property('x', 'lucio');
+      done();
+    });
+  });
+
+  it('should do a join with three conditions', function(done) {
+    db.search([{
+      subject: db.v('x'),
+      predicate: 'friend',
+      object: db.v('y')
+    }, {
+      subject: db.v('x'),
+      predicate: 'friend',
+      object: 'matteo'
+    }, {
+      subject: 'lucio',
+      predicate: 'friend',
+      object: db.v('y')
+    }], function(err, results) {
+      expect(results).to.have.property('length', 4);
       done();
     });
   });
@@ -345,6 +364,38 @@ module.exports = function(joinAlgorithm) {
       expect(results).to.have.property('length', 1);
       expect(results[0]).to.have.property('x', 'lucio');
       done();
+    });
+  });
+
+  it('should find homes in paris', function(done) {
+    // extracted from levelgraph-jsonld
+    var paris = 'http://dbpedia.org/resource/Paris'
+      , parisians = [{
+          webid: 'http://bblfish.net/people/henry/card#me',
+          name: '"Henry Story"'
+        }, {
+          webid: 'https://my-profile.eu/people/deiu/card#me',
+          name: '"Andrei Vlad Sambra"'
+        }];
+
+    db.put(require('./fixture/homes_in_paris'), function() {
+      db.search([{
+        subject: 'http://manu.sporny.org#person',
+        predicate: 'http://xmlns.com/foaf/0.1/knows',
+        object: db.v('webid')
+      }, {
+        subject: db.v('webid'),
+        predicate: 'http://xmlns.com/foaf/0.1/based_near',
+        object: paris
+      }, {
+        subject: db.v('webid'),
+        predicate: 'http://xmlns.com/foaf/0.1/name',
+        object: db.v('name')
+      }
+      ], function(err, solution) {
+        expect(solution).to.eql(parisians);
+        done();
+      });
     });
   });
 };
