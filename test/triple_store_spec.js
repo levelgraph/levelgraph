@@ -299,14 +299,6 @@ describe('a basic triple store', function() {
     });
   });
 
-  it('should alias searchStream to joinStream', function() {
-    expect(db.joinStream).to.eql(db.searchStream);
-  });
-
-  it('should alias search to join', function() {
-    expect(db.join).to.eql(db.search);
-  });
-
   it('should support filtering', function(done) {
     var triple1 = { subject: 'a', predicate: 'b', object: 'd' }
       , triple2 = { subject: 'a', predicate: 'b', object: 'c' };
@@ -320,6 +312,45 @@ describe('a basic triple store', function() {
         expect(results).to.eql([triple1]);
         done();
       });
+    });
+  });
+
+  describe('API deprecations', function() {
+
+    var warnSpy;
+
+    beforeEach(function() {
+      warnSpy = sinon.spy(console, 'warn');
+    });
+
+    afterEach(function() {
+      warnSpy.restore();
+    });
+
+    it('should call searchStream when calling joinStream', function() {
+      var stub = sinon.stub(db, 'searchStream');
+      db.joinStream('a', 'b', 'c');
+      expect(stub).to.be.calledWith('a', 'b', 'c');
+    });
+
+    it('should alias search to join', function() {
+      var stub = sinon.stub(db, 'search');
+      db.join('a', 'b', 'c');
+      expect(stub).to.be.calledWith('a', 'b', 'c');
+    });
+
+    it('should warn when calling joinStream', function() {
+      var stub = sinon.stub(db, 'searchStream');
+      db.joinStream('a', 'b', 'c');
+
+      expect(warnSpy).to.be.calledWith('joinStream is deprecated, use searchStream instead');
+    });
+
+    it('should warn when calling join', function() {
+      var stub = sinon.stub(db, 'search');
+      db.join('a', 'b', 'c');
+
+      expect(warnSpy).to.be.calledWith('join is deprecated, use search instead');
     });
   });
 });
