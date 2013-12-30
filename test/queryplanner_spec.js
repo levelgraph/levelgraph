@@ -320,7 +320,7 @@ describe('query planner', function() {
         , predicate: 'friend'
         , object: 'davide'
         , stream: JoinStream
-        , index: 'ops'
+        , index: 'pos'
       }, {
           subject: v('x1')
         , predicate: 'friend'
@@ -381,7 +381,7 @@ describe('query planner', function() {
         , predicate: 'friend'
         , object: 'daniele'
         , stream: SortJoinStream
-        , index: 'ops'
+        , index: 'pos'
       }];
 
       stub
@@ -471,7 +471,7 @@ describe('query planner', function() {
         , predicate: 'friend'
         , object: 'marco'
         , stream: JoinStream
-        , index: 'ops'
+        , index: 'pos'
       }, {
           subject: v('a')
         , predicate: 'friend'
