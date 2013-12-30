@@ -320,7 +320,7 @@ describe('a basic triple store', function() {
     var warnSpy;
 
     beforeEach(function() {
-      warnSpy = sinon.spy(console, 'warn');
+      warnSpy = sinon.stub(console, 'warn');
     });
 
     afterEach(function() {
