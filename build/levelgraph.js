@@ -232,8 +232,15 @@ module.exports = function levelgraph(leveldb, options, readyCallback) {
     }
   };
 
-  db.joinStream = db.searchStream;
-  db.join = db.search;
+  db.joinStream = function(a, b, c) {
+    console.warn('joinStream is deprecated, use searchStream instead');
+    return db.searchStream(a, b, c);
+  };
+
+  db.join = function(a, b, c) {
+    console.warn('join is deprecated, use search instead');
+    return db.search(a, b, c);
+  };
 
   if (callTheCallback && readyCallback) {
     process.nextTick(readyCallback.bind(null, null, db));
@@ -549,7 +556,7 @@ function queryplanner(db, options) {
               return cb(err);
             }
             q.size = size;
-            cb();
+            async.nextTick(cb);
           };
 
       try {
@@ -622,8 +629,14 @@ doSortQueryPlan = function(first, second) {
           return firstVar.name === secondVar.name;
         });
       })
+
     , firstIndexArray = Object.keys(firstQueryMask)
     , secondIndexArray = Object.keys(secondQueryMask)
+
+    , commonValueKeys = firstIndexArray.filter(function(key) {
+        return secondIndexArray.indexOf(key) >= 0;
+      })
+
     , firstIndexes
     , secondIndexes;
 
@@ -633,8 +646,18 @@ doSortQueryPlan = function(first, second) {
 
   first.stream = first.stream ? first.stream : JoinStream;
 
-  firstIndexArray.sort();
-  secondIndexArray.sort();
+  firstIndexArray = firstIndexArray.filter(function(key) {
+    return commonValueKeys.indexOf(key) < 0;
+  });
+
+  secondIndexArray = secondIndexArray.filter(function(key) {
+    return commonValueKeys.indexOf(key) < 0;
+  });
+
+  commonValueKeys.forEach(function(key) {
+    firstIndexArray.unshift(key);
+    secondIndexArray.unshift(key);
+  });
 
   commonVariables.sort(function(a, b) {
     if (a.name < b.name) {
@@ -729,7 +752,7 @@ function SortJoinStream(options) {
   options.objectMode = true;
 
   Transform.call(this, options);
-  
+
   this.triple = options.triple;
   this.matcher = matcher(options.triple);
   this.db = options.db;
@@ -769,12 +792,12 @@ SortJoinStream.prototype._nextTriple = function nextTriple(skip) {
 
   if (!this._previousTriple && this._readStream) {
     this._previousTriple = this._readStream.read();
-  } else if (!this._readStream && this._lastDone) {
-    this._execLastDone();
   }
 
   if (this._previousTriple) {
     this._doRead(this._previousTriple);
+  } else if (!this._readStream) {
+    this.push(null);
   }
 };
 
@@ -789,7 +812,9 @@ SortJoinStream.prototype._start = function() {
 
   this._readStream.on('end', function() {
     that._readStream = null;
-    that._execLastDone();
+    if (!that._previousTriple) {
+      that._execLastDone();
+    }
   });
 
   this._readStream.on('readable', function() {
@@ -813,23 +838,19 @@ SortJoinStream.prototype._flush = function(cb) {
 
   this._execLastDone();
 
-  if (this._readStream && this._readStream.readable) {
+  if (this._readStream) {
     that._readStream.destroy();
   }
+
+  this.push(null);
 
   cb();
 };
 
 SortJoinStream.prototype._transform = function(solution, encoding, done) {
-
-  if (!this._readStream && !this._previousTriple) {
-    done();
-    return;
-  }
-
   this._lastSolution = solution;
   this._lastDone = done;
-  this._nextTriple();
+  this._nextTriple(false);
 };
 
 SortJoinStream.prototype._doRead = function doRead(triple) {
@@ -839,7 +860,8 @@ SortJoinStream.prototype._doRead = function doRead(triple) {
     , otherKey
     , done = this._lastDone;
 
-  key = genKey(this.index, materializer(this.triple, this._lastSolution)) + '::\xff';
+  key = genKey(this.index, materializer(this.triple, this._lastSolution), '\xff');
+  otherKey = genKey(this.index, triple, '');
 
   if (newsolution) {
     if (!this.offset || ++this._offsetCounter > this.offset) {
@@ -847,17 +869,15 @@ SortJoinStream.prototype._doRead = function doRead(triple) {
     }
 
     if (this.limit && ++this._limitCounter === this.limit) {
+      this._previousTriple = null;
+      this._execLastDone();
       this._readStream.destroy();
-    } else {
-      this._nextTriple(true);
+      this._readStream = null;
+      return;
     }
-
-    return;
   }
 
-  otherKey = genKey(this.index, triple);
-
-  if (key >= otherKey) {
+  if (key > otherKey) {
     this._nextTriple(true);
   } else {
     this._lastDone = null;
@@ -903,14 +923,17 @@ function addToArray(result, element) {
   }
 }
 
-function genKey(key, triple) {
+function genKey(key, triple, filler) {
   var result = [key], def = defs[key];
+  
+  filler = filler || '';
+  
   for (var i = 0; i < def.length; i++) {
     addToArray(result, triple[def[i]]);
   }
 
   if (result.length < 4) {
-    result.push('');
+    result.push(filler);
   }
 
   return result.join('::');

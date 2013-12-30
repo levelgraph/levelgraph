@@ -2,6 +2,17 @@
 History
 ======
 
+## 0.7.1
+
+  
+* Fixed two bugs in the sort search algorithm:
+  1. The first was highlighted in levelgraph-jsonld and it created the
+     'homes in paris' test case. It was caused by a too early close of
+     the internal stream.
+  2. The second was caused by a wrong skipping of triples in the merge
+     sort implementation.
+* Added deprecation warnings for `join()` and `joinStream()`.
+
 ## 0.7.0
 
 * Rename the term context into solution,
