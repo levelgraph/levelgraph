@@ -53,7 +53,8 @@
     "zuul": "~1.0.4",
     "coveralls": "~2.5.0",
     "istanbul": "~0.1.45",
-    "osenv": "0.0.3"
+    "osenv": "0.0.3",
+    "level-sublevel": "~5.2.0"
   },
   "dependencies": {
     "xtend": "~2.1.1",
