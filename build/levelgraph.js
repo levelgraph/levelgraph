@@ -128,10 +128,8 @@ KeyFilterStream.prototype = Object.create(
 KeyFilterStream.prototype._transform = function(data, encoding, done) {
   data.value = JSON.parse(data.value);
 
-  if (data.key.indexOf(this.start) < 0) {
-    this.destroy();
-  } else if ((!this.offset || ++this._offsetCounter > this.offset) &&
-             (!this.filter || this.filter(data.value))) {
+  if ((!this.offset || ++this._offsetCounter > this.offset) &&
+      (!this.filter || this.filter(data.value))) {
     this.push(data.value);
   }
 
@@ -160,8 +158,8 @@ var keyfilter = require('./keyfilterstream')
   , queryplanner = require('./queryplanner')
   , PassThrough = require('./streamwrapper').PassThrough
   , WriteStream = require('./writestream')
-  , levelup = require('levelup')
   , levelWriteStream = require('level-writestream')
+  , levelup = require('levelup')
   , Leveljs
   , searchStream
   , doAction
@@ -205,13 +203,15 @@ module.exports = function levelgraph(leveldb, options, readyCallback) {
     }
 
     leveldb = levelup(name, options, wrappedCallback);
-  } 
 
-  // it may be an empty object if we are on browserify
-  if (typeof levelWriteStream === 'function') {
+  }
+
+  // it may be an empty object if we are on browserify.
+  // we are not patching it up if a sublevel is passed in.
+  if (typeof levelWriteStream === 'function' && leveldb.parent) {
     levelWriteStream(leveldb);
   }
-  
+
   db = {
     getStream: function(pattern, options) {
       var query = utilities.createQuery(pattern, options);
@@ -223,7 +223,13 @@ module.exports = function levelgraph(leveldb, options, readyCallback) {
     , del: doAction('del', leveldb)
     , putStream: doActionStream('put', leveldb)
     , delStream: doActionStream('del', leveldb)
-    , close: leveldb.close.bind(leveldb)
+    , close: function(callback) {
+        if (typeof leveldb.close === 'function') {
+          leveldb.close(callback);
+        } else if(typeof callback === 'function') {
+          callback();
+        }
+      }
     , v: Variable
     , searchStream: searchStream(leveldb, options)
     , search: utilities.wrapCallback('searchStream')
@@ -9365,9 +9371,7 @@ CallbackStream.prototype._write = function(data, encoding, done) {
 
 module.exports = CallbackStream
 
-},{"readable-stream":89,"stream":23}],"level-js":[function(require,module,exports){
-module.exports=require('AGZKLE');
-},{}],"AGZKLE":[function(require,module,exports){
+},{"readable-stream":89,"stream":23}],"AGZKLE":[function(require,module,exports){
 module.exports = Level
 
 var IDB = require('idb-wrapper')
@@ -9478,7 +9482,9 @@ function StringToArrayBuffer(str) {
   return buf
 }
 
-},{"./iterator":36,"abstract-leveldown":39,"idb-wrapper":40,"isbuffer":41,"util":26}],36:[function(require,module,exports){
+},{"./iterator":36,"abstract-leveldown":39,"idb-wrapper":40,"isbuffer":41,"util":26}],"level-js":[function(require,module,exports){
+module.exports=require('AGZKLE');
+},{}],36:[function(require,module,exports){
 var util = require('util')
 var AbstractIterator  = require('abstract-leveldown').AbstractIterator
 module.exports = Iterator
