@@ -481,6 +481,20 @@ var levelgraph = require("levelgraph");
 var db = levelgraph(levelup("yourdb"));
 ```
 
+### Usage with SubLevel
+
+An extremely powerful usage of LevelGraph is to partition your
+LevelDB with [SubLevel](http://npm.im/level-sublevel):
+
+```
+var levelup = require("level");
+var sublevel = require("level-sublevel");
+var levelWriteStream = require("level-writestream");
+var levelgraph = require("levelgraph");
+var db = sublevel(levelWriteStream(levelup("yourdb")));
+var graph = levelgraph(db.sublevel('yourGraph'));
+```
+
 ## Browserify
 
 You can use [browserify](https://github.com/substack/node-browserify) to bundle your module and all the dependencies, including levelgraph, into a single script-tag friendly js file for use in webpages. For the convenience of people unfamiliar with browserify, a pre-bundled version of levelgraph is included in the build folder.
