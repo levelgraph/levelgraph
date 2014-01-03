@@ -2,6 +2,10 @@
 History
 ======
 
+## 0.7.2
+
+* Sublevel Support [#52](https://github.com/mcollina/levelgraph/pull/52).
+
 ## 0.7.1
 
   
