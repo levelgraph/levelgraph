@@ -5,10 +5,11 @@ var levelgraph = require('../lib/levelgraph')
 
 describe('a basic triple store', function() {
 
-  var db;
+  var db, leveldb = leveldb;
 
   beforeEach(function() {
-    db = levelgraph(level());
+    leveldb = level();
+    db = levelgraph(leveldb);
   });
 
   afterEach(function(done) {
@@ -136,6 +137,13 @@ describe('a basic triple store', function() {
         expect(matched[0]).to.eql(t2);
         done();
       });
+    });
+  });
+
+  it('should put a triple with an object to false', function(done) {
+    var t = { subject: 'a', predicate: 'b', object: false };
+    db.put(t, function() {
+      leveldb.get('spo::a::b::false', done);
     });
   });
 
