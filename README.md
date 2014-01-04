@@ -104,7 +104,24 @@ db.get({ subject: "a", limit: 4, offset: 2}, function(err, list) {
 });
 ```
 
-### Multiple Puts
+#### Updating
+
+__LevelGraph__ does not support in-place update, as there are no
+constraint in the graph.
+In order to update a triple, you should first delete it:
+```javascript
+var triple = { subject: "a", predicate: "b", object: "c" };
+db.put(triple, function(err) {
+  db.del(triple, function(err) {
+    triple.object = 'd';
+    db.put(triple, function(err) {
+      // do something with your update
+    });
+  });
+});
+```
+
+#### Multiple Puts
 
 __LevelGraph__ also supports adding putting multiple triples:
 ```javascript
