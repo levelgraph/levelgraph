@@ -5,7 +5,7 @@
   "main": "lib/levelgraph.js",
   "scripts": {
     "test": "mocha --recursive --bail --reporter spec test",
-    "zuul": "zuul test",
+    "zuul": "zuul -- test",
     "coverage": "rm -rf coverage; istanbul cover _mocha -- --recursive --reporter spec --bail",
     "publish-coverage": "cat coverage/lcov.info | coveralls",
     "ci": "mocha --recursive --bail --watch test",
@@ -48,7 +48,7 @@
     "browserify": "~3.17.0",
     "levelup": "~0.18.0",
     "pre-commit": "0.0.4",
-    "zuul": "~1.1.1",
+    "zuul": "~1.2.0",
     "coveralls": "~2.6.1",
     "istanbul": "~0.2.3",
     "osenv": "0.0.3",
