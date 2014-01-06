@@ -2,6 +2,13 @@
 History
 ======
 
+## 0.8.0
+
+* Store false values correctly [#55](https://github.com/mcollina/levelgraph/issues/55).
+* Dependencies upgrade, including Browserify 3.
+* Performance optimizations, +75% for `getStream`, and +25% for sort
+  `search`.
+
 ## 0.7.2
 
 * Sublevel Support [#52](https://github.com/mcollina/levelgraph/pull/52).
