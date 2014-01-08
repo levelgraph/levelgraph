@@ -7,7 +7,7 @@ LevelGraph&nbsp;&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/leve
 
 [![NPM](https://nodei.co/npm-dl/levelgraph.png)](https://nodei.co/npm/levelgraph/)
 
-[![Browser support](https://saucelabs.com/browser-matrix/matteocollina.svg)](https://saucelabs.com/u/matteocollina)
+[![Browser support](https://saucelabs.com/browser-matrix/levelgraph.svg)](https://saucelabs.com/u/levelgraph)
 
 __LevelGraph__ is a Graph Database. Unlike many other graph database,
 __LevelGraph__ is built on the uber-fast key-value store
