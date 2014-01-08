@@ -1,0 +1,5 @@
+{
+  "name": "levelgraph",
+  "version": "0.8.0",
+  "main": "build/levelgraph.js"
+}
