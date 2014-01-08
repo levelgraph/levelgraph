@@ -58,7 +58,7 @@
     "xtend": "~2.1.1",
     "callback-stream": "~1.0.0",
     "async": "~0.2.9",
-    "readable-stream": "~1.0.2",
+    "readable-stream": "~1.0.17",
     "level-writestream": "~0.1.1",
     "levelup": ">= 0.10.0 < 0.19.0",
     "leveldown": "> 0.7.0 < 0.11.0",
