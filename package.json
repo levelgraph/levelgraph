@@ -52,7 +52,9 @@
     "coveralls": "~2.6.1",
     "istanbul": "~0.2.3",
     "osenv": "0.0.3",
-    "level-sublevel": "~5.2.0"
+    "level-sublevel": "~5.2.0",
+    "multilevel": "git+https://github.com/juliangruber/multilevel.git#nested-objects",
+    "level-manifest": "~1.2.0"
   },
   "dependencies": {
     "xtend": "~2.1.1",
