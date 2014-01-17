@@ -503,7 +503,11 @@ describe('query planner', function() {
 
   describe('without approximateSize', function() {
     beforeEach(function() {
-      db = {};
+      db = {
+        approximateSize: function(a, b, cb) {
+          cb(new Error('not implemented'));
+        }
+      };
       planner = queryplanner(db, { joinAlgorithm: 'sort' });
     });
 

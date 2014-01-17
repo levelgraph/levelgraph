@@ -385,4 +385,11 @@ describe('deferred open support', function() {
       done();
     });
   });
+
+  it('should support deferred search', function(done) {
+    db = levelgraph(level());
+    db.search([{ predicate: 'likes' }], function() {
+      done();
+    });
+  });
 });
