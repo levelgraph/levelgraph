@@ -19,7 +19,7 @@ var level = require("level-test")()
         return;
       }
 
-      var triple = { 
+      var triple = {
           subject: vertexes[0]
         , predicate: "p"
         , object: vertexes[1]

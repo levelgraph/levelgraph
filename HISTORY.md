@@ -15,7 +15,7 @@ History
 
 ## 0.7.1
 
-  
+
 * Fixed two bugs in the sort search algorithm:
   1. The first was highlighted in levelgraph-jsonld and it created the
      'homes in paris' test case. It was caused by a too early close of

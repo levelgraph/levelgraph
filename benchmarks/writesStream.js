@@ -10,7 +10,7 @@ var level = require("level-test")()
 
   , startTime = new Date()
   , endTime
-  
+
   , ws
 
   , doBench = function() {

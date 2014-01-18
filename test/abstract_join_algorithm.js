@@ -228,7 +228,7 @@ module.exports = function(joinAlgorithm) {
            subject: 'daniele'
          , predicate: 'newpredicate'
          , object: 'abcde'
-        }] 
+        }]
 
       , stream = db.searchStream([{
           subject: 'matteo',
@@ -281,7 +281,7 @@ module.exports = function(joinAlgorithm) {
       subject: db.v('y'),
       predicate: 'friend',
       object: db.v('x'),
-      filter: function(triple) { 
+      filter: function(triple) {
         return triple.object !== 'matteo';
       }
     }], function(err, results) {
@@ -303,7 +303,7 @@ module.exports = function(joinAlgorithm) {
       predicate: 'friend',
       object: db.v('x')
     }], {
-      filter: function(context, callback) { 
+      filter: function(context, callback) {
         if (context.x !== 'matteo') {
           callback(null, context);
         } else {

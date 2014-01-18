@@ -18,7 +18,7 @@ var level = require("level-test")()
         return;
       }
 
-      var triple = { 
+      var triple = {
         subject: "s" + counts,
         predicate: "p" + counts,
         object: "o" + counts

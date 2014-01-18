@@ -36,7 +36,7 @@ describe('navigator', function() {
     });
   });
 
-  it('should follow multiple archs, in and out a path', 
+  it('should follow multiple archs, in and out a path',
      function(done) {
     db.nav('davide')
       .archIn('friend')
@@ -49,7 +49,7 @@ describe('navigator', function() {
     });
   });
 
-  it('should follow multiple archs, in and out a path using a stream', 
+  it('should follow multiple archs, in and out a path using a stream',
      function(done) {
     var stream = db.nav('davide')
                    .archIn('friend')
@@ -64,7 +64,7 @@ describe('navigator', function() {
     stream.on('end', done);
   });
 
-  it('should allow to set the name of the variables', 
+  it('should allow to set the name of the variables',
      function(done) {
     db.nav('marco')
       .archIn('friend')
@@ -78,7 +78,7 @@ describe('navigator', function() {
       });
   });
 
-  it('should allow to bind a variable', 
+  it('should allow to bind a variable',
      function(done) {
     db.nav('matteo')
       .archIn('friend')
@@ -100,7 +100,7 @@ describe('navigator', function() {
       });
   });
 
-  it('should return the solutions', 
+  it('should return the solutions',
      function(done) {
     db.nav('daniele').archOut('friend').as('a').
       solutions(function(err, solutions) {
@@ -109,7 +109,7 @@ describe('navigator', function() {
       });
   });
 
-  it('should return the solution as a stream', 
+  it('should return the solution as a stream',
      function(done) {
 
     var solutions = [{ a: 'marco' }, { a: 'matteo' }]
@@ -134,7 +134,7 @@ describe('navigator', function() {
     });
   });
 
-  it('should return the materialized triples', 
+  it('should return the materialized triples',
      function(done) {
     var pattern = {
       subject: 'daniele',
@@ -159,7 +159,7 @@ describe('navigator', function() {
     });
   });
 
-  it('should return the materialized triples as a stream', 
+  it('should return the materialized triples as a stream',
      function(done) {
 
     var pattern = {
@@ -206,7 +206,7 @@ describe('navigator', function() {
         a: 'daniele',
         b: 'daniele'
       }, {
-        a: 'lucio', 
+        a: 'lucio',
         b: 'daniele'
       }]);
 
@@ -227,7 +227,7 @@ describe('navigator', function() {
           a: 'daniele',
           b: 'matteo'
         }, {
-          a: 'lucio', 
+          a: 'lucio',
           b: 'matteo'
         }]);
 

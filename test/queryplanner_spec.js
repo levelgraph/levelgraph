@@ -142,7 +142,7 @@ describe('query planner', function() {
         , predicate: 'abc'
         , object: v('c')
       }];
-      
+
       expected = [{
           subject: v('x')
         , predicate: 'friend'
@@ -181,7 +181,7 @@ describe('query planner', function() {
         , predicate: 'friend'
         , object: v('x')
       }];
-      
+
       expected = [{
           subject: v('x')
         , predicate: 'friend'
@@ -220,7 +220,7 @@ describe('query planner', function() {
         , predicate: 'father'
         , object: v('c')
       }];
-      
+
       expected = [{
           subject: v('x')
         , predicate: 'friend'
@@ -269,7 +269,7 @@ describe('query planner', function() {
         , predicate: 'friend'
         , object: v('z')
       }];
-      
+
       expected = [{
           subject: v('x')
         , predicate: 'friend'
@@ -299,7 +299,7 @@ describe('query planner', function() {
         done();
       });
     });
-    
+
     it('should put the variables from the previous condition in the same order', function(done) {
       query = [{
           subject: v('x0')
@@ -314,7 +314,7 @@ describe('query planner', function() {
         , predicate: 'friend'
         , object: v('x2')
       }];
-      
+
       expected = [{
           subject: v('x0')
         , predicate: 'friend'
@@ -363,7 +363,7 @@ describe('query planner', function() {
         , predicate: 'friend'
         , object: 'daniele'
       }];
-      
+
       expected = [{
           subject: 'matteo'
         , predicate: 'friend'
@@ -416,7 +416,7 @@ describe('query planner', function() {
         , predicate: 'friend'
         , object: v('z')
       }];
-      
+
       expected = [{
           subject: 'matteo'
         , predicate: 'friend'
@@ -465,7 +465,7 @@ describe('query planner', function() {
         , predicate: 'friend'
         , object: v('a')
       }];
-      
+
       expected = [{
           subject: v('a')
         , predicate: 'friend'

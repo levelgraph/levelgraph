@@ -20,7 +20,7 @@ var level = require("level-test")()
         doReads();
       }
 
-      var triple = { 
+      var triple = {
         subject: "s" + counts,
         predicate: "p" + counts,
         object: "o" + counts
@@ -41,7 +41,7 @@ var level = require("level-test")()
 
       var num = Math.round(Math.random() * startCounts);
 
-      var triple = { 
+      var triple = {
         subject: "s" + num
       };
 
