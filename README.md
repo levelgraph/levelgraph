@@ -210,7 +210,7 @@ db.put([{
 });
 ```
 
-#### Triple Generation 
+#### Triple Generation
 
 It also allows to generate a stream of triples, instead of a solution:
 ```javascript
@@ -234,8 +234,8 @@ It also allows to generate a stream of triples, instead of a solution:
     }
   }, function(err, results) {
     // this will print all the 'friend of a friend triples..'
-    // like so: { 
-    //   subject: "lucio", 
+    // like so: {
+    //   subject: "lucio",
     //   predicate: "friend-of-a-friend",
     //   object: "daniele"
     // }
@@ -286,7 +286,7 @@ db.get({
   , filter: function filter(triple) {
       return triple.object !== 'daniele';
     }
-}, function process(err, results) { 
+}, function process(err, results) {
   // results will not contain any triples that
   // have 'daniele' as object
 });
@@ -301,7 +301,7 @@ db.search({
   , filter: function filter(triple) {
       return triple.object !== 'daniele';
     }
-}, function process(err, solutions) { 
+}, function process(err, solutions) {
   // results will not contain any solutions that
   // have { x: 'daniele' }
 });
@@ -323,7 +323,7 @@ db.search({
         callback(null);
       }
     }
-}, function process(err, solutions) { 
+}, function process(err, solutions) {
   // results will not contain any solutions that
   // have { x: 'daniele' }
 });
@@ -355,7 +355,7 @@ db.search({
         }
       });
     }
-}, function process(err, solutions) { 
+}, function process(err, solutions) {
   // results will not contain any solutions that
   // do not satisfy the filter
 });
@@ -417,7 +417,7 @@ Variable names can also be specified, like so:
 ```javascript
 db.nav("marco").archIn("friend").as("a").archOut("friend").archOut("friend").as("a").
       solutions(function(err, friends) {
- 
+
   console.log(friends); // will print [{ a: "daniele" }]
 });
 ```
@@ -440,15 +440,15 @@ db.nav("matteo").archOut("friend").bind("lucio").archOut("friend").bind("marco")
         object: db.v("b")
       }
     }, function(err, results) {
-      
+
   // this will return all the 'friend of a friend triples..'
-  // like so: { 
-  //   subject: "lucio", 
+  // like so: {
+  //   subject: "lucio",
   //   predicate: "friend-of-a-friend",
   //   object: "daniele"
   // }
 
-  console.log(results); 
+  console.log(results);
 });
 ```
 
@@ -461,10 +461,10 @@ db.nav("marco").archIn("friend").as("a").go("matteo").archOut("friend").as("b").
    //    a: "daniele",
    //    b: "daniele"
    //   }, {
-   //     a: "lucio", 
+   //     a: "lucio",
    //     b: "daniele"
    //   }]
-   
+
 });
 ```
 
@@ -567,7 +567,7 @@ Here are some ideas:
 * [ ] Add more database operators (grouping, filtering).
 * [x] Browser support
   [#10](https://github.com/mcollina/levelgraph/issues/10)
-* [ ] Live searches 
+* [ ] Live searches
   [#3](https://github.com/mcollina/node-levelgraph/issues/3)
 * Extensions
   * [ ] RDFa
@@ -585,7 +585,7 @@ See the [CONTRIBUTING.md](https://github.com/mcollina/levelgraph/blob/master/CON
 ## Credits
 
 *LevelGraph builds on the excellent work on both the LevelUp community
-and the LevelDB and Snappy teams from Google and additional contributors. 
+and the LevelDB and Snappy teams from Google and additional contributors.
 LevelDB and Snappy are both issued under the [New BSD Licence](http://opensource.org/licenses/BSD-3-Clause).*
 
 ## Contributors
@@ -601,7 +601,7 @@ href="https://github.com/jez0990">GitHub/jez0990</a></td></tr>
 
 ## LICENSE - "MIT License"
 
-Copyright (c) 2013 Matteo Collina (http://matteocollina.com) and LevelGraph Contributors 
+Copyright (c) 2013 Matteo Collina (http://matteocollina.com) and LevelGraph Contributors
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation

@@ -19,13 +19,13 @@ var level = require("level-test")()
         return;
       }
 
-      var triple1 = { 
+      var triple1 = {
             subject: vertexes[0],
             predicate: "p",
             object: vertexes[1]
           }
 
-        , triple2 = { 
+        , triple2 = {
             subject: vertexes[0],
             predicate: "a",
             object: "b" + counts % 2
