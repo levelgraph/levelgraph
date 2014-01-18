@@ -393,3 +393,36 @@ describe('deferred open support', function() {
     });
   });
 });
+
+describe('generateBatch', function () {
+  var db, leveldb = leveldb;
+
+  beforeEach(function() {
+    leveldb = level();
+    db = levelgraph(leveldb);
+  });
+
+  afterEach(function(done) {
+    db.close(done);
+  });
+
+  it('should generate a batch from a triple', function() {
+    var triple = { subject: 'a', predicate: 'b', object: 'c' };
+    var ops = db.generateBatch(triple);
+    expect(ops).to.have.property('length', 6);
+    ops.forEach(function (op) {
+      expect(op).to.have.property('type', 'put');
+      expect(JSON.parse(op.value)).to.eql(triple);
+    });
+  });
+
+  it('should generate a batch of type', function() {
+    var triple = { subject: 'a', predicate: 'b', object: 'c' };
+    var ops = db.generateBatch(triple, 'del');
+    expect(ops).to.have.property('length', 6);
+    ops.forEach(function (op) {
+      expect(op).to.have.property('type', 'del');
+      expect(JSON.parse(op.value)).to.eql(triple);
+    });
+  });
+});
