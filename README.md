@@ -486,6 +486,21 @@ stream.on("close", function() {
 });
 ```
 
+### Generate batch operations
+
+You can also generate a `put` and `del` batch, so you can
+manage the batching yourself:
+
+```javascript
+var triple = { subject: "a", predicate: "b", object: "c" };
+
+// Produces a batch of put operations
+var putBatch = db.generateBatch(triple);
+
+// Produces a batch of del operations
+var delBatch = db.generateBatch(triple, 'del');
+```
+
 ## LevelUp integration
 
 LevelGraph allows to leverage the full power of all
