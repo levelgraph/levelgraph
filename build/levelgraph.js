@@ -254,6 +254,7 @@ module.exports = function levelgraph(leveldb, options, readyCallback) {
     , nav: function(start) {
       return new Navigator({ start: start, db: this });
     }
+    , generateBatch: utilities.generateBatch
   };
 
   db.joinStream = function(a, b, c) {
@@ -341,7 +342,7 @@ doAction = function(action, leveldb) {
     }
 
     var actions = triples.reduce(function(acc, triple) {
-      return acc.concat(utilities.genActions(action, triple));
+      return acc.concat(utilities.generateBatch(triple, action));
     }, []);
 
     leveldb.batch(actions, cb);
@@ -1003,14 +1004,17 @@ function createQuery(pattern, options) {
 
 module.exports.createQuery = createQuery;
 
-function genActions(action, triple) {
+function generateBatch(triple, action) {
+  if (!action) {
+    action = 'put';
+  }
   var json = JSON.stringify(triple);
   return genKeys(triple).map(function(key) {
     return { type: action, key: key, value: json };
   });
 }
 
-module.exports.genActions = genActions;
+module.exports.generateBatch = generateBatch;
 
 function materializer(pattern, data) {
   return Object.keys(pattern)

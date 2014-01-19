@@ -2,6 +2,11 @@
 History
 ======
 
+## 0.8.2
+
+* Exposed `generateBatch()` method
+  [#62](https://github.com/mcollina/levelgraph/issues/62).
+
 ## 0.8.1
 
 * Fixed deferred open support for searches over IndexedDB.
