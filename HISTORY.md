@@ -2,6 +2,10 @@
 History
 ======
 
+## 0.8.1
+
+* Fixed deferred open support for searches over IndexedDB.
+
 ## 0.8.0
 
 * Store false values correctly [#55](https://github.com/mcollina/levelgraph/issues/55).

@@ -32,7 +32,7 @@ function FilterStream(options) {
   options.objectMode = true;
 
   Transform.call(this, options);
-  
+
   var that = this;
 
   this.once('pipe', function(source) {
@@ -91,7 +91,7 @@ function JoinStream(options) {
   options.objectMode = true;
 
   Transform.call(this, options);
-  
+
   this.triple = options.triple;
   this.matcher = matcher(options.triple);
   this.mask = queryMask(options.triple);
@@ -213,6 +213,8 @@ module.exports = function levelgraph(leveldb, options, readyCallback) {
     leveldb = levelup(name, options, wrappedCallback);
 
   }
+
+  utilities.patchApproximateSize(leveldb);
 
   // it may be an empty object if we are on browserify.
   // we are not patching it up if a sublevel is passed in.
@@ -498,7 +500,7 @@ Navigator.prototype.contextsStream = Navigator.prototype.triplesStream;
 
 Navigator.prototype.valuesStream = function () {
   var stream, options;
-  
+
   stream = new NavigatorStream({
     _lastElement: this._lastElement
   });
@@ -569,21 +571,15 @@ function queryplanner(db, options) {
 
     async.each(query, function(q, cb) {
       var newq = queryMask(q)
-        , range = utilities.createQuery(newq)
-        , result = function(err, size) {
-            if (err) {
-              return cb(err);
-            }
-            q.size = size;
-            async.nextTick(cb);
-          };
+        , range = utilities.createQuery(newq);
 
-      try {
-        db.approximateSize(range.start, range.end, result);
-      } catch(err) {
-        result(null, Object.keys(variablesMask(q)).length);
-      }
-
+      db.approximateSize(range.start, range.end, function(err, size) {
+        if (err) {
+          size = Object.keys(variablesMask(q)).length;
+        }
+        q.size = size;
+        async.nextTick(cb);
+      });
     }, function(err) {
       if (err) {
         callback(err);
@@ -636,7 +632,7 @@ doSortQueryPlan = function(first, second) {
     , secondVariables = Object.keys(secondVariablesMask).map(function(key) {
         return secondVariablesMask[key];
       })
-      
+
     , variableKey = function(obj, variable) {
         return Object.keys(obj).filter(function(key) {
           return obj[key].name === variable.name;
@@ -940,7 +936,7 @@ function possibleIndexes(types) {
         matches++;
         return true;
       }
-      
+
       if (matches === types.length) {
         return true;
       }
@@ -1107,6 +1103,39 @@ function matcher(pattern) {
 }
 
 module.exports.matcher = matcher;
+
+function patchApproximateSize(leveldb) {
+  // we need to be sublevel-aware
+  var db = leveldb.db || leveldb._root.db;
+
+  // monkey patching _approximateSize
+  // see https://github.com/maxogden/level.js/pull/21
+  function doPatch(db) {
+    if (db.constructor.name === 'Level') {
+      // we are in Level-js
+      db._approximateSize = function(a, b, callback) {
+        var err = new Error('Not implemented');
+        if (callback) {
+          return callback(err);
+        }
+
+        throw err;
+      };
+    }
+  }
+
+  if (db.constructor.name === 'DeferredLevelDOWN') {
+    db.setDb = function() {
+      doPatch(arguments[0]);
+      var result = db.constructor.prototype.setDb.apply(db, arguments);
+      return result;
+    };
+  } else {
+    doPatch(db);
+  }
+}
+
+module.exports.patchApproximateSize = patchApproximateSize;
 
 },{"./variable":10,"callback-stream":32}],10:[function(require,module,exports){
 
@@ -8072,9 +8101,7 @@ CallbackStream.prototype._write = function(data, encoding, done) {
 
 module.exports = CallbackStream
 
-},{"readable-stream":88,"stream":23}],"level-js":[function(require,module,exports){
-module.exports=require('AGZKLE');
-},{}],"AGZKLE":[function(require,module,exports){
+},{"readable-stream":88,"stream":23}],"AGZKLE":[function(require,module,exports){
 module.exports = Level
 
 var IDB = require('idb-wrapper')
@@ -8185,7 +8212,9 @@ function StringToArrayBuffer(str) {
   return buf
 }
 
-},{"./iterator":35,"abstract-leveldown":38,"idb-wrapper":39,"isbuffer":40,"util":31}],35:[function(require,module,exports){
+},{"./iterator":35,"abstract-leveldown":38,"idb-wrapper":39,"isbuffer":40,"util":31}],"level-js":[function(require,module,exports){
+module.exports=require('AGZKLE');
+},{}],35:[function(require,module,exports){
 var util = require('util')
 var AbstractIterator  = require('abstract-leveldown').AbstractIterator
 module.exports = Iterator
