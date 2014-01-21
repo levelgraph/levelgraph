@@ -43,7 +43,7 @@ describe('a multileveled triple store', function() {
     });
   });
 
-  it('should put a triple with a stream', function(done) {
+  it.skip('should put a triple with a stream', function(done) {
     var triple = { subject: 'a', predicate: 'b', object: 'c' };
     var stream = client.graph.putStream();
     stream.on('end', done);
