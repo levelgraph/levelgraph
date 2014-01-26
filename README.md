@@ -65,8 +65,7 @@ db.put(triple, function(err) {
 Retrieving it through pattern-matching is extremely easy:
 ```javascript
 db.get({ subject: "a" }, function(err, list) {
-  expect(list).to.eql([triple]);
-  done();
+  console.log(list);
 });
 ```
 
@@ -74,9 +73,8 @@ It even support a Stream interface:
 ```javascript
 var stream = db.getStream({ predicate: "b" });
 stream.on("data", function(data) {
-  expect(data).to.eql(triple);
+  console.log(data);
 });
-stream.on("end", done);
 ```
 
 #### Triple Properties
@@ -87,7 +85,7 @@ little overhead (a part from storage costs), it is very easy:
 var triple = { subject: "a", predicate: "b", object: "c", "someStuff": 42 };
 db.put(triple, function() {
   db.get({ subject: "a" }, function(err, list) {
-    expect(list).to.eql([triple]);
+    console.log(list);
   });
 });
 ```
@@ -99,8 +97,7 @@ It is possible to implement pagination of get results by using
 
 ```javascript
 db.get({ subject: "a", limit: 4, offset: 2}, function(err, list) {
-  expect(list).to.eql([triple]);
-  done();
+  console.log(list);
 });
 ```
 
@@ -258,8 +255,7 @@ db.search([{
     object: db.v("y")
   }], { limit: 4, offset: 2 }, function(err, list) {
 
-  expect(list).to.eql([triple]);
-  done();
+  console.log(list);
 });
 ```
 
