@@ -23,6 +23,11 @@ C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
 Following this approach, __LevelGraph__ uses six indices for every triple,
 in order to access them as fast as it is possible.
 
+Check out a [slideshow](http://nodejsconfit.levelgraph.io)
+that introduces you to LevelGraph by
+[@matteocollina](http://twitter.com/matteocollina) at
+http://nodejsconf.it.
+
 **LevelGraph** is an **OPEN Open Source Project**, see the <a href="#contributing">Contributing</a> section to find out what this means.
 
 ## Install on Node.js
