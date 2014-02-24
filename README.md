@@ -164,7 +164,7 @@ db.put([{
   object: "davide"
 }], function () {
 
-  var stream = db.searchestream([{
+  var stream = db.searchStream([{
     subject: "matteo",
     predicate: "friend",
     object: db.v("x")
