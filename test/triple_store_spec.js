@@ -72,6 +72,13 @@ describe('a basic triple store', function() {
       });
     });
 
+    it('should get it specifiying the subject and falsy params', function(done) {
+      db.get({ subject: 'a', predicate: false, object: null }, function(err, list) {
+        expect(list).to.eql([triple]);
+        done();
+      });
+    });
+
     ['subject', 'predicate', 'object'].forEach(function(type) {
       it('should get nothing if nothing matches an only ' + type + ' query', 
          function(done) {
@@ -87,6 +94,14 @@ describe('a basic triple store', function() {
 
     it('should return the triple through the getStream interface', function(done) {
       var stream = db.getStream({ predicate: 'b' });
+      stream.on('data', function(data) {
+        expect(data).to.eql(triple);
+      });
+      stream.on('end', done);
+    });
+
+    it('should return the triple through the getStream interface with falsy params', function(done) {
+      var stream = db.getStream({ subject: null, predicate: 'b', object: false });
       stream.on('data', function(data) {
         expect(data).to.eql(triple);
       });
@@ -165,8 +180,22 @@ describe('a basic triple store', function() {
       });
     });
 
+    it('should get one by specifiying the subject and a falsy predicate', function(done) {
+      db.get({ subject: 'a1', predicate: null }, function(err, list) {
+        expect(list).to.eql([triple1]);
+        done();
+      });
+    });
+
     it('should get two by specifiying the predicate', function(done) {
       db.get({ predicate: 'b' }, function(err, list) {
+        expect(list).to.eql([triple1, triple2]);
+        done();
+      });
+    });
+
+    it('should get two by specifiying the predicate and a falsy subject', function(done) {
+      db.get({ subject: null, predicate: 'b' }, function(err, list) {
         expect(list).to.eql([triple1, triple2]);
         done();
       });
