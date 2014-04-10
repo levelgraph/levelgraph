@@ -19,7 +19,7 @@ IndexedDB-powered Browser. PhoneGap support coming soon (late fall).
 __LevelGraph__ loosely follows the __Hexastore__ approach as presente in the article:
 [Hexastore: sextuple indexing for semantic web data management
 C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
-2008](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.140.8776&rep=rep1&type=pdf).
+2008](http://www.vldb.org/pvldb/1/1453965.pdf).
 Following this approach, __LevelGraph__ uses six indices for every triple,
 in order to access them as fast as it is possible.
 
