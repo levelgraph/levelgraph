@@ -274,6 +274,30 @@ describe('a basic triple store', function() {
 
       stream.on('end', done);
     });
+
+    it('should return the triples in reverse order with reverse true', function(done) {
+      db.get({ predicate: 'b', reverse: true }, function(err, list) {
+        expect(list).to.eql([triple2, triple1]);
+        done();
+      });
+    });
+
+    it('should return the last triple with reverse true and limit 1', function(done) {
+      db.get({ predicate: 'b', reverse: true, limit: 1 }, function(err, list) {
+        expect(list).to.eql([triple2]);
+        done();
+      });
+    });
+
+    it('should support reverse over streams', function(done) {
+      var triples = [triple2, triple1]
+        , stream = db.getStream({ predicate: 'b', reverse: true });
+      stream.on('data', function(data) {
+        expect(data).to.eql(triples.shift());
+      });
+
+      stream.on('end', done);
+    });
   });
 
   it('should put triples using a stream', function(done) {
