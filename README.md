@@ -106,6 +106,19 @@ db.get({ subject: "a", limit: 4, offset: 2}, function(err, list) {
 });
 ```
 
+#### Reverse Order
+
+It is possible to get results in reverse lexicographical order
+using the `'reverse'` option. This option is only supported by
+`get()` and `getStream()` and not available in `search()`.  
+
+```javascript
+db.get({ predicate: "b", reverse: true }, function (err, list) {
+  console.log(list);
+});
+```
+
+
 #### Updating
 
 __LevelGraph__ does not support in-place update, as there are no
