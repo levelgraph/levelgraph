@@ -300,6 +300,23 @@ describe('a basic triple store', function() {
     });
   });
 
+  describe('with 10 triples inserted', function() {
+    beforeEach(function (done) {
+      var triples = [];
+      for (var i = 0; i < 10; i++) {
+        triples[i] = { subject: 's', predicate: 'p', object: 'o' + i };
+      }
+      db.put(triples, done);
+    });
+
+    it('should return the approximate size', function(done) {
+      db.approximateSize({ predicate: 'b' }, function (err, size) {
+        expect(size).to.be.a('number');
+        done(err);
+      });
+    });
+  });
+
   it('should put triples using a stream', function(done) {
     var t1 = { subject: 'a', predicate: 'b', object: 'c' };
     var t2 = { subject: 'a', predicate: 'b', object: 'd' };
