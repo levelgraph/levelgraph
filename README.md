@@ -16,7 +16,7 @@ __LevelGraph__ is built on the uber-fast key-value store
 You can use it inside your node.js application or in any
 IndexedDB-powered Browser. PhoneGap support coming soon (late fall).
 
-__LevelGraph__ loosely follows the __Hexastore__ approach as presente in the article:
+__LevelGraph__ loosely follows the __Hexastore__ approach as presented in the article:
 [Hexastore: sextuple indexing for semantic web data management
 C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
 2008](http://www.vldb.org/pvldb/1/1453965.pdf).
