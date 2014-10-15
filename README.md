@@ -522,10 +522,12 @@ LevelDB with [SubLevel](http://npm.im/level-sublevel):
 ```javascript
 var levelup = require("level");
 var sublevel = require("level-sublevel");
-var levelWriteStream = require("level-writestream");
+var levelWriteStream = require("level-write-stream");
 var levelgraph = require("levelgraph");
-var db = sublevel(levelWriteStream(levelup("yourdb")));
-var graph = levelgraph(db.sublevel('yourGraph'));
+var db = sublevel(levelup("yourdb"));
+var sl = db.sublevel('graph');
+var graph = levelgraph(sl);
+sl.createWriteStream = levelWriteStream(sl);
 ```
 
 ## Browserify
