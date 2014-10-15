@@ -1,25 +1,22 @@
 
 var levelgraph = require('../lib/levelgraph')
   , level = require('level-test')()
-  , levelWriteStream = require('level-writestream')
   , sublevel = require('level-sublevel')
   , osenv = require('osenv');
-
-if (typeof levelWriteStream !== 'function') {
-  levelWriteStream = function(db) { return db; };
-}
 
 describe('sublevel support', function() {
 
   var db, graph;
 
-  beforeEach(function(done) {
-    db = sublevel(levelWriteStream(level('test', { mem: true}, done)));
+  beforeEach(function() {
+    db = sublevel(level());
     graph = levelgraph(db.sublevel('graph'));
   });
 
   afterEach(function(done) {
-    db.close(done);
+    setImmediate(function() {
+      db.close(done);
+    });
   });
 
   it('should put a triple', function(done) {

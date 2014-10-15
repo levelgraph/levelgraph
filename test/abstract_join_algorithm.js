@@ -12,7 +12,9 @@ module.exports = function(joinAlgorithm) {
   });
 
   afterEach(function(done) {
-    db.close(done);
+    setImmediate(function() {
+      db.close(done);
+    });
   });
 
   it('should do a join with one results', function(done) {
