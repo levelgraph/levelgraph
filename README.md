@@ -16,10 +16,10 @@ __LevelGraph__ is built on the uber-fast key-value store
 You can use it inside your node.js application or in any
 IndexedDB-powered Browser. PhoneGap support coming soon (late fall).
 
-__LevelGraph__ loosely follows the __Hexastore__ approach as presente in the article:
+__LevelGraph__ loosely follows the __Hexastore__ approach as presented in the article:
 [Hexastore: sextuple indexing for semantic web data management
 C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
-2008](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.140.8776&rep=rep1&type=pdf).
+2008](http://www.vldb.org/pvldb/1/1453965.pdf).
 Following this approach, __LevelGraph__ uses six indices for every triple,
 in order to access them as fast as it is possible.
 
@@ -106,6 +106,19 @@ db.get({ subject: "a", limit: 4, offset: 2}, function(err, list) {
 });
 ```
 
+#### Reverse Order
+
+It is possible to get results in reverse lexicographical order
+using the `'reverse'` option. This option is only supported by
+`get()` and `getStream()` and not available in `search()`.  
+
+```javascript
+db.get({ predicate: "b", reverse: true }, function (err, list) {
+  console.log(list);
+});
+```
+
+
 #### Updating
 
 __LevelGraph__ does not support in-place update, as there are no
@@ -164,7 +177,7 @@ db.put([{
   object: "davide"
 }], function () {
 
-  var stream = db.searchestream([{
+  var stream = db.searchStream([{
     subject: "matteo",
     predicate: "friend",
     object: db.v("x")
