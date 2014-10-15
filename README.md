@@ -95,15 +95,24 @@ db.put(triple, function() {
 });
 ```
 
-#### Limit and Offset
+#### Pagination: Limit and startPosition
 
 It is possible to implement pagination of get results by using
-`'offset'` and `'limit'`, like so:
+`'startPosition'` and `'limit'`, like so:
 
 ```javascript
-db.get({ subject: "a", limit: 4, offset: 2}, function(err, list) {
-  console.log(list);
+var streamPage1 = db.getStream({subject:"a", limit:2}, {}, printNextPage});
+console.log("Page 1:");
+streamPage1.on("data", function(data) {
+  console.log(data);
 });
+var printNextPage = function(nextStart){
+  var streamNextPage = db.getStream({subject:"a", limit:2, startPosition : nextStart});
+  console.log("And the next page with startPosition " + nextStart + ":");
+  streamNextPage.on("data",function(data) {
+    console.log(data);
+  });
+};
 ```
 
 #### Reverse Order
