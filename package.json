@@ -65,8 +65,7 @@
     "level-js": "~2.1.6"
   },
   "browser": {
-    "./lib/getdb.js": "./lib/getdb-browser.js",
-    "level-writestream": false
+    "./lib/getdb.js": "./lib/getdb-browser.js"
   },
   "testling": {
     "browsers": [
