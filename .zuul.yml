@@ -5,4 +5,4 @@ browsers:
   - name: firefox
     version: 21..latest
   - name: opera
-    version: 15..latest
+    version: latest
