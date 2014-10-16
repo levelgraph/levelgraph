@@ -49,6 +49,7 @@
     "mocha": "^1.16.2",
     "osenv": "^0.1.0",
     "pre-commit": "0.0.9",
+    "setimmediate": "^1.0.2",
     "sinon": "~1.10.3",
     "sinon-chai": "^2.6.0",
     "uglify-js": "~2.4.8",
