@@ -1,8 +1,8 @@
 ui: mocha-bdd
 browsers:
   - name: chrome
-    version: 27..latest
+    version: latest
   - name: firefox
-    version: 21..latest
+    version: latest
   - name: opera
     version: latest
