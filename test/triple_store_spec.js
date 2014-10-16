@@ -1,6 +1,7 @@
 
 var levelgraph = require('../lib/levelgraph')
   , level = require('level-test')()
+  , path = require('path')
   , osenv = require('osenv');
 
 describe('a basic triple store', function() {
@@ -80,7 +81,7 @@ describe('a basic triple store', function() {
     });
 
     ['subject', 'predicate', 'object'].forEach(function(type) {
-      it('should get nothing if nothing matches an only ' + type + ' query', 
+      it('should get nothing if nothing matches an only ' + type + ' query',
          function(done) {
 
         var query  = {};
@@ -434,7 +435,7 @@ describe('a basic triple store', function() {
 });
 
 describe('deferred open support', function() {
-  
+
   var db;
 
   afterEach(function(done) {
@@ -446,7 +447,7 @@ describe('deferred open support', function() {
   });
 
   it('should call the callback if a level is not passed', function(done) {
-    db = levelgraph(osenv.tmpdir() + '_levelDeferred1', done);
+    db = levelgraph(path.join(osenv.tmpdir(), '_levelDeferred1'), done);
   });
 
   it('should call the callback with a levelgrap', function(done) {
