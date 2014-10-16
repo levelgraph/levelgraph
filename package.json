@@ -33,7 +33,7 @@
     "triple"
   ],
   "engines": {
-    "node": ">= 0.10.0"
+    "node": "0.10"
   },
   "author": "Matteo Collina <hello@matteocollina.com>",
   "license": "MIT",
