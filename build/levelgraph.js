@@ -92,7 +92,7 @@ FilterStream.prototype.destroy = function() {
 
 module.exports = FilterStream;
 
-},{"readable-stream":72}],2:[function(require,module,exports){
+},{"readable-stream":74}],2:[function(require,module,exports){
 /*
 Copyright (c) 2013-2014 Matteo Collina and LevelGraph Contributors
 
@@ -121,7 +121,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 var Leveljs = require('level-js');
 module.exports = function(l) { return new Leveljs(l); };
 
-},{"level-js":undefined}],3:[function(require,module,exports){
+},{"level-js":25}],3:[function(require,module,exports){
 /*
 Copyright (c) 2013-2014 Matteo Collina and LevelGraph Contributors
 
@@ -227,7 +227,7 @@ JoinStream.prototype._transform = function transform(solution, encoding, done) {
 
 module.exports = JoinStream;
 
-},{"./utilities":9,"./variable":10,"readable-stream":72}],4:[function(require,module,exports){
+},{"./utilities":9,"./variable":10,"readable-stream":74}],4:[function(require,module,exports){
 (function (process){
 /*
 Copyright (c) 2013-2014 Matteo Collina and LevelGraph Contributors
@@ -308,7 +308,6 @@ module.exports = function levelgraph(leveldb, options, readyCallback) {
     }
 
     leveldb = levelup(name, options, wrappedCallback);
-
   }
 
   if (!leveldb.createWriteStream) {
@@ -468,7 +467,7 @@ doActionStream = function(type, leveldb) {
 };
 
 }).call(this,require('_process'))
-},{"./filterstream":1,"./getdb":2,"./materializerstream":5,"./navigator":6,"./queryplanner":7,"./utilities":9,"./variable":10,"./writestream":11,"_process":20,"level-write-stream":40,"levelup":undefined,"readable-stream":72,"xtend":75}],5:[function(require,module,exports){
+},{"./filterstream":1,"./getdb":2,"./materializerstream":5,"./navigator":6,"./queryplanner":7,"./utilities":9,"./variable":10,"./writestream":11,"_process":20,"level-write-stream":41,"levelup":49,"readable-stream":74,"xtend":77}],5:[function(require,module,exports){
 /*
 Copyright (c) 2013-2014 Matteo Collina and LevelGraph Contributors
 
@@ -523,7 +522,7 @@ MaterializerStream.prototype._transform = function(data, encoding, done) {
 
 module.exports = MaterializerStream;
 
-},{"./utilities":9,"readable-stream":72}],6:[function(require,module,exports){
+},{"./utilities":9,"readable-stream":74}],6:[function(require,module,exports){
 /*
 Copyright (c) 2013-2014 Matteo Collina and LevelGraph Contributors
 
@@ -700,7 +699,7 @@ Navigator.prototype.values = function (cb) {
 
 module.exports = Navigator;
 
-},{"./utilities":9,"./variable":10,"callback-stream":24,"readable-stream":72}],7:[function(require,module,exports){
+},{"./utilities":9,"./variable":10,"callback-stream":24,"readable-stream":74}],7:[function(require,module,exports){
 /*
 Copyright (c) 2013-2014 Matteo Collina and LevelGraph Contributors
 
@@ -1071,7 +1070,7 @@ SortJoinStream.prototype._doRead = function doRead(triple) {
 
 module.exports = SortJoinStream;
 
-},{"./utilities":9,"./variable":10,"readable-stream":72}],9:[function(require,module,exports){
+},{"./utilities":9,"./variable":10,"readable-stream":74}],9:[function(require,module,exports){
 /*
 Copyright (c) 2013-2014 Matteo Collina and LevelGraph Contributors
 
@@ -1474,7 +1473,7 @@ WriteStream.prototype._transform = function(data, encoding, done) {
 
 module.exports = WriteStream;
 
-},{"./utilities":9,"readable-stream":72}],12:[function(require,module,exports){
+},{"./utilities":9,"readable-stream":74}],12:[function(require,module,exports){
 (function (process){
 /*!
  * async
@@ -4443,7 +4442,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":18,"inherits":19,"readable-stream/duplex.js":61,"readable-stream/passthrough.js":71,"readable-stream/readable.js":72,"readable-stream/transform.js":73,"readable-stream/writable.js":74}],22:[function(require,module,exports){
+},{"events":18,"inherits":19,"readable-stream/duplex.js":63,"readable-stream/passthrough.js":73,"readable-stream/readable.js":74,"readable-stream/transform.js":75,"readable-stream/writable.js":76}],22:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
@@ -5083,7 +5082,181 @@ CallbackStream.prototype._write = function(data, encoding, done) {
 
 module.exports = CallbackStream
 
-},{"readable-stream":72,"stream":21}],25:[function(require,module,exports){
+},{"readable-stream":74,"stream":21}],25:[function(require,module,exports){
+(function (Buffer){
+module.exports = Level
+
+var IDB = require('idb-wrapper')
+var AbstractLevelDOWN = require('abstract-leveldown').AbstractLevelDOWN
+var util = require('util')
+var Iterator = require('./iterator')
+var isBuffer = require('isbuffer')
+var xtend = require('xtend')
+var toBuffer = require('typedarray-to-buffer')
+
+function Level(location) {
+  if (!(this instanceof Level)) return new Level(location)
+  if (!location) throw new Error("constructor requires at least a location argument")
+  this.IDBOptions = {}
+  this.location = location
+}
+
+util.inherits(Level, AbstractLevelDOWN)
+
+Level.prototype._open = function(options, callback) {
+  var self = this
+    
+  var idbOpts = {
+    storeName: this.location,
+    autoIncrement: false,
+    keyPath: null,
+    onStoreReady: function () {
+      callback && callback(null, self.idb)
+    }, 
+    onError: function(err) {
+      callback && callback(err)
+    }
+  }
+  
+  xtend(idbOpts, options)
+  this.IDBOptions = idbOpts
+  this.idb = new IDB(idbOpts)
+}
+
+Level.prototype._get = function (key, options, callback) {
+  this.idb.get(key, function (value) {
+    if (value === undefined) {
+      // 'NotFound' error, consistent with LevelDOWN API
+      return callback(new Error('NotFound'))
+    }
+    // by default return buffers, unless explicitly told not to
+    var asBuffer = true
+    if (options.asBuffer === false) asBuffer = false
+    if (options.raw) asBuffer = false
+    if (asBuffer) {
+      if (value instanceof Uint8Array) value = toBuffer(value)
+      else value = new Buffer(String(value))
+    }
+    return callback(null, value, key)
+  }, callback)
+}
+
+Level.prototype._del = function(id, options, callback) {
+  this.idb.remove(id, callback, callback)
+}
+
+Level.prototype._put = function (key, value, options, callback) {
+  if (value instanceof ArrayBuffer) {
+    value = toBuffer(new Uint8Array(value))
+  }
+  var obj = this.convertEncoding(key, value, options)
+  if (Buffer.isBuffer(obj.value)) {
+    obj.value = new Uint8Array(value.toArrayBuffer())
+  }
+  this.idb.put(obj.key, obj.value, function() { callback() }, callback)
+}
+
+Level.prototype.convertEncoding = function(key, value, options) {
+  if (options.raw) return {key: key, value: value}
+  if (value) {
+    var stringed = value.toString()
+    if (stringed === 'NaN') value = 'NaN'
+  }
+  var valEnc = options.valueEncoding
+  var obj = {key: key, value: value}
+  if (value && (!valEnc || valEnc !== 'binary')) {
+    if (typeof obj.value !== 'object') {
+      obj.value = stringed
+    }
+  }
+  return obj
+}
+
+Level.prototype.iterator = function (options) {
+  if (typeof options !== 'object') options = {}
+  return new Iterator(this.idb, options)
+}
+
+Level.prototype._batch = function (array, options, callback) {
+  var op
+  var i
+  var k
+  var copiedOp
+  var currentOp
+  var modified = []
+  
+  if (array.length === 0) return setTimeout(callback, 0)
+  
+  for (i = 0; i < array.length; i++) {
+    copiedOp = {}
+    currentOp = array[i]
+    modified[i] = copiedOp
+    
+    var converted = this.convertEncoding(currentOp.key, currentOp.value, options)
+    currentOp.key = converted.key
+    currentOp.value = converted.value
+
+    for (k in currentOp) {
+      if (k === 'type' && currentOp[k] == 'del') {
+        copiedOp[k] = 'remove'
+      } else {
+        copiedOp[k] = currentOp[k]
+      }
+    }
+  }
+
+  return this.idb.batch(modified, function(){ callback() }, callback)
+}
+
+Level.prototype._close = function (callback) {
+  this.idb.db.close()
+  callback()
+}
+
+Level.prototype._approximateSize = function (start, end, callback) {
+  var err = new Error('Not implemented')
+  if (callback)
+    return callback(err)
+
+  throw err
+}
+
+Level.prototype._isBuffer = function (obj) {
+  return Buffer.isBuffer(obj)
+}
+
+Level.destroy = function (db, callback) {
+  if (typeof db === 'object') {
+    var prefix = db.IDBOptions.storePrefix || 'IDBWrapper-'
+    var dbname = db.location
+  } else {
+    var prefix = 'IDBWrapper-'
+    var dbname = db
+  }
+  var request = indexedDB.deleteDatabase(prefix + dbname)
+  request.onsuccess = function() {
+    callback()
+  }
+  request.onerror = function(err) {
+    callback(err)
+  }
+}
+
+var checkKeyValue = Level.prototype._checkKeyValue = function (obj, type) {
+  if (obj === null || obj === undefined)
+    return new Error(type + ' cannot be `null` or `undefined`')
+  if (obj === null || obj === undefined)
+    return new Error(type + ' cannot be `null` or `undefined`')
+  if (isBuffer(obj) && obj.byteLength === 0)
+    return new Error(type + ' cannot be an empty ArrayBuffer')
+  if (String(obj) === '')
+    return new Error(type + ' cannot be an empty String')
+  if (obj.length === 0)
+    return new Error(type + ' cannot be an empty Array')
+}
+
+}).call(this,require("buffer").Buffer)
+},{"./iterator":26,"abstract-leveldown":29,"buffer":14,"idb-wrapper":31,"isbuffer":32,"typedarray-to-buffer":34,"util":23,"xtend":36}],26:[function(require,module,exports){
 var util = require('util')
 var AbstractIterator  = require('abstract-leveldown').AbstractIterator
 var ltgt = require('ltgt')
@@ -5150,7 +5323,7 @@ Iterator.prototype._next = function (callback) {
   this.callback = callback
 }
 
-},{"abstract-leveldown":28,"ltgt":32,"util":23}],26:[function(require,module,exports){
+},{"abstract-leveldown":29,"ltgt":33,"util":23}],27:[function(require,module,exports){
 (function (process){
 /* Copyright (c) 2013 Rod Vagg, MIT License */
 
@@ -5234,7 +5407,7 @@ AbstractChainedBatch.prototype.write = function (options, callback) {
 
 module.exports = AbstractChainedBatch
 }).call(this,require('_process'))
-},{"_process":20}],27:[function(require,module,exports){
+},{"_process":20}],28:[function(require,module,exports){
 (function (process){
 /* Copyright (c) 2013 Rod Vagg, MIT License */
 
@@ -5287,7 +5460,7 @@ AbstractIterator.prototype.end = function (callback) {
 module.exports = AbstractIterator
 
 }).call(this,require('_process'))
-},{"_process":20}],28:[function(require,module,exports){
+},{"_process":20}],29:[function(require,module,exports){
 (function (process,Buffer){
 /* Copyright (c) 2013 Rod Vagg, MIT License */
 
@@ -5547,7 +5720,7 @@ module.exports.AbstractIterator     = AbstractIterator
 module.exports.AbstractChainedBatch = AbstractChainedBatch
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"./abstract-chained-batch":26,"./abstract-iterator":27,"_process":20,"buffer":14,"xtend":29}],29:[function(require,module,exports){
+},{"./abstract-chained-batch":27,"./abstract-iterator":28,"_process":20,"buffer":14,"xtend":30}],30:[function(require,module,exports){
 module.exports = extend
 
 function extend() {
@@ -5566,7 +5739,7 @@ function extend() {
     return target
 }
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 /*global window:false, self:false, define:false, module:false */
 
 /**
@@ -6786,7 +6959,7 @@ function extend() {
 
 }, this);
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 var Buffer = require('buffer').Buffer;
 
 module.exports = isBuffer;
@@ -6796,7 +6969,7 @@ function isBuffer (o) {
     || /\[object (.+Array|Array.+)\]/.test(Object.prototype.toString.call(o));
 }
 
-},{"buffer":14}],32:[function(require,module,exports){
+},{"buffer":14}],33:[function(require,module,exports){
 (function (Buffer){
 
 exports.compare = function (a, b) {
@@ -6945,7 +7118,7 @@ exports.filter = function (range, compare) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":14}],33:[function(require,module,exports){
+},{"buffer":14}],34:[function(require,module,exports){
 (function (Buffer){
 /**
  * Convert a typed array to a Buffer without a copy
@@ -6968,7 +7141,7 @@ module.exports = function (arr) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":14}],34:[function(require,module,exports){
+},{"buffer":14}],35:[function(require,module,exports){
 module.exports = hasKeys
 
 function hasKeys(source) {
@@ -6977,7 +7150,7 @@ function hasKeys(source) {
         typeof source === "function")
 }
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 var Keys = require("object-keys")
 var hasKeys = require("./has-keys")
 
@@ -7004,7 +7177,7 @@ function extend() {
     return target
 }
 
-},{"./has-keys":34,"object-keys":37}],36:[function(require,module,exports){
+},{"./has-keys":35,"object-keys":38}],37:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
 var toString = Object.prototype.toString;
 
@@ -7046,11 +7219,11 @@ module.exports = function forEach(obj, fn) {
 };
 
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 module.exports = Object.keys || require('./shim');
 
 
-},{"./shim":39}],38:[function(require,module,exports){
+},{"./shim":40}],39:[function(require,module,exports){
 var toString = Object.prototype.toString;
 
 module.exports = function isArguments(value) {
@@ -7068,7 +7241,7 @@ module.exports = function isArguments(value) {
 };
 
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 (function () {
 	"use strict";
 
@@ -7132,7 +7305,7 @@ module.exports = function isArguments(value) {
 }());
 
 
-},{"./foreach":36,"./isArguments":38}],40:[function(require,module,exports){
+},{"./foreach":37,"./isArguments":39}],41:[function(require,module,exports){
 (function (process){
 var EndStream = require("end-stream")
 
@@ -7181,7 +7354,7 @@ function LevelWriteStream(db) {
 }
 
 }).call(this,require('_process'))
-},{"_process":20,"end-stream":41}],41:[function(require,module,exports){
+},{"_process":20,"end-stream":42}],42:[function(require,module,exports){
 var WriteStream = require("write-stream")
 
 module.exports = EndStream
@@ -7217,7 +7390,7 @@ function EndStream(write, end) {
 
 function noop() {}
 
-},{"write-stream":43}],42:[function(require,module,exports){
+},{"write-stream":44}],43:[function(require,module,exports){
 var to = require("./index")
 
 module.exports = toArray
@@ -7240,7 +7413,7 @@ function toArray(array, end) {
     }
 }
 
-},{"./index":43}],43:[function(require,module,exports){
+},{"./index":44}],44:[function(require,module,exports){
 var Stream = require("stream")
 
 module.exports = WriteStream
@@ -7283,7 +7456,7 @@ function defaultEnd() {
     this.emit("finish")
 }
 
-},{"./array":42,"stream":21}],44:[function(require,module,exports){
+},{"./array":43,"stream":21}],45:[function(require,module,exports){
 /* Copyright (c) 2012-2014 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
  * MIT License
@@ -7364,7 +7537,7 @@ Batch.prototype.write = function (callback) {
 
 module.exports = Batch
 
-},{"./errors":47,"./util":49}],45:[function(require,module,exports){
+},{"./errors":48,"./util":51}],46:[function(require,module,exports){
 /* Copyright (c) 2012-2014 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
  * MIT License
@@ -7449,7 +7622,7 @@ module.exports = {
   , decodeKey       : decodeKey
 }
 
-},{"./encodings":46}],46:[function(require,module,exports){
+},{"./encodings":47}],47:[function(require,module,exports){
 (function (Buffer){
 /* Copyright (c) 2012-2014 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
@@ -7525,7 +7698,7 @@ module.exports = (function () {
 
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":14}],47:[function(require,module,exports){
+},{"buffer":14}],48:[function(require,module,exports){
 /* Copyright (c) 2012-2014 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
  * MIT License
@@ -7549,7 +7722,476 @@ module.exports = {
   , EncodingError       : createError('EncodingError', LevelUPError)
 }
 
-},{"errno":57}],48:[function(require,module,exports){
+},{"errno":59}],49:[function(require,module,exports){
+(function (process){
+/* Copyright (c) 2012-2014 LevelUP contributors
+ * See list at <https://github.com/rvagg/node-levelup#contributing>
+ * MIT License
+ * <https://github.com/rvagg/node-levelup/blob/master/LICENSE.md>
+ */
+
+var EventEmitter   = require('events').EventEmitter
+  , inherits       = require('util').inherits
+  , extend         = require('xtend')
+  , prr            = require('prr')
+  , DeferredLevelDOWN = require('deferred-leveldown')
+
+  , WriteError     = require('./errors').WriteError
+  , ReadError      = require('./errors').ReadError
+  , NotFoundError  = require('./errors').NotFoundError
+  , OpenError      = require('./errors').OpenError
+  , EncodingError  = require('./errors').EncodingError
+  , InitializationError = require('./errors').InitializationError
+
+  , ReadStream     = require('./read-stream')
+  , WriteStream    = require('./write-stream')
+  , util           = require('./util')
+  , Batch          = require('./batch')
+  , codec          = require('./codec')
+
+  , getOptions     = util.getOptions
+  , defaultOptions = util.defaultOptions
+  , getLevelDOWN   = util.getLevelDOWN
+  , dispatchError  = util.dispatchError
+  , isDefined      = util.isDefined
+
+function getCallback (options, callback) {
+  return typeof options == 'function' ? options : callback
+}
+
+// Possible LevelUP#_status values:
+//  - 'new'     - newly created, not opened or closed
+//  - 'opening' - waiting for the database to be opened, post open()
+//  - 'open'    - successfully opened the database, available for use
+//  - 'closing' - waiting for the database to be closed, post close()
+//  - 'closed'  - database has been successfully closed, should not be
+//                 used except for another open() operation
+
+function LevelUP (location, options, callback) {
+  if (!(this instanceof LevelUP))
+    return new LevelUP(location, options, callback)
+
+  var error
+
+  EventEmitter.call(this)
+  this.setMaxListeners(Infinity)
+
+  if (typeof location == 'function') {
+    options = typeof options == 'object' ? options : {}
+    options.db = location
+    location = null
+  } else if (typeof location == 'object' && typeof location.db == 'function') {
+    options = location
+    location = null
+  }
+
+
+  if (typeof options == 'function') {
+    callback = options
+    options  = {}
+  }
+
+  if ((!options || typeof options.db != 'function') && typeof location != 'string') {
+    error = new InitializationError(
+        'Must provide a location for the database')
+    if (callback) {
+      return process.nextTick(function () {
+        callback(error)
+      })
+    }
+    throw error
+  }
+
+  options      = getOptions(this, options)
+  this.options = extend(defaultOptions, options)
+  this._codec = options.codec || codec
+  this._status = 'new'
+  // set this.location as enumerable but not configurable or writable
+  prr(this, 'location', location, 'e')
+
+  this.open(callback)
+}
+
+inherits(LevelUP, EventEmitter)
+
+LevelUP.prototype.open = function (callback) {
+  var self = this
+    , dbFactory
+    , db
+
+  if (this.isOpen()) {
+    if (callback)
+      process.nextTick(function () { callback(null, self) })
+    return this
+  }
+
+  if (this._isOpening()) {
+    return callback && this.once(
+        'open'
+      , function () { callback(null, self) }
+    )
+  }
+
+  this.emit('opening')
+
+  this._status = 'opening'
+  this.db      = new DeferredLevelDOWN(this.location)
+  dbFactory    = this.options.db || getLevelDOWN()
+  db           = dbFactory(this.location)
+
+  db.open(this.options, function (err) {
+    if (err) {
+      return dispatchError(self, new OpenError(err), callback)
+    } else {
+      self.db.setDb(db)
+      self.db = db
+      self._status = 'open'
+      if (callback)
+        callback(null, self)
+      self.emit('open')
+      self.emit('ready')
+    }
+  })
+}
+
+LevelUP.prototype.close = function (callback) {
+  var self = this
+
+  if (this.isOpen()) {
+    this._status = 'closing'
+    this.db.close(function () {
+      self._status = 'closed'
+      self.emit('closed')
+      if (callback)
+        callback.apply(null, arguments)
+    })
+    this.emit('closing')
+    this.db = null
+  } else if (this._status == 'closed' && callback) {
+    return process.nextTick(callback)
+  } else if (this._status == 'closing' && callback) {
+    this.once('closed', callback)
+  } else if (this._isOpening()) {
+    this.once('open', function () {
+      self.close(callback)
+    })
+  }
+}
+
+LevelUP.prototype.isOpen = function () {
+  return this._status == 'open'
+}
+
+LevelUP.prototype._isOpening = function () {
+  return this._status == 'opening'
+}
+
+LevelUP.prototype.isClosed = function () {
+  return (/^clos/).test(this._status)
+}
+
+function maybeError(db, options, callback) {
+  if (!db._isOpening() && !db.isOpen()) {
+    dispatchError(
+        db
+      , new ReadError('Database is not open')
+      , callback
+    )
+    return true
+  }
+}
+
+function writeError (db, message, callback) {
+  dispatchError(
+      db
+     , new WriteError(message)
+     , callback
+  )
+}
+
+function readError (db, message, callback) {
+  dispatchError(
+      db
+     , new ReadError(message)
+     , callback
+  )
+  return true
+}
+
+
+LevelUP.prototype.get = function (key_, options, callback) {
+  var self = this
+    , key
+
+  callback = getCallback(options, callback)
+
+  if (maybeError(this, options, callback))
+    return
+
+  if (key_ === null || key_ === undefined || 'function' !== typeof callback)
+    return readError(this
+      , 'get() requires key and callback arguments', callback)
+
+  options = util.getOptions(this, options)
+  key = this._codec.encodeKey(key_, options)
+
+  options.asBuffer = this._codec.isValueAsBuffer(options)
+
+  this.db.get(key, options, function (err, value) {
+    if (err) {
+      if ((/notfound/i).test(err)) {
+        err = new NotFoundError(
+            'Key not found in database [' + key_ + ']', err)
+      } else {
+        err = new ReadError(err)
+      }
+      return dispatchError(self, err, callback)
+    }
+    if (callback) {
+      try {
+        value = self._codec.decodeValue(value, options)
+      } catch (e) {
+        return callback(new EncodingError(e))
+      }
+      callback(null, value)
+    }
+  })
+}
+
+LevelUP.prototype.put = function (key_, value_, options, callback) {
+  var self = this
+    , key
+    , value
+
+  callback = getCallback(options, callback)
+
+  if (key_ === null || key_ === undefined
+        || value_ === null || value_ === undefined)
+    return writeError(this, 'put() requires key and value arguments', callback)
+
+  if (maybeError(this, options, callback))
+    return
+
+  options = getOptions(this, options)
+  key     = this._codec.encodeKey(key_, options)
+  value   = this._codec.encodeValue(value_, options)
+
+  this.db.put(key, value, options, function (err) {
+    if (err) {
+      return dispatchError(self, new WriteError(err), callback)
+    } else {
+      self.emit('put', key_, value_)
+      if (callback)
+        callback()
+    }
+  })
+}
+
+LevelUP.prototype.del = function (key_, options, callback) {
+  var self = this
+    , key
+
+  callback = getCallback(options, callback)
+
+  if (key_ === null || key_ === undefined)
+    return writeError(this, 'del() requires a key argument', callback)
+
+  if (maybeError(this, options, callback))
+    return
+
+  options = getOptions(this, options)
+  key     = this._codec.encodeKey(key_, options)
+
+  this.db.del(key, options, function (err) {
+    if (err) {
+      return dispatchError(self, new WriteError(err), callback)
+    } else {
+      self.emit('del', key_)
+      if (callback)
+        callback()
+    }
+  })
+}
+
+LevelUP.prototype.batch = function (arr_, options, callback) {
+  var self = this
+    , keyEnc
+    , valueEnc
+    , arr
+
+  if (!arguments.length)
+    return new Batch(this, codec)
+
+  callback = getCallback(options, callback)
+
+  if (!Array.isArray(arr_))
+    return writeError(this, 'batch() requires an array argument', callback)
+
+  if (maybeError(this, options, callback))
+    return
+
+  options  = getOptions(this, options)
+  keyEnc   = options.keyEncoding
+  valueEnc = options.valueEncoding
+
+  arr = arr_.map(function (e) {
+    if (e.type === undefined || e.key === undefined)
+      return {}
+
+    // inherit encoding
+    var kEnc = e.keyEncoding || keyEnc
+      , vEnc = e.valueEncoding || e.encoding || valueEnc
+      , o
+
+    // If we're not dealing with plain utf8 strings or plain
+    // Buffers then we have to do some work on the array to
+    // encode the keys and/or values. This includes JSON types.
+
+    if (kEnc != 'utf8' && kEnc != 'binary'
+        || vEnc != 'utf8' && vEnc != 'binary') {
+      o = {
+          type: e.type
+        , key: self._codec.encodeKey(e.key, options, e)
+      }
+
+      if (e.value !== undefined)
+        o.value = self._codec.encodeValue(e.value, options, e)
+
+      return o
+    } else {
+      return e
+    }
+  })
+
+  this.db.batch(arr, options, function (err) {
+    if (err) {
+      return dispatchError(self, new WriteError(err), callback)
+    } else {
+      self.emit('batch', arr_)
+      if (callback)
+        callback()
+    }
+  })
+}
+
+// DEPRECATED: prefer accessing LevelDOWN for this: db.db.approximateSize()
+LevelUP.prototype.approximateSize = function (start_, end_, options, callback) {
+  var self = this
+    , start
+    , end
+
+  callback = getCallback(options, callback)
+
+  options = getOptions(options, callback)
+
+  if (start_ === null || start_ === undefined
+        || end_ === null || end_ === undefined || 'function' !== typeof callback)
+    return readError(this, 'approximateSize() requires start, end and callback arguments', callback)
+
+  start = this._codec.encodeKey(start_, this.options)
+  end   = this._codec.encodeKey(end_, this.options)
+
+  this.db.approximateSize(start, end, function (err, size) {
+    if (err) {
+      return dispatchError(self, new OpenError(err), callback)
+    } else if (callback) {
+      callback(null, size)
+    }
+  })
+}
+
+LevelUP.prototype.readStream =
+LevelUP.prototype.createReadStream = function (options) {
+  var self = this
+  options = extend( {keys: true, values: true}, this.options, options)
+
+  options.keyEncoding   = options.keyEncoding   || options.encoding
+  options.valueEncoding = options.valueEncoding || options.encoding
+
+  if (isDefined(options.start))
+    options.start = this._codec.encodeKey(options.start, options)
+  if (isDefined(options.end))
+    options.end = this._codec.encodeKey(options.end, options)
+  if (isDefined(options.gte))
+    options.gte = this._codec.encodeKey(options.gte, options)
+  if (isDefined(options.gt))
+    options.gt = this._codec.encodeKey(options.gt, options)
+  if (isDefined(options.lte))
+    options.lte = this._codec.encodeKey(options.lte, options)
+  if (isDefined(options.lt))
+    options.lt = this._codec.encodeKey(options.lt, options)
+  if ('number' !== typeof options.limit)
+    options.limit = -1
+
+  options.keyAsBuffer   = this._codec.isKeyAsBuffer(options)
+  options.valueAsBuffer = this._codec.isValueAsBuffer(options)
+
+  var makeData = options.keys && options.values
+    ? function (key, value) {
+        return {
+            key: self._codec.decodeKey(key, options)
+          , value: self._codec.decodeValue(value, options)
+        }
+      }
+    : options.keys
+    ? function (key) {
+        return self._codec.decodeKey(key, options)
+      }
+    : options.values
+    ? function (_, value) {
+        return self._codec.decodeValue(value, options)
+      }
+    : function () {}
+
+  var stream = new ReadStream(options, makeData)
+
+  if (this.isOpen()) {
+    stream.setIterator(self.db.iterator(options))
+  } else {
+    this.once('ready', function () {
+      stream.setIterator(self.db.iterator(options))
+    })
+  }
+
+  return stream
+}
+
+LevelUP.prototype.keyStream =
+LevelUP.prototype.createKeyStream = function (options) {
+  return this.createReadStream(extend(options, { keys: true, values: false }))
+}
+
+LevelUP.prototype.valueStream =
+LevelUP.prototype.createValueStream = function (options) {
+  return this.createReadStream(extend(options, { keys: false, values: true }))
+}
+
+LevelUP.prototype.writeStream =
+LevelUP.prototype.createWriteStream = function (options) {
+  //XXX is extend needed here?
+  return new WriteStream(extend(options), this)
+}
+
+LevelUP.prototype.toString = function () {
+  return 'LevelUP'
+}
+
+function utilStatic (name) {
+  return function (location, callback) {
+    getLevelDOWN()[name](location, callback || function () {})
+  }
+}
+
+module.exports         = LevelUP
+module.exports.copy    = util.copy
+// DEPRECATED: prefer accessing LevelDOWN for this: require('leveldown').destroy()
+module.exports.destroy = utilStatic('destroy')
+// DEPRECATED: prefer accessing LevelDOWN for this: require('leveldown').repair()
+module.exports.repair  = utilStatic('repair')
+
+
+}).call(this,require('_process'))
+},{"./batch":45,"./codec":46,"./errors":48,"./read-stream":50,"./util":51,"./write-stream":52,"_process":20,"deferred-leveldown":54,"events":18,"prr":60,"util":23,"xtend":61}],50:[function(require,module,exports){
 /* Copyright (c) 2012-2014 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
  * MIT License <https://github.com/rvagg/node-levelup/blob/master/LICENSE.md>
@@ -7648,7 +8290,7 @@ ReadStream.prototype.toString = function () {
 module.exports = ReadStream
 
 
-},{"./errors":47,"./util":49,"readable-stream":72,"util":23,"xtend":59}],49:[function(require,module,exports){
+},{"./errors":48,"./util":51,"readable-stream":74,"util":23,"xtend":61}],51:[function(require,module,exports){
 /* Copyright (c) 2012-2014 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
  * MIT License
@@ -7742,7 +8384,7 @@ module.exports = {
   , isDefined       : isDefined
 }
 
-},{"../package.json":60,"./encodings":46,"./errors":47,"leveldown":13,"leveldown/package":13,"semver":13,"xtend":59}],50:[function(require,module,exports){
+},{"../package.json":62,"./encodings":47,"./errors":48,"leveldown":13,"leveldown/package":13,"semver":13,"xtend":61}],52:[function(require,module,exports){
 (function (process,global){
 /* Copyright (c) 2012-2014 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
@@ -7924,7 +8566,7 @@ WriteStream.prototype.toString = function () {
 module.exports = WriteStream
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./util":49,"_process":20,"bl":51,"stream":21,"util":23,"xtend":59}],51:[function(require,module,exports){
+},{"./util":51,"_process":20,"bl":53,"stream":21,"util":23,"xtend":61}],53:[function(require,module,exports){
 (function (Buffer){
 var DuplexStream = require('readable-stream').Duplex
   , util         = require('util')
@@ -8141,7 +8783,7 @@ BufferList.prototype.destroy = function () {
 module.exports = BufferList
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":14,"readable-stream":72,"util":23}],52:[function(require,module,exports){
+},{"buffer":14,"readable-stream":74,"util":23}],54:[function(require,module,exports){
 (function (process,Buffer){
 var util              = require('util')
   , AbstractLevelDOWN = require('abstract-leveldown').AbstractLevelDOWN
@@ -8192,13 +8834,13 @@ DeferredLevelDOWN.prototype._iterator = function () {
 module.exports = DeferredLevelDOWN
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":20,"abstract-leveldown":55,"buffer":14,"util":23}],53:[function(require,module,exports){
-module.exports=require(26)
-},{"/Users/matteocollina/Repositories/levelgraph/node_modules/level-js/node_modules/abstract-leveldown/abstract-chained-batch.js":26,"_process":20}],54:[function(require,module,exports){
+},{"_process":20,"abstract-leveldown":57,"buffer":14,"util":23}],55:[function(require,module,exports){
 module.exports=require(27)
-},{"/Users/matteocollina/Repositories/levelgraph/node_modules/level-js/node_modules/abstract-leveldown/abstract-iterator.js":27,"_process":20}],55:[function(require,module,exports){
+},{"/Users/matteocollina/Repositories/levelgraph/node_modules/level-js/node_modules/abstract-leveldown/abstract-chained-batch.js":27,"_process":20}],56:[function(require,module,exports){
 module.exports=require(28)
-},{"./abstract-chained-batch":53,"./abstract-iterator":54,"/Users/matteocollina/Repositories/levelgraph/node_modules/level-js/node_modules/abstract-leveldown/abstract-leveldown.js":28,"_process":20,"buffer":14,"xtend":59}],56:[function(require,module,exports){
+},{"/Users/matteocollina/Repositories/levelgraph/node_modules/level-js/node_modules/abstract-leveldown/abstract-iterator.js":28,"_process":20}],57:[function(require,module,exports){
+module.exports=require(29)
+},{"./abstract-chained-batch":55,"./abstract-iterator":56,"/Users/matteocollina/Repositories/levelgraph/node_modules/level-js/node_modules/abstract-leveldown/abstract-leveldown.js":29,"_process":20,"buffer":14,"xtend":61}],58:[function(require,module,exports){
 var prr = require('prr')
 
 function init (type, message, cause) {
@@ -8255,7 +8897,7 @@ module.exports = function (errno) {
   }
 }
 
-},{"prr":58}],57:[function(require,module,exports){
+},{"prr":60}],59:[function(require,module,exports){
 var all = module.exports.all = [
  {
   "errno": -1,
@@ -8683,7 +9325,7 @@ module.exports.code = {
 
 module.exports.custom = require("./custom")(module.exports)
 module.exports.create = module.exports.custom.createError
-},{"./custom":56}],58:[function(require,module,exports){
+},{"./custom":58}],60:[function(require,module,exports){
 /*!
   * prr
   * (c) 2013 Rod Vagg <rod@vagg.org>
@@ -8747,9 +9389,9 @@ module.exports.create = module.exports.custom.createError
 
   return prr
 })
-},{}],59:[function(require,module,exports){
-module.exports=require(29)
-},{"/Users/matteocollina/Repositories/levelgraph/node_modules/level-js/node_modules/abstract-leveldown/node_modules/xtend/index.js":29}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
+module.exports=require(30)
+},{"/Users/matteocollina/Repositories/levelgraph/node_modules/level-js/node_modules/abstract-leveldown/node_modules/xtend/index.js":30}],62:[function(require,module,exports){
 module.exports={
   "name": "levelup",
   "description": "Fast & simple storage - a Node.js-style LevelDB wrapper",
@@ -8901,10 +9543,10 @@ module.exports={
   "readme": "ERROR: No README data found!"
 }
 
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 module.exports = require("./lib/_stream_duplex.js")
 
-},{"./lib/_stream_duplex.js":62}],62:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":64}],64:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -8997,7 +9639,7 @@ function forEach (xs, f) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_readable":64,"./_stream_writable":66,"_process":20,"core-util-is":67,"inherits":68}],63:[function(require,module,exports){
+},{"./_stream_readable":66,"./_stream_writable":68,"_process":20,"core-util-is":69,"inherits":70}],65:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -9045,7 +9687,7 @@ PassThrough.prototype._transform = function(chunk, encoding, cb) {
   cb(null, chunk);
 };
 
-},{"./_stream_transform":65,"core-util-is":67,"inherits":68}],64:[function(require,module,exports){
+},{"./_stream_transform":67,"core-util-is":69,"inherits":70}],66:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -10031,7 +10673,7 @@ function indexOf (xs, x) {
 }
 
 }).call(this,require('_process'))
-},{"_process":20,"buffer":14,"core-util-is":67,"events":18,"inherits":68,"isarray":69,"stream":21,"string_decoder/":70}],65:[function(require,module,exports){
+},{"_process":20,"buffer":14,"core-util-is":69,"events":18,"inherits":70,"isarray":71,"stream":21,"string_decoder/":72}],67:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10243,7 +10885,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"./_stream_duplex":62,"core-util-is":67,"inherits":68}],66:[function(require,module,exports){
+},{"./_stream_duplex":64,"core-util-is":69,"inherits":70}],68:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -10633,7 +11275,7 @@ function endWritable(stream, state, cb) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":62,"_process":20,"buffer":14,"core-util-is":67,"inherits":68,"stream":21}],67:[function(require,module,exports){
+},{"./_stream_duplex":64,"_process":20,"buffer":14,"core-util-is":69,"inherits":70,"stream":21}],69:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -10743,14 +11385,14 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 }).call(this,require("buffer").Buffer)
-},{"buffer":14}],68:[function(require,module,exports){
+},{"buffer":14}],70:[function(require,module,exports){
 module.exports=require(19)
-},{"/Users/matteocollina/Repositories/levelgraph/node_modules/browserify/node_modules/inherits/inherits_browser.js":19}],69:[function(require,module,exports){
+},{"/Users/matteocollina/Repositories/levelgraph/node_modules/browserify/node_modules/inherits/inherits_browser.js":19}],71:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],70:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10973,10 +11615,10 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":14}],71:[function(require,module,exports){
+},{"buffer":14}],73:[function(require,module,exports){
 module.exports = require("./lib/_stream_passthrough.js")
 
-},{"./lib/_stream_passthrough.js":63}],72:[function(require,module,exports){
+},{"./lib/_stream_passthrough.js":65}],74:[function(require,module,exports){
 require('stream'); // hack to fix a circular dependency issue when used with browserify
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Readable = exports;
@@ -10985,656 +11627,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":62,"./lib/_stream_passthrough.js":63,"./lib/_stream_readable.js":64,"./lib/_stream_transform.js":65,"./lib/_stream_writable.js":66,"stream":21}],73:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":64,"./lib/_stream_passthrough.js":65,"./lib/_stream_readable.js":66,"./lib/_stream_transform.js":67,"./lib/_stream_writable.js":68,"stream":21}],75:[function(require,module,exports){
 module.exports = require("./lib/_stream_transform.js")
 
-},{"./lib/_stream_transform.js":65}],74:[function(require,module,exports){
+},{"./lib/_stream_transform.js":67}],76:[function(require,module,exports){
 module.exports = require("./lib/_stream_writable.js")
 
-},{"./lib/_stream_writable.js":66}],75:[function(require,module,exports){
-module.exports=require(29)
-},{"/Users/matteocollina/Repositories/levelgraph/node_modules/level-js/node_modules/abstract-leveldown/node_modules/xtend/index.js":29}],"level-js":[function(require,module,exports){
-(function (Buffer){
-module.exports = Level
-
-var IDB = require('idb-wrapper')
-var AbstractLevelDOWN = require('abstract-leveldown').AbstractLevelDOWN
-var util = require('util')
-var Iterator = require('./iterator')
-var isBuffer = require('isbuffer')
-var xtend = require('xtend')
-var toBuffer = require('typedarray-to-buffer')
-
-function Level(location) {
-  if (!(this instanceof Level)) return new Level(location)
-  if (!location) throw new Error("constructor requires at least a location argument")
-  this.IDBOptions = {}
-  this.location = location
-}
-
-util.inherits(Level, AbstractLevelDOWN)
-
-Level.prototype._open = function(options, callback) {
-  var self = this
-    
-  var idbOpts = {
-    storeName: this.location,
-    autoIncrement: false,
-    keyPath: null,
-    onStoreReady: function () {
-      callback && callback(null, self.idb)
-    }, 
-    onError: function(err) {
-      callback && callback(err)
-    }
-  }
-  
-  xtend(idbOpts, options)
-  this.IDBOptions = idbOpts
-  this.idb = new IDB(idbOpts)
-}
-
-Level.prototype._get = function (key, options, callback) {
-  this.idb.get(key, function (value) {
-    if (value === undefined) {
-      // 'NotFound' error, consistent with LevelDOWN API
-      return callback(new Error('NotFound'))
-    }
-    // by default return buffers, unless explicitly told not to
-    var asBuffer = true
-    if (options.asBuffer === false) asBuffer = false
-    if (options.raw) asBuffer = false
-    if (asBuffer) {
-      if (value instanceof Uint8Array) value = toBuffer(value)
-      else value = new Buffer(String(value))
-    }
-    return callback(null, value, key)
-  }, callback)
-}
-
-Level.prototype._del = function(id, options, callback) {
-  this.idb.remove(id, callback, callback)
-}
-
-Level.prototype._put = function (key, value, options, callback) {
-  if (value instanceof ArrayBuffer) {
-    value = toBuffer(new Uint8Array(value))
-  }
-  var obj = this.convertEncoding(key, value, options)
-  if (Buffer.isBuffer(obj.value)) {
-    obj.value = new Uint8Array(value.toArrayBuffer())
-  }
-  this.idb.put(obj.key, obj.value, function() { callback() }, callback)
-}
-
-Level.prototype.convertEncoding = function(key, value, options) {
-  if (options.raw) return {key: key, value: value}
-  if (value) {
-    var stringed = value.toString()
-    if (stringed === 'NaN') value = 'NaN'
-  }
-  var valEnc = options.valueEncoding
-  var obj = {key: key, value: value}
-  if (value && (!valEnc || valEnc !== 'binary')) {
-    if (typeof obj.value !== 'object') {
-      obj.value = stringed
-    }
-  }
-  return obj
-}
-
-Level.prototype.iterator = function (options) {
-  if (typeof options !== 'object') options = {}
-  return new Iterator(this.idb, options)
-}
-
-Level.prototype._batch = function (array, options, callback) {
-  var op
-  var i
-  var k
-  var copiedOp
-  var currentOp
-  var modified = []
-  
-  if (array.length === 0) return setTimeout(callback, 0)
-  
-  for (i = 0; i < array.length; i++) {
-    copiedOp = {}
-    currentOp = array[i]
-    modified[i] = copiedOp
-    
-    var converted = this.convertEncoding(currentOp.key, currentOp.value, options)
-    currentOp.key = converted.key
-    currentOp.value = converted.value
-
-    for (k in currentOp) {
-      if (k === 'type' && currentOp[k] == 'del') {
-        copiedOp[k] = 'remove'
-      } else {
-        copiedOp[k] = currentOp[k]
-      }
-    }
-  }
-
-  return this.idb.batch(modified, function(){ callback() }, callback)
-}
-
-Level.prototype._close = function (callback) {
-  this.idb.db.close()
-  callback()
-}
-
-Level.prototype._approximateSize = function (start, end, callback) {
-  var err = new Error('Not implemented')
-  if (callback)
-    return callback(err)
-
-  throw err
-}
-
-Level.prototype._isBuffer = function (obj) {
-  return Buffer.isBuffer(obj)
-}
-
-Level.destroy = function (db, callback) {
-  if (typeof db === 'object') {
-    var prefix = db.IDBOptions.storePrefix || 'IDBWrapper-'
-    var dbname = db.location
-  } else {
-    var prefix = 'IDBWrapper-'
-    var dbname = db
-  }
-  var request = indexedDB.deleteDatabase(prefix + dbname)
-  request.onsuccess = function() {
-    callback()
-  }
-  request.onerror = function(err) {
-    callback(err)
-  }
-}
-
-var checkKeyValue = Level.prototype._checkKeyValue = function (obj, type) {
-  if (obj === null || obj === undefined)
-    return new Error(type + ' cannot be `null` or `undefined`')
-  if (obj === null || obj === undefined)
-    return new Error(type + ' cannot be `null` or `undefined`')
-  if (isBuffer(obj) && obj.byteLength === 0)
-    return new Error(type + ' cannot be an empty ArrayBuffer')
-  if (String(obj) === '')
-    return new Error(type + ' cannot be an empty String')
-  if (obj.length === 0)
-    return new Error(type + ' cannot be an empty Array')
-}
-
-}).call(this,require("buffer").Buffer)
-},{"./iterator":25,"abstract-leveldown":28,"buffer":14,"idb-wrapper":30,"isbuffer":31,"typedarray-to-buffer":33,"util":23,"xtend":35}],"levelup":[function(require,module,exports){
-(function (process){
-/* Copyright (c) 2012-2014 LevelUP contributors
- * See list at <https://github.com/rvagg/node-levelup#contributing>
- * MIT License
- * <https://github.com/rvagg/node-levelup/blob/master/LICENSE.md>
- */
-
-var EventEmitter   = require('events').EventEmitter
-  , inherits       = require('util').inherits
-  , extend         = require('xtend')
-  , prr            = require('prr')
-  , DeferredLevelDOWN = require('deferred-leveldown')
-
-  , WriteError     = require('./errors').WriteError
-  , ReadError      = require('./errors').ReadError
-  , NotFoundError  = require('./errors').NotFoundError
-  , OpenError      = require('./errors').OpenError
-  , EncodingError  = require('./errors').EncodingError
-  , InitializationError = require('./errors').InitializationError
-
-  , ReadStream     = require('./read-stream')
-  , WriteStream    = require('./write-stream')
-  , util           = require('./util')
-  , Batch          = require('./batch')
-  , codec          = require('./codec')
-
-  , getOptions     = util.getOptions
-  , defaultOptions = util.defaultOptions
-  , getLevelDOWN   = util.getLevelDOWN
-  , dispatchError  = util.dispatchError
-  , isDefined      = util.isDefined
-
-function getCallback (options, callback) {
-  return typeof options == 'function' ? options : callback
-}
-
-// Possible LevelUP#_status values:
-//  - 'new'     - newly created, not opened or closed
-//  - 'opening' - waiting for the database to be opened, post open()
-//  - 'open'    - successfully opened the database, available for use
-//  - 'closing' - waiting for the database to be closed, post close()
-//  - 'closed'  - database has been successfully closed, should not be
-//                 used except for another open() operation
-
-function LevelUP (location, options, callback) {
-  if (!(this instanceof LevelUP))
-    return new LevelUP(location, options, callback)
-
-  var error
-
-  EventEmitter.call(this)
-  this.setMaxListeners(Infinity)
-
-  if (typeof location == 'function') {
-    options = typeof options == 'object' ? options : {}
-    options.db = location
-    location = null
-  } else if (typeof location == 'object' && typeof location.db == 'function') {
-    options = location
-    location = null
-  }
-
-
-  if (typeof options == 'function') {
-    callback = options
-    options  = {}
-  }
-
-  if ((!options || typeof options.db != 'function') && typeof location != 'string') {
-    error = new InitializationError(
-        'Must provide a location for the database')
-    if (callback) {
-      return process.nextTick(function () {
-        callback(error)
-      })
-    }
-    throw error
-  }
-
-  options      = getOptions(this, options)
-  this.options = extend(defaultOptions, options)
-  this._codec = options.codec || codec
-  this._status = 'new'
-  // set this.location as enumerable but not configurable or writable
-  prr(this, 'location', location, 'e')
-
-  this.open(callback)
-}
-
-inherits(LevelUP, EventEmitter)
-
-LevelUP.prototype.open = function (callback) {
-  var self = this
-    , dbFactory
-    , db
-
-  if (this.isOpen()) {
-    if (callback)
-      process.nextTick(function () { callback(null, self) })
-    return this
-  }
-
-  if (this._isOpening()) {
-    return callback && this.once(
-        'open'
-      , function () { callback(null, self) }
-    )
-  }
-
-  this.emit('opening')
-
-  this._status = 'opening'
-  this.db      = new DeferredLevelDOWN(this.location)
-  dbFactory    = this.options.db || getLevelDOWN()
-  db           = dbFactory(this.location)
-
-  db.open(this.options, function (err) {
-    if (err) {
-      return dispatchError(self, new OpenError(err), callback)
-    } else {
-      self.db.setDb(db)
-      self.db = db
-      self._status = 'open'
-      if (callback)
-        callback(null, self)
-      self.emit('open')
-      self.emit('ready')
-    }
-  })
-}
-
-LevelUP.prototype.close = function (callback) {
-  var self = this
-
-  if (this.isOpen()) {
-    this._status = 'closing'
-    this.db.close(function () {
-      self._status = 'closed'
-      self.emit('closed')
-      if (callback)
-        callback.apply(null, arguments)
-    })
-    this.emit('closing')
-    this.db = null
-  } else if (this._status == 'closed' && callback) {
-    return process.nextTick(callback)
-  } else if (this._status == 'closing' && callback) {
-    this.once('closed', callback)
-  } else if (this._isOpening()) {
-    this.once('open', function () {
-      self.close(callback)
-    })
-  }
-}
-
-LevelUP.prototype.isOpen = function () {
-  return this._status == 'open'
-}
-
-LevelUP.prototype._isOpening = function () {
-  return this._status == 'opening'
-}
-
-LevelUP.prototype.isClosed = function () {
-  return (/^clos/).test(this._status)
-}
-
-function maybeError(db, options, callback) {
-  if (!db._isOpening() && !db.isOpen()) {
-    dispatchError(
-        db
-      , new ReadError('Database is not open')
-      , callback
-    )
-    return true
-  }
-}
-
-function writeError (db, message, callback) {
-  dispatchError(
-      db
-     , new WriteError(message)
-     , callback
-  )
-}
-
-function readError (db, message, callback) {
-  dispatchError(
-      db
-     , new ReadError(message)
-     , callback
-  )
-  return true
-}
-
-
-LevelUP.prototype.get = function (key_, options, callback) {
-  var self = this
-    , key
-
-  callback = getCallback(options, callback)
-
-  if (maybeError(this, options, callback))
-    return
-
-  if (key_ === null || key_ === undefined || 'function' !== typeof callback)
-    return readError(this
-      , 'get() requires key and callback arguments', callback)
-
-  options = util.getOptions(this, options)
-  key = this._codec.encodeKey(key_, options)
-
-  options.asBuffer = this._codec.isValueAsBuffer(options)
-
-  this.db.get(key, options, function (err, value) {
-    if (err) {
-      if ((/notfound/i).test(err)) {
-        err = new NotFoundError(
-            'Key not found in database [' + key_ + ']', err)
-      } else {
-        err = new ReadError(err)
-      }
-      return dispatchError(self, err, callback)
-    }
-    if (callback) {
-      try {
-        value = self._codec.decodeValue(value, options)
-      } catch (e) {
-        return callback(new EncodingError(e))
-      }
-      callback(null, value)
-    }
-  })
-}
-
-LevelUP.prototype.put = function (key_, value_, options, callback) {
-  var self = this
-    , key
-    , value
-
-  callback = getCallback(options, callback)
-
-  if (key_ === null || key_ === undefined
-        || value_ === null || value_ === undefined)
-    return writeError(this, 'put() requires key and value arguments', callback)
-
-  if (maybeError(this, options, callback))
-    return
-
-  options = getOptions(this, options)
-  key     = this._codec.encodeKey(key_, options)
-  value   = this._codec.encodeValue(value_, options)
-
-  this.db.put(key, value, options, function (err) {
-    if (err) {
-      return dispatchError(self, new WriteError(err), callback)
-    } else {
-      self.emit('put', key_, value_)
-      if (callback)
-        callback()
-    }
-  })
-}
-
-LevelUP.prototype.del = function (key_, options, callback) {
-  var self = this
-    , key
-
-  callback = getCallback(options, callback)
-
-  if (key_ === null || key_ === undefined)
-    return writeError(this, 'del() requires a key argument', callback)
-
-  if (maybeError(this, options, callback))
-    return
-
-  options = getOptions(this, options)
-  key     = this._codec.encodeKey(key_, options)
-
-  this.db.del(key, options, function (err) {
-    if (err) {
-      return dispatchError(self, new WriteError(err), callback)
-    } else {
-      self.emit('del', key_)
-      if (callback)
-        callback()
-    }
-  })
-}
-
-LevelUP.prototype.batch = function (arr_, options, callback) {
-  var self = this
-    , keyEnc
-    , valueEnc
-    , arr
-
-  if (!arguments.length)
-    return new Batch(this, codec)
-
-  callback = getCallback(options, callback)
-
-  if (!Array.isArray(arr_))
-    return writeError(this, 'batch() requires an array argument', callback)
-
-  if (maybeError(this, options, callback))
-    return
-
-  options  = getOptions(this, options)
-  keyEnc   = options.keyEncoding
-  valueEnc = options.valueEncoding
-
-  arr = arr_.map(function (e) {
-    if (e.type === undefined || e.key === undefined)
-      return {}
-
-    // inherit encoding
-    var kEnc = e.keyEncoding || keyEnc
-      , vEnc = e.valueEncoding || e.encoding || valueEnc
-      , o
-
-    // If we're not dealing with plain utf8 strings or plain
-    // Buffers then we have to do some work on the array to
-    // encode the keys and/or values. This includes JSON types.
-
-    if (kEnc != 'utf8' && kEnc != 'binary'
-        || vEnc != 'utf8' && vEnc != 'binary') {
-      o = {
-          type: e.type
-        , key: self._codec.encodeKey(e.key, options, e)
-      }
-
-      if (e.value !== undefined)
-        o.value = self._codec.encodeValue(e.value, options, e)
-
-      return o
-    } else {
-      return e
-    }
-  })
-
-  this.db.batch(arr, options, function (err) {
-    if (err) {
-      return dispatchError(self, new WriteError(err), callback)
-    } else {
-      self.emit('batch', arr_)
-      if (callback)
-        callback()
-    }
-  })
-}
-
-// DEPRECATED: prefer accessing LevelDOWN for this: db.db.approximateSize()
-LevelUP.prototype.approximateSize = function (start_, end_, options, callback) {
-  var self = this
-    , start
-    , end
-
-  callback = getCallback(options, callback)
-
-  options = getOptions(options, callback)
-
-  if (start_ === null || start_ === undefined
-        || end_ === null || end_ === undefined || 'function' !== typeof callback)
-    return readError(this, 'approximateSize() requires start, end and callback arguments', callback)
-
-  start = this._codec.encodeKey(start_, this.options)
-  end   = this._codec.encodeKey(end_, this.options)
-
-  this.db.approximateSize(start, end, function (err, size) {
-    if (err) {
-      return dispatchError(self, new OpenError(err), callback)
-    } else if (callback) {
-      callback(null, size)
-    }
-  })
-}
-
-LevelUP.prototype.readStream =
-LevelUP.prototype.createReadStream = function (options) {
-  var self = this
-  options = extend( {keys: true, values: true}, this.options, options)
-
-  options.keyEncoding   = options.keyEncoding   || options.encoding
-  options.valueEncoding = options.valueEncoding || options.encoding
-
-  if (isDefined(options.start))
-    options.start = this._codec.encodeKey(options.start, options)
-  if (isDefined(options.end))
-    options.end = this._codec.encodeKey(options.end, options)
-  if (isDefined(options.gte))
-    options.gte = this._codec.encodeKey(options.gte, options)
-  if (isDefined(options.gt))
-    options.gt = this._codec.encodeKey(options.gt, options)
-  if (isDefined(options.lte))
-    options.lte = this._codec.encodeKey(options.lte, options)
-  if (isDefined(options.lt))
-    options.lt = this._codec.encodeKey(options.lt, options)
-  if ('number' !== typeof options.limit)
-    options.limit = -1
-
-  options.keyAsBuffer   = this._codec.isKeyAsBuffer(options)
-  options.valueAsBuffer = this._codec.isValueAsBuffer(options)
-
-  var makeData = options.keys && options.values
-    ? function (key, value) {
-        return {
-            key: self._codec.decodeKey(key, options)
-          , value: self._codec.decodeValue(value, options)
-        }
-      }
-    : options.keys
-    ? function (key) {
-        return self._codec.decodeKey(key, options)
-      }
-    : options.values
-    ? function (_, value) {
-        return self._codec.decodeValue(value, options)
-      }
-    : function () {}
-
-  var stream = new ReadStream(options, makeData)
-
-  if (this.isOpen()) {
-    stream.setIterator(self.db.iterator(options))
-  } else {
-    this.once('ready', function () {
-      stream.setIterator(self.db.iterator(options))
-    })
-  }
-
-  return stream
-}
-
-LevelUP.prototype.keyStream =
-LevelUP.prototype.createKeyStream = function (options) {
-  return this.createReadStream(extend(options, { keys: true, values: false }))
-}
-
-LevelUP.prototype.valueStream =
-LevelUP.prototype.createValueStream = function (options) {
-  return this.createReadStream(extend(options, { keys: false, values: true }))
-}
-
-LevelUP.prototype.writeStream =
-LevelUP.prototype.createWriteStream = function (options) {
-  //XXX is extend needed here?
-  return new WriteStream(extend(options), this)
-}
-
-LevelUP.prototype.toString = function () {
-  return 'LevelUP'
-}
-
-function utilStatic (name) {
-  return function (location, callback) {
-    getLevelDOWN()[name](location, callback || function () {})
-  }
-}
-
-module.exports         = LevelUP
-module.exports.copy    = util.copy
-// DEPRECATED: prefer accessing LevelDOWN for this: require('leveldown').destroy()
-module.exports.destroy = utilStatic('destroy')
-// DEPRECATED: prefer accessing LevelDOWN for this: require('leveldown').repair()
-module.exports.repair  = utilStatic('repair')
-
-
-}).call(this,require('_process'))
-},{"./batch":44,"./codec":45,"./errors":47,"./read-stream":48,"./util":49,"./write-stream":50,"_process":20,"deferred-leveldown":52,"events":18,"prr":58,"util":23,"xtend":59}]},{},[4])("levelup")
+},{"./lib/_stream_writable.js":68}],77:[function(require,module,exports){
+module.exports=require(30)
+},{"/Users/matteocollina/Repositories/levelgraph/node_modules/level-js/node_modules/abstract-leveldown/node_modules/xtend/index.js":30}]},{},[4])(4)
 });
