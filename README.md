@@ -59,7 +59,7 @@ var db = levelgraph("yourdb");
 
 ### Get and Put
 
-Inserting a triple in the database is extremey easy:
+Inserting a triple in the database is extremely easy:
 ```javascript
 var triple = { subject: "a", predicate: "b", object: "c" };
 db.put(triple, function(err) {
