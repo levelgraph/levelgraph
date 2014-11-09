@@ -1,7 +1,7 @@
 
 var levelgraph = require('../lib/levelgraph')
   , level = require('level-test')()
-  , sublevel = require('level-sublevel')
+  , sublevel = require('level-subkey')
   , osenv = require('osenv');
 
 describe('sublevel support', function() {

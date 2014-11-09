@@ -43,7 +43,7 @@
     "coveralls": "^2.11.2",
     "istanbul": "~0.3.2",
     "jshint": "~2.5.6",
-    "level-sublevel": "git://github.com/snowyu/level-sublevel.git#feature/KeyPath",
+    "level-subkey": "^7.7.1",
     "level-test": "~1.6.5",
     "levelup": "~0.19.0",
     "mocha": "^1.16.2",
