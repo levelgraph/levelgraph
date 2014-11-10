@@ -1,6 +1,6 @@
 {
   "name": "levelgraph",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "A graph database for Node.js and the browser built on top of LevelUp",
   "main": "lib/levelgraph.js",
   "scripts": {
@@ -43,6 +43,7 @@
     "coveralls": "^2.11.2",
     "istanbul": "~0.3.2",
     "jshint": "~2.5.6",
+    "level-subkey": "^7.7.1",
     "level-sublevel": "^6.3.15",
     "level-test": "~1.6.5",
     "levelup": "~0.19.0",
