@@ -44,6 +44,7 @@
     "istanbul": "~0.3.2",
     "jshint": "~2.5.6",
     "level-subkey": "^7.7.1",
+    "level-sublevel": "^6.3.15",
     "level-test": "~1.6.5",
     "levelup": "~0.19.0",
     "mocha": "^1.16.2",
