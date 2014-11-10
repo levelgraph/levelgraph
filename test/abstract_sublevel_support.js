@@ -46,4 +46,4 @@ module.exports = function(sublevel) {
         graph.close(done);
       });
     });
-}
+};
