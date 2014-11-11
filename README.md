@@ -625,6 +625,7 @@ LevelGraph is only possible due to the excellent work of the following contribut
 <tr><th align="left">Jeremy Taylor</th><td><a
 href="https://github.com/jez0990">GitHub/jez0990</a></td></tr>
 <tr><th align="left">Elf Pavlik</th><td><a href="https://github.com/elf-pavlik">GitHub/elf-pavlik</a></td><td><a href="https://twitter.com/elfpavlik">Twitter/@elfpavlik</a></td></tr>
+<tr><th align="left">Riceball LEE</th><td><a href="https://github.com/snowyu">GitHub/snowyu</a></td><td></td></tr>
 </tbody></table>
 
 ## LICENSE - "MIT License"
