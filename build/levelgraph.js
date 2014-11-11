@@ -925,7 +925,7 @@ function genKeyWithEnding(key, triple) {
   }
 
   if (i < 3) {
-    result += '::\xff';
+    result += '::\uffff';
   }
 
   return result;
@@ -1217,8 +1217,8 @@ function createQuery(pattern, options) {
     , key = genKey(index, pattern, '')
     , limit = pattern.limit
     , reverse = pattern.reverse || false
-    , start = reverse ? key + '\xff' : key
-    , end = reverse ? key : key + '\xff'
+    , start = reverse ? key + '\uffff' : key
+    , end = reverse ? key : key + '\uffff'
     , query = {
           start: start
         , end: end
