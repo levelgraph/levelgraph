@@ -438,7 +438,12 @@ searchStream = function(db, options) {
 };
 
 doAction = function(action, leveldb) {
-  return function(triples, cb) {
+  return function(triples, options, cb) {
+    if ('function' === typeof options) {
+      cb = options;
+      options = {};
+    }
+
     if(!triples.reduce) {
       triples = [triples];
     }
@@ -447,7 +452,7 @@ doAction = function(action, leveldb) {
       return acc.concat(utilities.generateBatch(triple, action));
     }, []);
 
-    leveldb.batch(actions, cb);
+    leveldb.batch(actions, options, cb);
   };
 };
 
