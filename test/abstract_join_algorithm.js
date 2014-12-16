@@ -275,6 +275,7 @@ module.exports = function(joinAlgorithm) {
   });
 
   it('should support filtering inside a second-level condition', function(done) {
+    var solutions = [{ x: 'davide', y: 'daniele' }, { x: 'marco', y: 'daniele' }];
     db.search([{
       subject: 'matteo',
       predicate: 'friend',
@@ -287,15 +288,13 @@ module.exports = function(joinAlgorithm) {
         return triple.object !== 'matteo';
       }
     }], function(err, results) {
-      expect(results).to.eql([{
-        'y': 'daniele',
-        'x': 'marco'
-      }]);
+      expect(results).to.eql(solutions);
       done();
     });
   });
 
   it('should support solution filtering', function(done) {
+    var solutions = [{ x: 'davide', y: 'daniele' }, { x: 'marco', y: 'daniele' }];
     db.search([{
       subject: 'matteo',
       predicate: 'friend',
@@ -313,10 +312,7 @@ module.exports = function(joinAlgorithm) {
         }
       }
     }, function(err, results) {
-      expect(results).to.eql([{
-        'y': 'daniele',
-        'x': 'marco'
-      }]);
+      expect(results).to.eql(solutions);
       done();
     });
   });
