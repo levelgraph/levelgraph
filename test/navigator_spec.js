@@ -44,9 +44,33 @@ describe('navigator', function() {
       .archIn('friend')
       .archOut('friend').
       values(function(err, friends) {
-        expect(friends).to.have.length(solutions.length);
-        friends.forEach(function (friend) {
-          expect(solutions.indexOf(friend) >= 0).to.equal(true);
+        db.search([
+          {
+            subject: db.v('x'),
+            predicate: 'friend',
+            object: 'davide'
+          },
+          {
+            subject: db.v('y'),
+            predicate: 'friend',
+            object: db.v('x')
+          },
+          {
+            subject: db.v('y'),
+            predicate: 'friend',
+            object: db.v('z')
+          }
+        ], { joinAlgorithm: 'basic' }, function (err, results) {
+          results = results.map(function (result) { return result.z;  });
+          expect(friends).to.have.length(solutions.length);
+          expect(results).to.have.length(solutions.length);
+          friends.forEach(function (friend) {
+            expect(solutions.indexOf(friend) >= 0).to.equal(true);
+          });
+          results.forEach(function (result) {
+            expect(solutions.indexOf(result) >= 0).to.equal(true);
+          });
+          done();
         });
     });
   });
