@@ -65,6 +65,40 @@ module.exports = function(joinAlgorithm) {
     });
   });
 
+  it('should do a join with three variables', function(done) {
+    db.search([{
+      subject: db.v('x'),
+      predicate: 'friend',
+      object: 'davide'
+    }, {
+      subject: db.v('y'),
+      predicate: 'friend',
+      object: db.v('x')
+    }, {
+      subject: db.v('y'),
+      predicate: 'friend',
+      object: db.v('z')
+    }], function (err, results) {
+      expect(results).to.have.length(6);
+      done();
+    });
+  });
+
+  it('should support navigator with multiple archs, in and out a path', function(done) {
+    var solutions = [ 'matteo', 'davide', 'marco', 'daniele' ];
+    db.nav('davide')
+      .archIn('friend')
+      .archIn('friend')
+      .archOut('friend')
+      .values(function(err, friends) {
+        expect(friends).to.have.length(solutions.length);
+        friends.forEach(function (friend) {
+          expect(solutions.indexOf(friend) >= 0).to.equal(true);
+        });
+        done();
+      });
+  });
+
   it('should return the two solutions through the searchStream interface', function(done) {
     var solutions = [{ x: 'daniele' }, { x: 'lucio' }]
       , stream = db.searchStream([{
