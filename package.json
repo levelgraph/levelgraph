@@ -5,6 +5,7 @@
   "main": "lib/levelgraph.js",
   "scripts": {
     "test": "mocha --recursive --bail --reporter spec test",
+    "mocha": "mocha --recursive --reporter spec test",
     "zuul": "zuul test/common.js test/*spec.js",
     "coverage": "rm -rf coverage; istanbul cover _mocha -- --recursive --reporter spec --bail",
     "publish-coverage": "cat coverage/lcov.info | coveralls",
