@@ -27,54 +27,54 @@ describe('a basic unicode triple store', function() {
     var triple;
 
     beforeEach(function(done) {
-      triple = { subject: '车', predicate: '是', object: '交通工具' };
+      triple = { subject: '􀃿', predicate: '🜁', object: '🚃' };
       db.put(triple, done);
     });
 
     it('should get it specifiying the subject', function(done) {
-      db.get({ subject: '车' }, function(err, list) {
+      db.get({ subject: '􀃿' }, function(err, list) {
         expect(list).to.eql([triple]);
         done();
       });
     });
 
     it('should get it specifiying the object', function(done) {
-      db.get({ object: '交通工具' }, function(err, list) {
+      db.get({ object: '🚃' }, function(err, list) {
         expect(list).to.eql([triple]);
         done();
       });
     });
 
     it('should get it specifiying the predicate', function(done) {
-      db.get({ predicate: '是' }, function(err, list) {
+      db.get({ predicate: '🜁' }, function(err, list) {
         expect(list).to.eql([triple]);
         done();
       });
     });
 
     it('should get it specifiying the subject and the predicate', function(done) {
-      db.get({ subject: '车', predicate: '是' }, function(err, list) {
+      db.get({ subject: '􀃿', predicate: '🜁' }, function(err, list) {
         expect(list).to.eql([triple]);
         done();
       });
     });
 
     it('should get it specifiying the subject and the object', function(done) {
-      db.get({ subject: '车', object: '交通工具' }, function(err, list) {
+      db.get({ subject: '􀃿', object: '🚃' }, function(err, list) {
         expect(list).to.eql([triple]);
         done();
       });
     });
 
     it('should get it specifiying the predicate and the object', function(done) {
-      db.get({ predicate: '是', object: '交通工具' }, function(err, list) {
+      db.get({ predicate: '🜁', object: '🚃' }, function(err, list) {
         expect(list).to.eql([triple]);
         done();
       });
     });
 
     it('should get it specifiying the subject and falsy params', function(done) {
-      db.get({ subject: '车', predicate: false, object: null }, function(err, list) {
+      db.get({ subject: '􀃿', predicate: false, object: null }, function(err, list) {
         expect(list).to.eql([triple]);
         done();
       });
@@ -94,7 +94,7 @@ describe('a basic unicode triple store', function() {
     });
 
     it('should return the triple through the getStream interface', function(done) {
-      var stream = db.getStream({ predicate: '是' });
+      var stream = db.getStream({ predicate: '🜁' });
       stream.on('data', function(data) {
         expect(data).to.eql(triple);
       });
@@ -102,7 +102,7 @@ describe('a basic unicode triple store', function() {
     });
 
     it('should return the triple through the getStream interface with falsy params', function(done) {
-      var stream = db.getStream({ subject: null, predicate: '是', object: false });
+      var stream = db.getStream({ subject: null, predicate: '🜁', object: false });
       stream.on('data', function(data) {
         expect(data).to.eql(triple);
       });

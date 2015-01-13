@@ -4,6 +4,8 @@ var queryplanner = require('../lib/queryplanner')
   , SortJoinStream = require('../lib/sortjoinstream')
   , JoinStream = require('../lib/joinstream');
 
+var upperBoundChar = '\udbff\udfff';
+
 describe('query planner', function() {
 
   var db, query, planner, stub, expected;
@@ -28,7 +30,7 @@ describe('query planner', function() {
       expected = [ { predicate: 'friend', stream: JoinStream } ];
 
       stub
-        .withArgs('pos::friend::', 'pos::friend::\uffff', sinon.match.func)
+        .withArgs('pos::friend::', 'pos::friend::'+upperBoundChar, sinon.match.func)
         .yields(null, 10);
 
       planner(query, function(err, result) {
@@ -55,11 +57,11 @@ describe('query planner', function() {
       }];
 
       stub
-        .withArgs('pso::friend::matteo::', 'pso::friend::matteo::\uffff')
+        .withArgs('pso::friend::matteo::', 'pso::friend::matteo::'+upperBoundChar)
         .yields(null, 1);
 
       stub
-        .withArgs('pos::friend::', 'pos::friend::\uffff')
+        .withArgs('pos::friend::', 'pos::friend::'+upperBoundChar)
         .yields(null, 10);
 
       planner(query, function(err, result) {
@@ -86,11 +88,11 @@ describe('query planner', function() {
       }];
 
       db.approximateSize
-        .withArgs('pos::friend::', 'pos::friend::\uffff')
+        .withArgs('pos::friend::', 'pos::friend::'+upperBoundChar)
         .yields(null, 10);
 
       db.approximateSize
-        .withArgs('pso::friend::matteo::', 'pso::friend::matteo::\uffff')
+        .withArgs('pso::friend::matteo::', 'pso::friend::matteo::'+upperBoundChar)
         .yields(null, 1);
 
       planner(query, function(err, result) {
@@ -104,7 +106,7 @@ describe('query planner', function() {
       expected = [ { predicate: 'friend', subject: v('x'), stream: JoinStream } ];
 
       stub
-        .withArgs('pos::friend::', 'pos::friend::\uffff', sinon.match.func)
+        .withArgs('pos::friend::', 'pos::friend::'+upperBoundChar, sinon.match.func)
         .yields(null, 10);
 
       planner(query, function(err, result) {
@@ -123,7 +125,7 @@ describe('query planner', function() {
       expected = [ { predicate: 'friend', stream: JoinStream } ];
 
       stub
-        .withArgs('pos::friend::', 'pos::friend::\uffff', sinon.match.func)
+        .withArgs('pos::friend::', 'pos::friend::'+upperBoundChar, sinon.match.func)
         .yields(null, 10);
 
       planner(query, function(err, result) {
@@ -158,11 +160,11 @@ describe('query planner', function() {
       }];
 
       stub
-        .withArgs('pos::friend::', 'pos::friend::\uffff', sinon.match.func)
+        .withArgs('pos::friend::', 'pos::friend::'+upperBoundChar, sinon.match.func)
         .yields(null, 1);
 
       stub
-        .withArgs('pos::abc::', 'pos::abc::\uffff', sinon.match.func)
+        .withArgs('pos::abc::', 'pos::abc::'+upperBoundChar, sinon.match.func)
         .yields(null, 10);
 
       planner(query, function(err, result) {
@@ -197,7 +199,7 @@ describe('query planner', function() {
       }];
 
       stub
-        .withArgs('pos::friend::', 'pos::friend::\uffff', sinon.match.func)
+        .withArgs('pos::friend::', 'pos::friend::'+upperBoundChar, sinon.match.func)
         .yields(null, 10);
 
       planner(query, function(err, result) {
@@ -242,11 +244,11 @@ describe('query planner', function() {
       }];
 
       stub
-        .withArgs('pos::friend::', 'pos::friend::\uffff', sinon.match.func)
+        .withArgs('pos::friend::', 'pos::friend::'+upperBoundChar, sinon.match.func)
         .yields(null, 10);
 
       stub
-        .withArgs('pso::father::bob::', 'pso::father::bob::\uffff', sinon.match.func)
+        .withArgs('pso::father::bob::', 'pso::father::bob::'+upperBoundChar, sinon.match.func)
         .yields(null, 100);
 
       planner(query, function(err, result) {
@@ -291,7 +293,7 @@ describe('query planner', function() {
       }];
 
       stub
-        .withArgs('pos::friend::', 'pos::friend::\uffff', sinon.match.func)
+        .withArgs('pos::friend::', 'pos::friend::'+upperBoundChar, sinon.match.func)
         .yields(null, 10);
 
       planner(query, function(err, result) {
@@ -336,11 +338,11 @@ describe('query planner', function() {
       }];
 
       stub
-        .withArgs('pos::friend::', 'pos::friend::\uffff', sinon.match.func)
+        .withArgs('pos::friend::', 'pos::friend::'+upperBoundChar, sinon.match.func)
         .yields(null, 10);
 
       stub
-        .withArgs('ops::davide::friend::', 'ops::davide::friend::\uffff', sinon.match.func)
+        .withArgs('ops::davide::friend::', 'ops::davide::friend::'+upperBoundChar, sinon.match.func)
         .yields(null, 1);
 
       planner(query, function(err, result) {
@@ -385,15 +387,15 @@ describe('query planner', function() {
       }];
 
       stub
-        .withArgs('pos::friend::', 'pos::friend::\uffff', sinon.match.func)
+        .withArgs('pos::friend::', 'pos::friend::'+upperBoundChar, sinon.match.func)
         .yields(null, 10);
 
       stub
-        .withArgs('pso::friend::matteo::', 'pso::friend::matteo::\uffff', sinon.match.func)
+        .withArgs('pso::friend::matteo::', 'pso::friend::matteo::'+upperBoundChar, sinon.match.func)
         .yields(null, 1);
 
       stub
-        .withArgs('ops::daniele::friend::', 'ops::daniele::friend::\uffff', sinon.match.func)
+        .withArgs('ops::daniele::friend::', 'ops::daniele::friend::'+upperBoundChar, sinon.match.func)
         .yields(null, 100);
 
       planner(query, function(err, result) {
@@ -438,11 +440,11 @@ describe('query planner', function() {
       }];
 
       stub
-        .withArgs('pos::friend::', 'pos::friend::\uffff', sinon.match.func)
+        .withArgs('pos::friend::', 'pos::friend::'+upperBoundChar, sinon.match.func)
         .yields(null, 10);
 
       stub
-        .withArgs('pso::friend::matteo::', 'pso::friend::matteo::\uffff', sinon.match.func)
+        .withArgs('pso::friend::matteo::', 'pso::friend::matteo::'+upperBoundChar, sinon.match.func)
         .yields(null, 1);
 
       planner(query, function(err, result) {
@@ -487,11 +489,11 @@ describe('query planner', function() {
       }];
 
       stub
-        .withArgs('pos::friend::', 'pos::friend::\uffff', sinon.match.func)
+        .withArgs('pos::friend::', 'pos::friend::'+upperBoundChar, sinon.match.func)
         .yields(null, 10);
 
       stub
-        .withArgs('ops::marco::friend::', 'ops::marco::friend::\uffff', sinon.match.func)
+        .withArgs('ops::marco::friend::', 'ops::marco::friend::'+upperBoundChar, sinon.match.func)
         .yields(null, 1);
 
       planner(query, function(err, result) {

@@ -23,6 +23,14 @@ tmp.dir (err, dir) ->
     predicate: "是"
     object: "汽车"
   ,
+    subject: "𠁩"
+    predicate: "动力"
+    object: "电"
+  ,
+    subject: "𠁩"
+    predicate: "是"
+    object: "汽车"
+  ,
     subject: "特斯拉"
     predicate: "是"
     object: "汽车"
