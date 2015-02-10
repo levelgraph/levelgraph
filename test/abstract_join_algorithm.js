@@ -321,6 +321,33 @@ module.exports = function(joinAlgorithm) {
     });
   });
 
+  it('should support solution filtering w/ 2 args', function(done) {
+    // Who's a friend of matteo and aged 25.
+    db.search([{
+      subject: db.v('s'),
+      predicate: 'age',
+      object: db.v('age'),
+    }, {
+      subject: db.v('s'),
+      predicate: 'friend',
+      object: 'matteo'
+    }], {
+      filter: function(context, callback) {
+        if (context.age == 25) {
+          callback(null, context); // confirm
+        } else {
+          callback(null); // refute
+        }
+      }
+    }, function(err, results) {
+      expect(results).to.eql([{
+        'age': 25,
+        's': 'daniele'
+      }]);
+      done();
+    });
+  });
+
   it('should return only one solution with limit 1', function(done) {
     db.search([{
       subject: db.v('x'),
