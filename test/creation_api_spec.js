@@ -1,6 +1,8 @@
 
 var levelgraph = require('../lib/levelgraph')
-  , level = require('level-test')();
+  , level = require('level-test')(),
+  os = require('os'),
+  path = require('path');
 
 describe('creation api', function() {
 
@@ -18,6 +20,7 @@ describe('creation api', function() {
   });
 
   it('should create a db passing a string', function() {
-    db = levelgraph('/tmp/hello');
+    var dbPath = path.join(os.tmpdir(), 'hello');
+    db = levelgraph(dbPath);
   });
 });
