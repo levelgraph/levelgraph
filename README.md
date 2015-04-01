@@ -30,7 +30,39 @@ http://nodejsconf.it.
 
 **LevelGraph** is an **OPEN Open Source Project**, see the <a href="#contributing">Contributing</a> section to find out what this means.
 
-## Install on Node.js
+
+## Table of Contents
+
+* [Install](#install)
+* [Usage](#usage)
+  * [Get and Put](#get-and-put)
+    * [Triple Properties](#triple-properties)
+    * [Limit and Offset](#limit-and-offset)
+    * [Reverse Order](#reverse-order)
+    * [Updating](#updating)
+    * [Multiple Puts](#multiple-puts)
+  * [Deleting](#deleting)
+  * [Searches](#searches)
+    * [Search Without Streams](#search-without-streams)
+    * [Triple Generation](#triple-generation)
+    * [Limit and Offset](#limit-and-offset-1)
+  * [Filtering](#filtering)
+  * [Putting and Deleting through Streams](#putting-and-deleting-through-streams)
+  * [Generate batch operations](#generate-batch-operations)
+* [Navigator API](#navigator-api)
+* [LevelUp integration](#levelup-integration)
+* [Browserify](#browserify)
+* [RDF support](#rdf-support)
+* [Extensions](#extensions)
+* [TODO](#todo)
+* [Contributing](#contributing)
+* [Credits](#credits)
+* [Contributors](#contributors)
+* [LICENSE - "MIT License"](#license---mit-license)
+
+
+## Install
+### On Node.js
 
 ```
 npm install levelgraph --save
@@ -40,7 +72,7 @@ At the moment it requires node v0.10.x, but the port to node v0.8.x
 should be straighforward.
 If you need it, just open a pull request.
 
-## Install in the Browser
+### In the Browser
 
 Just download
 [levelgraph.min.js](https://github.com/mcollina/levelgraph/blob/master/build/levelgraph.min.js)
@@ -74,7 +106,7 @@ db.get({ subject: "a" }, function(err, list) {
 });
 ```
 
-It even support a Stream interface:
+It even supports a Stream interface:
 ```javascript
 var stream = db.getStream({ predicate: "b" });
 stream.on("data", function(data) {
@@ -84,8 +116,8 @@ stream.on("data", function(data) {
 
 #### Triple Properties
 
-LevelGraph support adding properties to triples with very
-little overhead (a part from storage costs), it is very easy:
+LevelGraph supports adding properties to triples with very
+little overhead (apart from storage costs). It is very easy:
 ```javascript
 var triple = { subject: "a", predicate: "b", object: "c", "someStuff": 42 };
 db.put(triple, function() {
@@ -110,7 +142,7 @@ db.get({ subject: "a", limit: 4, offset: 2}, function(err, list) {
 
 It is possible to get results in reverse lexicographical order
 using the `'reverse'` option. This option is only supported by
-`get()` and `getStream()` and not available in `search()`.  
+`get()` and `getStream()` and not available in `search()`.
 
 ```javascript
 db.get({ predicate: "b", reverse: true }, function (err, list) {
@@ -138,7 +170,7 @@ db.put(triple, function(err) {
 
 #### Multiple Puts
 
-__LevelGraph__ also supports adding putting multiple triples:
+__LevelGraph__ also supports putting multiple triples:
 ```javascript
 var triple1 = { subject: "a1", predicate: "b", object: "c" };
 var triple2 = { subject: "a2", predicate: "b", object: "d" };
@@ -146,6 +178,17 @@ db.put([triple1, triple2],  function(err) {
   // do something after the triples are inserted
 });
 ```
+
+### Deleting
+
+Deleting is easy too:
+```javascript
+var triple = { subject: "a", predicate: "b", object: "c" };
+db.del(triple, function(err) {
+  // do something after the triple is deleted
+});
+```
+
 
 ### Searches
 
@@ -198,9 +241,9 @@ db.put([{
 });
 ```
 
-#### Search Streams
+#### Search Without Streams
 
-It also support a similar API without streams:
+It also supports a similar API without streams:
 ```javascript
 db.put([{
  //...
@@ -274,16 +317,6 @@ db.search([{
   }], { limit: 4, offset: 2 }, function(err, list) {
 
   console.log(list);
-});
-```
-
-### Deleting
-
-Deleting is easy too:
-```javascript
-var triple = { subject: "a", predicate: "b", object: "c" };
-db.del(triple, function(err) {
-  // do something after the triple is deleted
 });
 ```
 
@@ -377,6 +410,40 @@ db.search({
 
 The heavier method is filtering solutions, so we recommend filtering the
 triples whenever possible.
+
+
+### Putting and Deleting through Streams
+
+It is also possible to `put` or `del` triples from the store
+using a `Stream2` interface:
+
+```javascript
+var t1 = { subject: "a", predicate: "b", object: "c" };
+var t2 = { subject: "a", predicate: "b", object: "d" };
+var stream = db.putStream();
+
+stream.write(t1);
+stream.end(t2);
+
+stream.on("close", function() {
+  // do something, the writes are done
+});
+```
+
+### Generate batch operations
+
+You can also generate a `put` and `del` batch, so you can
+manage the batching yourself:
+
+```javascript
+var triple = { subject: "a", predicate: "b", object: "c" };
+
+// Produces a batch of put operations
+var putBatch = db.generateBatch(triple);
+
+// Produces a batch of del operations
+var delBatch = db.generateBatch(triple, 'del');
+```
 
 ## Navigator API
 
@@ -480,39 +547,6 @@ db.nav("marco").archIn("friend").as("a").go("matteo").archOut("friend").as("b").
    //   }]
 
 });
-```
-
-### Putting and Deleting through Streams
-
-It is also possible to `put` or `del` triples from the store
-using a `Stream2` interface:
-
-```javascript
-var t1 = { subject: "a", predicate: "b", object: "c" };
-var t2 = { subject: "a", predicate: "b", object: "d" };
-var stream = db.putStream();
-
-stream.write(t1);
-stream.end(t2);
-
-stream.on("close", function() {
-  // do something, the writes are done
-});
-```
-
-### Generate batch operations
-
-You can also generate a `put` and `del` batch, so you can
-manage the batching yourself:
-
-```javascript
-var triple = { subject: "a", predicate: "b", object: "c" };
-
-// Produces a batch of put operations
-var putBatch = db.generateBatch(triple);
-
-// Produces a batch of del operations
-var delBatch = db.generateBatch(triple, 'del');
 ```
 
 ## LevelUp integration
