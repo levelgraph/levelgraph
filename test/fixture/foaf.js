@@ -22,4 +22,20 @@ module.exports = [{
   subject: "marco",
   predicate: "friend",
   object: "davide"
+}, {
+  subject: "marco",
+  predicate: "age",
+  object: 32
+}, {
+  subject: "daniele",
+  predicate: "age",
+  object: 25
+}, {
+  subject: "lucio",
+  predicate: "age",
+  object: 15
+}, {
+  subject: "davide",
+  predicate: "age",
+  object: 70
 }];
