@@ -333,7 +333,7 @@ module.exports = function(joinAlgorithm) {
       object: 'matteo'
     }], {
       filter: function(context, callback) {
-        if (context.age == 25) {
+        if (context.age === 25) {
           callback(null, context); // confirm
         } else {
           callback(null); // refute
