@@ -1,10 +1,12 @@
 language: node_js
 node_js:
-- 0.1
+  - "0.10"
+  - "0.12"
+  - iojs
 script:
-- npm run coverage
-- npm run publish-coverage
-- test $SAUCE_USERNAME && npm run zuul || echo 'not running on saucelabs'
+  - npm run coverage
+  - npm run publish-coverage
+  - test $SAUCE_USERNAME && npm run zuul || echo 'not running on saucelabs'
 env:
   global:
   - secure: Cuq9z31FxXAqpeT8cg58PK1qVSu6GQ6oVRRS5HqLRPxVPdz6yZSsM8VbDP+fC4EMeLihdnjTxQ4QoxGHhpNZjY2P+lX5nCZMvclW7lU7puuXOn0EAzFMMLFZiz28w1HyZSudDfyKN9jN15mYxEqUyJIqMIn6sLVnaCu/Okq8XbQ=

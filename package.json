@@ -33,7 +33,9 @@
     "triple"
   ],
   "engines": {
-    "node": "0.10"
+    "node": ">= 0.10 < 0.13",
+    "npm": ">= 1.4.0",
+    "iojs": ">= 1.0.0"
   },
   "author": "Matteo Collina <hello@matteocollina.com>",
   "license": "MIT",
