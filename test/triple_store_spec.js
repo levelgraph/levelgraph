@@ -301,6 +301,151 @@ describe('a basic triple store', function() {
     });
   });
 
+  describe('with two triple inserted with the same predicate and same object', function() {
+
+    var triple1
+      , triple2;
+
+    beforeEach(function(done) {
+      triple1 = { subject: 'a', predicate: 'b', object: 'c' };
+      triple2 = { subject: 'a2', predicate: 'b', object: 'c' };
+      db.put([triple1, triple2], done);
+    });
+
+    it('should get one by specifiying the subject', function(done) {
+      db.get({ subject: 'a' }, function(err, list) {
+        expect(list).to.eql([triple1]);
+        done();
+      });
+    });
+
+    it('should get one by specifiying the exact triple', function(done) {
+      db.get({ subject: 'a', predicate: 'b', object: 'c'}, function(err, list) {
+        expect(list).to.eql([triple1]);
+        done();
+      });
+    });
+
+    it('should get one by specifiying the subject and a falsy predicate', function(done) {
+      db.get({ subject: 'a', predicate: null }, function(err, list) {
+        expect(list).to.eql([triple1]);
+        done();
+      });
+    });
+
+    it('should get two by specifiying the predicate', function(done) {
+      db.get({ predicate: 'b' }, function(err, list) {
+        expect(list).to.eql([triple1, triple2]);
+        done();
+      });
+    });
+
+    it('should get two by specifiying the predicate and a falsy subject', function(done) {
+      db.get({ subject: null, predicate: 'b' }, function(err, list) {
+        expect(list).to.eql([triple1, triple2]);
+        done();
+      });
+    });
+
+    it('should remove one and still return the other', function(done) {
+      db.del(triple2, function() {
+        db.get({ predicate: 'b' }, function(err, list) {
+          expect(list).to.eql([triple1]);
+          done();
+        });
+      });
+    });
+
+    it('should return both triples through the getStream interface', function(done) {
+      var triples = [triple1, triple2]
+        , stream = db.getStream({ predicate: 'b' });
+      stream.on('data', function(data) {
+        expect(data).to.eql(triples.shift());
+      });
+
+      stream.on('end', done);
+    });
+
+    it('should return only one triple with limit 1', function(done) {
+      db.get({ predicate: 'b', limit: 1 }, function(err, list) {
+        expect(list).to.eql([triple1]);
+        done();
+      });
+    });
+
+    it('should return two triples with limit 2', function(done) {
+      db.get({ predicate: 'b', limit: 2 }, function(err, list) {
+        expect(list).to.eql([triple1, triple2]);
+        done();
+      });
+    });
+
+    it('should return three triples with limit 3', function(done) {
+      db.get({ predicate: 'b', limit: 3 }, function(err, list) {
+        expect(list).to.eql([triple1, triple2]);
+        done();
+      });
+    });
+
+    it('should support limit over streams', function(done) {
+      var triples = [triple1]
+        , stream = db.getStream({ predicate: 'b', limit: 1 });
+      stream.on('data', function(data) {
+        expect(data).to.eql(triples.shift());
+      });
+
+      stream.on('end', done);
+    });
+
+    it('should return only one triple with offset 1', function(done) {
+      db.get({ predicate: 'b', offset: 1 }, function(err, list) {
+        expect(list).to.eql([triple2]);
+        done();
+      });
+    });
+
+    it('should return only no triples with offset 2', function(done) {
+      db.get({ predicate: 'b', offset: 2 }, function(err, list) {
+        expect(list).to.eql([]);
+        done();
+      });
+    });
+
+    it('should support offset over streams', function(done) {
+      var triples = [triple2]
+        , stream = db.getStream({ predicate: 'b', offset: 1 });
+      stream.on('data', function(data) {
+        expect(data).to.eql(triples.shift());
+      });
+
+      stream.on('end', done);
+    });
+
+    it('should return the triples in reverse order with reverse true', function(done) {
+      db.get({ predicate: 'b', reverse: true }, function(err, list) {
+        expect(list).to.eql([triple2, triple1]);
+        done();
+      });
+    });
+
+    it('should return the last triple with reverse true and limit 1', function(done) {
+      db.get({ predicate: 'b', reverse: true, limit: 1 }, function(err, list) {
+        expect(list).to.eql([triple2]);
+        done();
+      });
+    });
+
+    it('should support reverse over streams', function(done) {
+      var triples = [triple2, triple1]
+        , stream = db.getStream({ predicate: 'b', reverse: true });
+      stream.on('data', function(data) {
+        expect(data).to.eql(triples.shift());
+      });
+
+      stream.on('end', done);
+    });
+  });
+
   describe('with 10 triples inserted', function() {
     beforeEach(function (done) {
       var triples = [];
