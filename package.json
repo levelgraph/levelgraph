@@ -65,7 +65,7 @@
     "readable-stream": "~1.0.17",
     "level-write-stream": "~1.0.0",
     "levelup": ">= 0.10.0 < 0.20.0",
-    "leveldown": "> 0.7.0 < 0.11.0",
+    "leveldown": "^1.0.6",
     "level-js": "~2.1.6"
   },
   "browser": {
