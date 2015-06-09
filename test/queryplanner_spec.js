@@ -14,9 +14,11 @@ describe('query planner', function() {
 
     beforeEach(function() {
       db = {
-        approximateSize: function() {}
+        db: {
+          approximateSize: function() {}
+        }
       };
-      stub = sinon.stub(db, 'approximateSize');
+      stub = sinon.stub(db.db, 'approximateSize');
       planner = queryplanner(db, { joinAlgorithm: algorithm });
     });
   }
@@ -87,11 +89,11 @@ describe('query planner', function() {
         , stream: JoinStream
       }];
 
-      db.approximateSize
+      db.db.approximateSize
         .withArgs('pos::friend::', 'pos::friend::'+upperBoundChar)
         .yields(null, 10);
 
-      db.approximateSize
+      db.db.approximateSize
         .withArgs('pso::friend::matteo::', 'pso::friend::matteo::'+upperBoundChar)
         .yields(null, 1);
 
@@ -506,8 +508,7 @@ describe('query planner', function() {
   describe('without approximateSize', function() {
     beforeEach(function() {
       db = {
-        approximateSize: function(a, b, cb) {
-          cb(new Error('not implemented'));
+        db: {
         }
       };
       planner = queryplanner(db, { joinAlgorithm: 'sort' });
