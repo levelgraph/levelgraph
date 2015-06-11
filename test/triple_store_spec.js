@@ -589,21 +589,6 @@ describe('deferred open support', function() {
     db.close(done);
   });
 
-  it('should call the callback if a level is passed', function(done) {
-    db = levelgraph(level(), done);
-  });
-
-  it('should call the callback if a level is not passed', function(done) {
-    db = levelgraph(path.join(osenv.tmpdir(), '_levelDeferred1'), done);
-  });
-
-  it('should call the callback with a levelgrap', function(done) {
-    db = levelgraph(level(), function(err, graphdb) {
-      expect(graphdb).to.be.equal(db);
-      done();
-    });
-  });
-
   it('should support deferred search', function(done) {
     db = levelgraph(level());
     db.search([{ predicate: 'likes' }], function() {

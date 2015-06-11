@@ -65,7 +65,7 @@ http://nodejsconf.it.
 ### On Node.js
 
 ```
-npm install levelgraph --save
+npm install levelgraph level-browserify --save
 ```
 
 At the moment it requires node v0.10.x, but the port to node v0.8.x
@@ -78,6 +78,8 @@ Just download
 [levelgraph.min.js](https://github.com/mcollina/levelgraph/blob/master/build/levelgraph.min.js)
 and you are done!
 
+Alternatively, you can use [browserify](http://browserify.org/).
+
 ## Usage
 
 The LevelGraph API remains the same for Node.js and the browsers,
@@ -85,8 +87,11 @@ however the initialization change slightly.
 
 Initializing a database is very easy:
 ```javascript
-var levelgraph = require("levelgraph"); // not needed in the Browser
-var db = levelgraph("yourdb");
+var level = require("level-browserify");
+var levelgraph = require("levelgraph");
+
+// just use this in the browser with the provided bundle
+var db = levelgraph(level("yourdb"));
 ```
 
 ### Get and Put
@@ -665,7 +670,7 @@ href="https://github.com/jez0990">GitHub/jez0990</a></td></tr>
 
 ## LICENSE - "MIT License"
 
-Copyright (c) 2013-2014 Matteo Collina and LevelGraph Contributors
+Copyright (c) 2013-2015 Matteo Collina and LevelGraph Contributors
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
