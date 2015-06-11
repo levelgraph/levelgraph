@@ -1,6 +1,6 @@
 {
   "name": "levelgraph",
-  "version": "0.10.5",
+  "version": "1.0.0",
   "description": "A graph database for Node.js and the browser built on top of LevelUp",
   "main": "lib/levelgraph.js",
   "scripts": {
@@ -33,11 +33,6 @@
     "triples",
     "triple"
   ],
-  "engines": {
-    "node": ">= 0.10 < 0.13",
-    "npm": ">= 1.4.0",
-    "iojs": ">= 1.0.0"
-  },
   "author": "Matteo Collina <hello@matteocollina.com>",
   "license": "MIT",
   "devDependencies": {
