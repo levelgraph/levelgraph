@@ -3,7 +3,7 @@ var levelgraph = require('../lib/levelgraph')
   , level = require('level-test')()
   , osenv = require('osenv');
 
-describe.only('a multileveled triple store', function() {
+describe('a multileveled triple store', function() {
 
   var db, graph, leveldb, server, client;
 
