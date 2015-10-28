@@ -4,6 +4,7 @@ node_js:
   - "0.12"
   - iojs-1
   - iojs-2
+  - "4"
 script:
   - npm run coverage
   - npm run publish-coverage
