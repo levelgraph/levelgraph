@@ -450,6 +450,15 @@ var putBatch = db.generateBatch(triple);
 var delBatch = db.generateBatch(triple, 'del');
 ```
 
+### Generate levelup query
+
+Return the leveldb query for the given triple.
+
+```js
+var query = db.createQuery({ predicate: "b"});
+leveldb.createReadStream(query);
+```
+
 ## Navigator API
 
 The Navigator API is a fluent API for LevelGraph, loosely inspired by
