@@ -49,6 +49,7 @@ http://nodejsconf.it.
   * [Filtering](#filtering)
   * [Putting and Deleting through Streams](#putting-and-deleting-through-streams)
   * [Generate batch operations](#generate-batch-operations)
+  * [Generate levelup query](#generate-levelup-query)
 * [Navigator API](#navigator-api)
 * [LevelUp integration](#levelup-integration)
 * [Browserify](#browserify)
@@ -448,6 +449,15 @@ var putBatch = db.generateBatch(triple);
 
 // Produces a batch of del operations
 var delBatch = db.generateBatch(triple, 'del');
+```
+
+### Generate levelup query
+
+Return the leveldb query for the given triple.
+
+```js
+var query = db.createQuery({ predicate: "b"});
+leveldb.createReadStream(query);
 ```
 
 ## Navigator API
