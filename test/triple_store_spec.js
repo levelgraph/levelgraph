@@ -164,7 +164,7 @@ describe('a basic triple store', function() {
         db.get({subject: 'a'}, function (err, values) {
           expect(values).to.have.lengthOf(1);
           done();
-        })
+        });
       });
     });
     it('should support string contain \\::', function (done) {
@@ -174,7 +174,7 @@ describe('a basic triple store', function() {
         db.get({subject: 'a'}, function (err, values) {
           expect(values).to.have.lengthOf(1);
           done();
-        })
+        });
       });
     });
     it('should support string end with :', function (done) {
@@ -185,7 +185,7 @@ describe('a basic triple store', function() {
           expect(values).to.have.lengthOf(1);
           expect(values[0].subject).to.equal('a:');
           done();
-        })
+        });
       });
     });
     it('should support string end with \\', function (done) {
@@ -196,7 +196,7 @@ describe('a basic triple store', function() {
           expect(values).to.have.lengthOf(1);
           expect(values[0].subject).to.equal('a\\');
           done();
-        })
+        });
       });
     });
   });
