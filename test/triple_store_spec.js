@@ -156,6 +156,51 @@ describe('a basic triple store', function() {
     });
   });
 
+  describe('with special characters', function () {
+    it('should support string contain ::', function (done) {
+      var t1 = {subject: 'a', predicate: 'b', object: 'c'};
+      var t2 = {subject: 'a::a::a', predicate: 'b', object: 'c'};
+      db.put([t1, t2], function () {
+        db.get({subject: 'a'}, function (err, values) {
+          expect(values).to.have.lengthOf(1);
+          done();
+        })
+      });
+    });
+    it('should support string contain \\::', function (done) {
+      var t1 = {subject: 'a', predicate: 'b', object: 'c'};
+      var t2 = {subject: 'a\\::a', predicate: 'b', object: 'c'};
+      db.put([t1, t2], function () {
+        db.get({subject: 'a'}, function (err, values) {
+          expect(values).to.have.lengthOf(1);
+          done();
+        })
+      });
+    });
+    it('should support string end with :', function (done) {
+      var t1 = {subject: 'a', predicate: 'b', object: 'c'};
+      var t2 = {subject: 'a:', predicate: 'b', object: 'c'};
+      db.put([t1, t2], function () {
+        db.get({subject: 'a:'}, function (err, values) {
+          expect(values).to.have.lengthOf(1);
+          expect(values[0].subject).to.equal('a:');
+          done();
+        })
+      });
+    });
+    it('should support string end with \\', function (done) {
+      var t1 = {subject: 'a', predicate: 'b', object: 'c'};
+      var t2 = {subject: 'a\\', predicate: 'b', object: 'c'};
+      db.put([t1, t2], function () {
+        db.get({subject: 'a\\'}, function (err, values) {
+          expect(values).to.have.lengthOf(1);
+          expect(values[0].subject).to.equal('a\\');
+          done();
+        })
+      });
+    });
+  });
+
   it('should put a triple with an object to false', function(done) {
     var t = { subject: 'a', predicate: 'b', object: false };
     db.put(t, function() {
