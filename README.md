@@ -1,4 +1,4 @@
-LevelGraph&nbsp;&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/levelgraph.png)](https://travis-ci.org/mcollina/levelgraph)&nbsp;[![Coverage Status](https://coveralls.io/repos/mcollina/levelgraph/badge.png)](https://coveralls.io/r/mcollina/levelgraph)&nbsp;[![Dependency Status](https://david-dm.org/mcollina/levelgraph.png?theme=shields.io)](https://david-dm.org/mcollina/levelgraph)
+LevelGraph&nbsp;&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/levelgraph.svg)](https://travis-ci.org/mcollina/levelgraph)&nbsp;[![Coverage Status](https://coveralls.io/repos/mcollina/levelgraph/badge.svg)](https://coveralls.io/r/mcollina/levelgraph)&nbsp;[![Dependency Status](https://david-dm.org/mcollina/levelgraph.svg?theme=shields.io)](https://david-dm.org/mcollina/levelgraph)
 ===========
 
 ![Logo](https://github.com/mcollina/node-levelgraph/raw/master/logo.png)
