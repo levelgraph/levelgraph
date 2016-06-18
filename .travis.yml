@@ -1,14 +1,21 @@
 language: node_js
 sudo: false
-node_js:
-  - "0.10"
-  - "0.12"
-  - "4"
-  - "5"
+matrix:
+  include:
+    - node_js: '0.10'
+      env: NO_WEB=1
+    - node_js: '0.12'
+      env: NO_WEB=1
+    - node_js: '4'
+      env: NO_WEB=1
+    - node_js: '5'
+      env: NO_WEB=1
+    - node_js: '6'
+      env: NO_WEB=1
+    - node_js: '4'
+      env: NO_WEB=
 script:
-  - npm run coverage
-  - npm run publish-coverage
-  - test $SAUCE_USERNAME && npm run zuul || echo 'not running on saucelabs'
+  - test $NO_WEB && (npm run coverage && npm run publish-coverage) || test $SAUCE_USERNAME && npm run zuul || echo 'not running on saucelabs'
 env:
   global:
   - secure: Cuq9z31FxXAqpeT8cg58PK1qVSu6GQ6oVRRS5HqLRPxVPdz6yZSsM8VbDP+fC4EMeLihdnjTxQ4QoxGHhpNZjY2P+lX5nCZMvclW7lU7puuXOn0EAzFMMLFZiz28w1HyZSudDfyKN9jN15mYxEqUyJIqMIn6sLVnaCu/Okq8XbQ=
