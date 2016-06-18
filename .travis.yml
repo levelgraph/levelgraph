@@ -12,13 +12,13 @@ env:
 matrix:
   exclude:
     - node: 0.10
-      env: WEB=1
+      env: NO_WEB=
     - node: 0.12
-      env: WEB=1
+      env: NO_WEB=
     - node: 5
-      env: WEB=1
+      env: NO_WEB=
     - node: 6
-      env: WEB=1
+      env: NO_WEB=
 script:
   - test $NO_WEB && (npm run coverage && npm run publish-coverage) || test $SAUCE_USERNAME && npm run zuul || echo 'not running on saucelabs'
 env:
