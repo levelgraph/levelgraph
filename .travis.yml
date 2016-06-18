@@ -7,8 +7,8 @@ node_js:
   - "5"
   - "6"
 env:
-  - WEB=0
-  - WEB=1
+  - NO_WEB=1
+  - NO_WEB=
 matrix:
   exclude:
     - node: 0.10
@@ -20,7 +20,7 @@ matrix:
     - node: 6
       env: WEB=1
 script:
-  - test $WEB = 0 && (npm run coverage && npm run publish-coverage) || test $SAUCE_USERNAME && npm run zuul || echo 'not running on saucelabs'
+  - test $NO_WEB && (npm run coverage && npm run publish-coverage) || test $SAUCE_USERNAME && npm run zuul || echo 'not running on saucelabs'
 env:
   global:
   - secure: Cuq9z31FxXAqpeT8cg58PK1qVSu6GQ6oVRRS5HqLRPxVPdz6yZSsM8VbDP+fC4EMeLihdnjTxQ4QoxGHhpNZjY2P+lX5nCZMvclW7lU7puuXOn0EAzFMMLFZiz28w1HyZSudDfyKN9jN15mYxEqUyJIqMIn6sLVnaCu/Okq8XbQ=
