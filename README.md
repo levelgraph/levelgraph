@@ -681,7 +681,7 @@ href="https://github.com/jez0990">GitHub/jez0990</a></td></tr>
 
 ## LICENSE - "MIT License"
 
-Copyright (c) 2013-2015 Matteo Collina and LevelGraph Contributors
+Copyright (c) 2013-2016 Matteo Collina and LevelGraph Contributors
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
