@@ -23,7 +23,6 @@ describe('createQuery', function() {
     db.get({ predicate: 'b' }, function(err, res) {
       leveldb.createValueStream(db.createQuery({ predicate: 'b' }))
         .on('data', function(data) {
-          console.log(data, res);
           expect([data]).to.eql(res);
           done();
         })
