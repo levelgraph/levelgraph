@@ -14,7 +14,7 @@ __LevelGraph__ is built on the uber-fast key-value store
 [LevelDB](http://code.google.com/p/leveldb/) through the powerful
 [LevelUp](https://github.com/rvagg/node-levelup) library.
 You can use it inside your node.js application or in any
-IndexedDB-powered Browser. PhoneGap support coming soon (late fall).
+IndexedDB-powered Browser.
 
 __LevelGraph__ loosely follows the __Hexastore__ approach as presented in the article:
 [Hexastore: sextuple indexing for semantic web data management
@@ -22,6 +22,10 @@ C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
 2008](http://www.vldb.org/pvldb/1/1453965.pdf).
 Following this approach, __LevelGraph__ uses six indices for every triple,
 in order to access them as fast as it is possible.
+
+__LevelGraph__ was presented in the paper [Graph databases in the
+browser: using LevelGraph
+to explore New Delhi - A. Maccioni, M. Collina - Proceedings of the VLDB Endowment, 2016](http://www.vldb.org/pvldb/vol9/p1469-maccioni.pdf).
 
 Check out a [slideshow](http://nodejsconfit.levelgraph.io)
 that introduces you to LevelGraph by
