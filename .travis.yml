@@ -8,8 +8,6 @@ matrix:
       env: NO_WEB=1
     - node_js: '4'
       env: NO_WEB=1
-    - node_js: '5'
-      env: NO_WEB=1
     - node_js: '6'
       env: NO_WEB=1
     - node_js: '4'
