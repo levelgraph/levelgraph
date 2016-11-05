@@ -53,7 +53,7 @@ describe('a multileveled triple store', function() {
   });
 
   it('should do a join with two results', function(done) {
-    graph.put(require('./fixture/foaf'), function(done) {
+    graph.put(require('./fixture/foaf'), function() {
       graph.search([{
         subject: graph.v('x'),
         predicate: 'friend',
