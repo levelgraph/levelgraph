@@ -29,6 +29,18 @@ module.exports = function(joinAlgorithm) {
     });
   });
 
+  it('should support non-array search parameter', function(done) {
+    db.search({
+      subject: db.v('x'),
+      predicate: 'friend',
+      object: 'daniele'
+    }, function(err, results) {
+      expect(results).to.have.property('length', 1);
+      expect(results[0]).to.have.property('x', 'matteo');
+      done();
+    });
+  });
+
   it('should do a join with two results', function(done) {
     db.search([{
       subject: db.v('x'),
