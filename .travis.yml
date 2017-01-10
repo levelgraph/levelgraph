@@ -2,13 +2,11 @@ language: node_js
 sudo: false
 matrix:
   include:
-    - node_js: '0.10'
-      env: NO_WEB=1
-    - node_js: '0.12'
-      env: NO_WEB=1
     - node_js: '4'
       env: NO_WEB=1
     - node_js: '6'
+      env: NO_WEB=1
+    - node_js: '7'
       env: NO_WEB=1
     - node_js: '4'
       env: NO_WEB=
