@@ -1,6 +1,6 @@
 
 var levelgraph = require('../lib/levelgraph');
-var level = require('level-test')();
+var level = require('memdb');
 
 module.exports = function(joinAlgorithm) {
 
@@ -23,6 +23,18 @@ module.exports = function(joinAlgorithm) {
       predicate: 'friend',
       object: 'daniele'
     }], function(err, results) {
+      expect(results).to.have.property('length', 1);
+      expect(results[0]).to.have.property('x', 'matteo');
+      done();
+    });
+  });
+
+  it('should support non-array search parameter', function(done) {
+    db.search({
+      subject: db.v('x'),
+      predicate: 'friend',
+      object: 'daniele'
+    }, function(err, results) {
       expect(results).to.have.property('length', 1);
       expect(results[0]).to.have.property('x', 'matteo');
       done();
