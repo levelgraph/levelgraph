@@ -43,7 +43,7 @@
     "jshint": "^2.9.2",
     "level-browserify": "^1.0.1",
     "level-sublevel": "^6.4.6",
-    "level-test": "^2.0.0",
+    "memdb": "^1.3.1",
     "mocha": "^2.2.5",
     "multilevel": "^7.2.0",
     "osenv": "^0.1.0",

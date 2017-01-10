@@ -1,6 +1,6 @@
 
 var levelgraph = require('../lib/levelgraph')
-  , level = require('level-test')(),
+  , level = require('memdb'),
   os = require('os'),
   path = require('path');
 

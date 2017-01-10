@@ -1,6 +1,6 @@
 
 var levelgraph = require('../lib/levelgraph')
-  , level = require('level-test')()
+  , level = require('memdb')
   , osenv = require('osenv');
 
 module.exports = function(sublevel) {

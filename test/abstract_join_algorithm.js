@@ -1,6 +1,6 @@
 
 var levelgraph = require('../lib/levelgraph');
-var level = require('level-test')();
+var level = require('memdb');
 
 module.exports = function(joinAlgorithm) {
 
