@@ -32,6 +32,8 @@ that introduces you to LevelGraph by
 [@matteocollina](http://twitter.com/matteocollina) at
 http://nodejsconf.it.
 
+Also, give the [LevelGraph Playground](http://bigbluehat.github.io/levelgraph-playground) to get a quick feel for adding JSON-LD and N3/Turtle documents to a filter-able subject, predicate, object table. The `db` variable in the browser console is very useful for checking out the full power of LevelGraph.
+
 **LevelGraph** is an **OPEN Open Source Project**, see the <a href="#contributing">Contributing</a> section to find out what this means.
 
 
