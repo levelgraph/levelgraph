@@ -10,6 +10,8 @@ matrix:
       env: NO_WEB=1
     - node_js: '4'
       env: NO_WEB=
+    - node_js: '8'
+      env: NO_WEB=1
 script:
   - if test $NO_WEB; then (npm run coverage && npm run publish-coverage) else if test $SAUCE_USERNAME; then  npm run zuul; else echo 'not running on saucelabs'; fi; fi
 env:
