@@ -1,6 +1,6 @@
 {
   "name": "levelgraph",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "A graph database for Node.js and the browser built on top of LevelUp",
   "main": "lib/levelgraph.js",
   "scripts": {
