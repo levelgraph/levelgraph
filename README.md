@@ -1,7 +1,7 @@
-LevelGraph&nbsp;&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/levelgraph.svg)](https://travis-ci.org/mcollina/levelgraph)&nbsp;[![Coverage Status](https://coveralls.io/repos/mcollina/levelgraph/badge.svg)](https://coveralls.io/r/mcollina/levelgraph)&nbsp;[![Dependency Status](https://david-dm.org/mcollina/levelgraph.svg?theme=shields.io)](https://david-dm.org/mcollina/levelgraph)
+LevelGraph&nbsp;&nbsp;&nbsp;[![Build Status](https://travis-ci.org/levelgraph/levelgraph.svg)](https://travis-ci.org/levelgraph/levelgraph)&nbsp;[![Coverage Status](https://coveralls.io/repos/levelgraph/levelgraph/badge.svg)](https://coveralls.io/r/levelgraph/levelgraph)&nbsp;[![Dependency Status](https://david-dm.org/levelgraph/levelgraph.svg?theme=shields.io)](https://david-dm.org/levelgraph/levelgraph)
 ===========
 
-![Logo](https://github.com/mcollina/node-levelgraph/raw/master/logo.png)
+![Logo](https://github.com/levelgraph/node-levelgraph/raw/master/logo.png)
 
 [![NPM](https://nodei.co/npm/levelgraph.png)](https://nodei.co/npm/levelgraph/)
 
@@ -82,7 +82,7 @@ If you need it, just open a pull request.
 ### In the Browser
 
 Just download
-[levelgraph.min.js](https://github.com/mcollina/levelgraph/blob/master/build/levelgraph.min.js)
+[levelgraph.min.js](https://github.com/levelgraph/levelgraph/blob/master/build/levelgraph.min.js)
 and you are done!
 
 Alternatively, you can use [browserify](http://browserify.org/).
@@ -617,8 +617,8 @@ Follow the [Testling install instructions](https://github.com/substack/testling#
 ## RDF support
 
 __LevelGraph__ does not support out of the box loading serialized RDF or storing it. Such functionality is provided by extensions:
-* [LevelGraph-N3](https://github.com/mcollina/levelgraph-n3) - __N3/Turtle__
-* [LevelGraph-JSONLD](https://github.com/mcollina/levelgraph-jsonld) - __JSON-LD__
+* [LevelGraph-N3](https://github.com/levelgraph/levelgraph-n3) - __N3/Turtle__
+* [LevelGraph-JSONLD](https://github.com/levelgraph/levelgraph-jsonld) - __JSON-LD__
 
 ## Extensions
 
@@ -649,9 +649,9 @@ Here are some ideas:
 * [x] Added a Sort-Join algorithm.
 * [ ] Add more database operators (grouping, filtering).
 * [x] Browser support
-  [#10](https://github.com/mcollina/levelgraph/issues/10)
+  [#10](https://github.com/levelgraph/levelgraph/issues/10)
 * [ ] Live searches
-  [#3](https://github.com/mcollina/node-levelgraph/issues/3)
+  [#3](https://github.com/levelgraph/node-levelgraph/issues/3)
 * Extensions
   * [ ] RDFa
   * [ ] RDF/XML
@@ -663,7 +663,7 @@ LevelGraph is an **OPEN Open Source Project**. This means that:
 
 > Individuals making significant and valuable contributions are given commit-access to the project to contribute as they see fit. This project is more like an open wiki than a standard guarded open source project.
 
-See the [CONTRIBUTING.md](https://github.com/mcollina/levelgraph/blob/master/CONTRIBUTING.md) file for more details.
+See the [CONTRIBUTING.md](https://github.com/levelgraph/levelgraph/blob/master/CONTRIBUTING.md) file for more details.
 
 ## Credits
 
