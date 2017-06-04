@@ -17,3 +17,5 @@ npm-debug.log
 docs
 .DS_Store
 coverage
+
+package-lock.json
