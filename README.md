@@ -19,7 +19,7 @@ IndexedDB-powered Browser.
 __LevelGraph__ loosely follows the __Hexastore__ approach as presented in the article:
 [Hexastore: sextuple indexing for semantic web data management
 C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
-2008](http://www.vldb.org/pvldb/1/1453965.pdf).
+2008](https://sci-hub.se/10.14778/1453856.1453965).
 Following this approach, __LevelGraph__ uses six indices for every triple,
 in order to access them as fast as it is possible.
 
