@@ -514,7 +514,7 @@ describe('a basic triple store', function() {
     var t1 = { subject: 'a', predicate: 'b', object: 'c' };
     var t2 = { subject: 'a', predicate: 'b', object: 'd' };
     var stream = db.putStream();
-    stream.on('close', done);
+    stream.on('end', done);
 
     stream.write(t1);
     stream.end(t2);
@@ -528,7 +528,7 @@ describe('a basic triple store', function() {
     stream.write(t1);
     stream.end(t2);
 
-    stream.on('close', function() {
+    stream.on('end', function() {
       var triples = [t1, t2];
       var readStream = db.getStream({ predicate: 'b' });
 
@@ -548,13 +548,13 @@ describe('a basic triple store', function() {
     stream.write(t1);
     stream.end(t2);
 
-    stream.on('close', function() {
+    stream.on('end', function() {
 
       var delStream = db.delStream();
       delStream.write(t1);
       delStream.end(t2);
 
-      delStream.on('close', function() {
+      delStream.on('end', function() {
         var readStream = db.getStream({ predicate: 'b' });
 
         var results = [];
