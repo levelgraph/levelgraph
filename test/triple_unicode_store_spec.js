@@ -324,7 +324,7 @@ describe('a basic unicode triple store', function() {
     var t1 = { subject: '车', predicate: '是', object: '交通工具' };
     var t2 = { subject: '车', predicate: '是', object: '动物' };
     var stream = db.putStream();
-    stream.on('close', done);
+    stream.on('end', done);
 
     stream.write(t1);
     stream.end(t2);
@@ -338,7 +338,7 @@ describe('a basic unicode triple store', function() {
     stream.write(t1);
     stream.end(t2);
 
-    stream.on('close', function() {
+    stream.on('end', function() {
       var triples = [t1, t2];
       var readStream = db.getStream({ predicate: '是' });
 
@@ -358,13 +358,13 @@ describe('a basic unicode triple store', function() {
     stream.write(t1);
     stream.end(t2);
 
-    stream.on('close', function() {
+    stream.on('end', function() {
 
       var delStream = db.delStream();
       delStream.write(t1);
       delStream.end(t2);
 
-      delStream.on('close', function() {
+      delStream.on('end', function() {
         var readStream = db.getStream({ predicate: '是' });
 
         var results = [];
