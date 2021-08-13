@@ -60,6 +60,7 @@
     "inherits": "^2.0.1",
     "level-ws": "^0.1.0",
     "lodash.keys": "^4.0.6",
+    "multileveldown": "^2.2.0",
     "pump": "^1.0.1",
     "readable-stream": "^2.2.10",
     "steed": "^1.1.3",
