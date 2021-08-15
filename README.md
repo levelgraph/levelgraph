@@ -1,7 +1,7 @@
 LevelGraph&nbsp;&nbsp;&nbsp;[![Dependency Status](https://david-dm.org/levelgraph/levelgraph.svg?theme=shields.io)](https://david-dm.org/levelgraph/levelgraph)
 ===========
 
-![Logo](https://github.com/levelgraph/levelgraph/raw/master/logo.png)
+![Logo](https://raw.githubusercontent.com/levelgraph/levelgraph/master/logo.png)
 
 [![NPM](https://nodei.co/npm/levelgraph.png)](https://nodei.co/npm/levelgraph/)
 
