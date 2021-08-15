@@ -1,13 +1,9 @@
-LevelGraph&nbsp;&nbsp;&nbsp;[![Build Status](https://travis-ci.org/levelgraph/levelgraph.svg)](https://travis-ci.org/levelgraph/levelgraph)&nbsp;[![Coverage Status](https://coveralls.io/repos/levelgraph/levelgraph/badge.svg)](https://coveralls.io/r/levelgraph/levelgraph)&nbsp;[![Dependency Status](https://david-dm.org/levelgraph/levelgraph.svg?theme=shields.io)](https://david-dm.org/levelgraph/levelgraph)
+LevelGraph&nbsp;&nbsp;&nbsp;[![Dependency Status](https://david-dm.org/levelgraph/levelgraph.svg?theme=shields.io)](https://david-dm.org/levelgraph/levelgraph)
 ===========
 
 ![Logo](https://github.com/levelgraph/levelgraph/raw/master/logo.png)
 
 [![NPM](https://nodei.co/npm/levelgraph.png)](https://nodei.co/npm/levelgraph/)
-
-[![NPM](https://nodei.co/npm-dl/levelgraph.png)](https://nodei.co/npm/levelgraph/)
-
-[![Browser support](https://saucelabs.com/browser-matrix/levelgraph.svg)](https://saucelabs.com/u/levelgraph)
 
 __LevelGraph__ is a Graph Database. Unlike many other graph database,
 __LevelGraph__ is built on the uber-fast key-value store
