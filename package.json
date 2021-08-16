@@ -1,6 +1,6 @@
 {
   "name": "levelgraph",
-  "version": "2.1.1",
+  "version": "3.0.0",
   "description": "A graph database for Node.js and the browser built on top of LevelUp",
   "main": "lib/levelgraph.js",
   "scripts": {
@@ -36,33 +36,33 @@
   "author": "Matteo Collina <hello@matteocollina.com>",
   "license": "MIT",
   "devDependencies": {
-    "browserify": "^14.0.1",
-    "chai": "^3.0.0",
-    "coveralls": "^2.13.1",
-    "istanbul": "^0.4.3",
-    "jshint": "^2.9.2",
+    "browserify": "^17.0.0",
+    "chai": "^4.3.4",
+    "coveralls": "^3.1.1",
+    "istanbul": "^0.4.5",
+    "jshint": "^2.13.1",
     "level": "^7.0.0",
     "level-sublevel": "^6.6.5",
     "memdb": "^1.3.1",
-    "mocha": "^3.4.2",
-    "multilevel": "^7.2.4",
+    "mocha": "^9.0.3",
+    "multilevel": "^7.2.3",
     "osenv": "^0.1.5",
-    "pre-commit": "^1.1.3",
+    "pre-commit": "^1.2.2",
     "setimmediate": "^1.0.5",
-    "sinon": "^2.3.2",
-    "sinon-chai": "^2.10.0",
+    "sinon": "^11.1.2",
+    "sinon-chai": "^3.7.0",
     "tmp": "^0.2.1",
-    "uglify-js": "^3.0.15",
-    "zuul": "^3.0.0"
+    "uglify-js": "^3.14.1",
+    "zuul": "^3.12.0"
   },
   "dependencies": {
     "callback-stream": "^1.1.0",
-    "inherits": "^2.0.1",
-    "level-ws": "^0.1.0",
-    "lodash.keys": "^4.0.6",
-    "pump": "^1.0.1",
-    "readable-stream": "^2.2.10",
+    "inherits": "^2.0.4",
+    "level-ws": "^3.0.0",
+    "lodash.keys": "^4.2.0",
+    "pump": "^3.0.0",
+    "readable-stream": "^3.6.0",
     "steed": "^1.1.3",
-    "xtend": "^4.0.0"
+    "xtend": "^4.0.2"
   }
 }
