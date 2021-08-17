@@ -31,37 +31,46 @@ describe('navigator', function() {
 
   it('should follow an arch going in a vertex', function(done) {
     db.nav('davide').archIn('friend').values(function(err, friends) {
-      expect(friends).to.eql(['marco']);
+      expect(friends).to.eql(['daniele', 'marco']);
       done();
     });
   });
 
-  it('should follow multiple archs, in and out a path',
-     function(done) {
+  it('should follow multiple archs, in and out a path', function(done) {
+    var solutions = [ 'matteo', 'davide', 'marco', 'daniele' ];
     db.nav('davide')
       .archIn('friend')
       .archIn('friend')
-      .archOut('friend').
-      values(function(err, friends) {
-
-      expect(friends).to.eql(['marco', 'matteo']);
-      done();
-    });
+      .archOut('friend')
+      .values(function(err, friends) {
+        expect(friends).to.have.length(solutions.length);
+        friends.forEach(function (friend) {
+          expect(solutions.indexOf(friend) >= 0).to.equal(true);
+        });
+        done();
+      });
   });
 
   it('should follow multiple archs, in and out a path using a stream',
      function(done) {
-    var stream = db.nav('davide')
+    var solutions = [ 'matteo', 'davide', 'marco', 'daniele' ]
+      , friends = []
+      , stream = db.nav('davide')
                    .archIn('friend')
                    .archIn('friend')
                    .archOut('friend')
                    .valuesStream();
 
     stream.on('data', function(data) {
-      expect(['marco', 'matteo'].indexOf(data) >= 0).to.equal(true);
+      expect(solutions.indexOf(data) >= 0).to.equal(true);
+      friends.push(data);
     });
 
-    stream.on('end', done);
+
+    stream.on('end', function () {
+      expect(friends).to.have.length(solutions.length);
+      done();
+    });
   });
 
   it('should allow to set the name of the variables',
@@ -104,7 +113,7 @@ describe('navigator', function() {
      function(done) {
     db.nav('daniele').archOut('friend').as('a').
       solutions(function(err, solutions) {
-        expect(solutions).to.eql([{ a: 'marco' }, { a: 'matteo' }]);
+        expect(solutions).to.eql([{ a: 'davide' }, { a: 'marco' }, { a: 'matteo' }]);
         done();
       });
   });
@@ -112,7 +121,7 @@ describe('navigator', function() {
   it('should return the solution as a stream',
      function(done) {
 
-    var solutions = [{ a: 'marco' }, { a: 'matteo' }]
+    var solutions = [{ a: 'davide' }, { a: 'marco' }, { a: 'matteo' }]
 
       , stream = db.nav('daniele')
                    .archOut('friend')
@@ -148,6 +157,10 @@ describe('navigator', function() {
       expect(triples).to.eql([{
         subject: 'daniele',
         predicate: 'friends-of-dani',
+        object: 'davide'
+      }, {
+        subject: 'daniele',
+        predicate: 'friends-of-dani',
         object: 'marco'
       }, {
         subject: 'daniele',
@@ -169,6 +182,10 @@ describe('navigator', function() {
         }
 
       , triples = [{
+          subject: 'daniele',
+          predicate: 'friends-of-dani',
+          object: 'davide'
+        }, {
           subject: 'daniele',
           predicate: 'friends-of-dani',
           object: 'marco'

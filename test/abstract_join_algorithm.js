@@ -77,6 +77,25 @@ module.exports = function(joinAlgorithm) {
     });
   });
 
+  it('should do a join with three variables', function(done) {
+    db.search([{
+      subject: db.v('x'),
+      predicate: 'friend',
+      object: 'davide'
+    }, {
+      subject: db.v('y'),
+      predicate: 'friend',
+      object: db.v('x')
+    }, {
+      subject: db.v('y'),
+      predicate: 'friend',
+      object: db.v('z')
+    }], function (err, results) {
+      expect(results).to.have.length(6);
+      done();
+    });
+  });
+
   it('should return the two solutions through the searchStream interface', function(done) {
     var solutions = [{ x: 'daniele' }, { x: 'lucio' }]
       , stream = db.searchStream([{
@@ -287,6 +306,7 @@ module.exports = function(joinAlgorithm) {
   });
 
   it('should support filtering inside a second-level condition', function(done) {
+    var solutions = [{ x: 'davide', y: 'daniele' }, { x: 'marco', y: 'daniele' }];
     db.search([{
       subject: 'matteo',
       predicate: 'friend',
@@ -299,15 +319,13 @@ module.exports = function(joinAlgorithm) {
         return triple.object !== 'matteo';
       }
     }], function(err, results) {
-      expect(results).to.eql([{
-        'y': 'daniele',
-        'x': 'marco'
-      }]);
+      expect(results).to.eql(solutions);
       done();
     });
   });
 
   it('should support solution filtering', function(done) {
+    var solutions = [{ x: 'davide', y: 'daniele' }, { x: 'marco', y: 'daniele' }];
     db.search([{
       subject: 'matteo',
       predicate: 'friend',
@@ -325,10 +343,7 @@ module.exports = function(joinAlgorithm) {
         }
       }
     }, function(err, results) {
-      expect(results).to.eql([{
-        'y': 'daniele',
-        'x': 'marco'
-      }]);
+      expect(results).to.eql(solutions);
       done();
     });
   });

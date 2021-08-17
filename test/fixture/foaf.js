@@ -9,6 +9,10 @@ module.exports = [{
 }, {
   subject: "daniele",
   predicate: "friend",
+  object: "davide"
+}, {
+  subject: "daniele",
+  predicate: "friend",
   object: "marco"
 }, {
   subject: "lucio",
