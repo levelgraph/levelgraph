@@ -587,7 +587,9 @@ LevelDB with [SubLevel](http://npm.im/level-sublevel):
 var levelup = require("level");
 var sublevel = require("level-sublevel");
 var levelgraph = require("levelgraph");
-var db = sublevel(levelup("yourdb"));
+var db = sublevel(levelup("yourdb"), {
+  valueEncoding: 'json'
+});
 var graph = levelgraph(db.sublevel('graph'));
 ```
 
