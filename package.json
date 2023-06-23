@@ -58,7 +58,7 @@
   "dependencies": {
     "callback-stream": "^1.1.0",
     "inherits": "^2.0.4",
-    "level-ws": "^3.0.0",
+    "level-ws": "^4.0.0",
     "lodash.keys": "^4.2.0",
     "pump": "^3.0.0",
     "readable-stream": "^4.0.0",
