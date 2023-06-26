@@ -1,5 +1,5 @@
 
-var Variable = require('../lib/variable');
+var Variable = require('../../lib/variable');
 
 describe('Variable', function() {
 

@@ -17,5 +17,6 @@ npm-debug.log
 docs
 .DS_Store
 coverage
+db_test
 
 package-lock.json
