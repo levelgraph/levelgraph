@@ -1,5 +1,5 @@
 
-var levelgraph = require('../lib/levelgraph')
+var levelgraph = require('../../lib/levelgraph')
   , level = require('memdb');
 
 describe('navigator', function() {
@@ -8,7 +8,7 @@ describe('navigator', function() {
 
   beforeEach(function(done) {
     db = levelgraph(level());
-    db.put(require('./fixture/foaf'), done);
+    db.put(require('./../fixture/foaf'), done);
   });
 
   afterEach(function(done) {

@@ -1,6 +1,6 @@
 
-var levelgraph = require('../lib/levelgraph')
-  , createQuery = require('../lib/utilities').createQuery
+var levelgraph = require('../../lib/levelgraph')
+  , createQuery = require('../../lib/utilities').createQuery
   , level = require('memdb')
   , path = require('path')
   , osenv = require('osenv');
