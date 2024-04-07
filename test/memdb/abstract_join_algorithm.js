@@ -1,5 +1,4 @@
-
-var levelgraph = require('../lib/levelgraph');
+var levelgraph = require('../../lib/levelgraph');
 var level = require('level-mem');
 
 module.exports = function(joinAlgorithm) {
@@ -8,7 +7,7 @@ module.exports = function(joinAlgorithm) {
 
   beforeEach(function(done) {
     db = levelgraph(level(), { joinAlgorithm: joinAlgorithm });
-    db.put(require('./fixture/foaf'), done);
+    db.put(require('./../fixture/foaf'), done);
   });
 
   afterEach(function(done) {
@@ -419,7 +418,7 @@ module.exports = function(joinAlgorithm) {
           name: '"Andrei Vlad Sambra"'
         }];
 
-    db.put(require('./fixture/homes_in_paris'), function() {
+    db.put(require('./../fixture/homes_in_paris'), function() {
       db.search([{
         subject: 'http://manu.sporny.org#person',
         predicate: 'http://xmlns.com/foaf/0.1/knows',

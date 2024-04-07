@@ -1,8 +1,7 @@
-
-var levelgraph = require('../lib/levelgraph')
-  , level = require('level-mem'),
-  os = require('os'),
-  path = require('path');
+var levelgraph = require('../../lib/levelgraph')
+  , level = require('level-mem')
+  , os = require('os')
+  , path = require('path');
 
 describe('creation api', function() {
 
