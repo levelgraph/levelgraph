@@ -1,5 +1,5 @@
 var levelgraph = require('../lib/levelgraph')
-  , level = require('memdb');
+  , level = require('level-mem');
 
 describe('a basic triple store', function() {
 

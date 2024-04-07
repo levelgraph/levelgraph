@@ -1,6 +1,6 @@
 var levelgraph = require('../lib/levelgraph')
   , multilevel = require('multilevel')
-  , level = require('memdb')
+  , level = require('level-mem')
   , osenv = require('osenv');
 
 describe('a multileveled triple store', function() {
