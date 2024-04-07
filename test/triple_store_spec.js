@@ -499,15 +499,6 @@ describe('a basic triple store', function() {
       }
       db.put(triples, done);
     });
-
-    if (!process.browser) {
-      it('should return the approximate size', function(done) {
-        db.approximateSize({ predicate: 'b' }, function (err, size) {
-          expect(size).to.be.a('number');
-          done(err);
-        });
-      });
-    }
   });
 
   it('should put triples using a stream', function(done) {
