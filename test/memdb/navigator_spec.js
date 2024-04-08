@@ -1,12 +1,13 @@
 var levelgraph = require('../../lib/levelgraph')
-  , level = require('level-mem');
+  , { MemoryLevel } = require('memory-level')
+  ;
 
 describe('navigator', function() {
 
   var db;
 
   beforeEach(function(done) {
-    db = levelgraph(level());
+    db = levelgraph(new MemoryLevel());
     db.put(require('./../fixture/foaf'), done);
   });
 

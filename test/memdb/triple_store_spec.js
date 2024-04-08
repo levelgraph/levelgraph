@@ -1,5 +1,5 @@
 var levelgraph = require('../../lib/levelgraph')
-  , level = require('level-mem')
+  , { MemoryLevel } = require('memory-level')
   , path = require('path')
   , osenv = require('osenv');
 
@@ -8,7 +8,7 @@ describe('a basic triple store', function() {
   var db, leveldb = leveldb;
 
   beforeEach(function() {
-    leveldb = level();
+    leveldb = new MemoryLevel();
     db = levelgraph(leveldb);
   });
 
@@ -625,7 +625,7 @@ describe('deferred open support', function() {
   });
 
   it('should support deferred search', function(done) {
-    db = levelgraph(level());
+    db = levelgraph(new MemoryLevel());
     db.search([{ predicate: 'likes' }], function() {
       done();
     });
@@ -636,7 +636,7 @@ describe('generateBatch', function () {
   var db, leveldb = leveldb;
 
   beforeEach(function() {
-    leveldb = level();
+    leveldb = new MemoryLevel();
     db = levelgraph(leveldb);
   });
 

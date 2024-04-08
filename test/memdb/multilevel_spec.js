@@ -1,6 +1,6 @@
 var levelgraph = require('../../lib/levelgraph')
-  , multilevel = require('multilevel')
-  , level = require('level-mem')
+  , { MemoryLevel } = require('memory-level')
+  , { ManyLevelHost, ManyLevelGuest } = require('many-level')
   , osenv = require('osenv');
 
 describe('a multileveled triple store', function() {
@@ -8,12 +8,13 @@ describe('a multileveled triple store', function() {
   var db, graph, leveldb, server, client;
 
   beforeEach(function() {
-    db = level();
-    server = multilevel.server(db);
-    client = multilevel.client();
+    db = new MemoryLevel();
+    server = new ManyLevelHost(db)
+    client = new ManyLevelGuest()
     graph = levelgraph(client);
 
-    server.pipe(client.createRpcStream()).pipe(server);
+    var serverStream = server.createRpcStream();
+    serverStream.pipe(client.createRpcStream()).pipe(serverStream);
   });
 
   it('should put a triple', function(done) {

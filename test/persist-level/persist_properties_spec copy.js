@@ -8,7 +8,7 @@ describe('a basic triple store', function() {
   var db;
 
   beforeEach(function() {
-    var bare  = new Level('./db_test', { valueEncoding: 'json' })
+    var bare  = new Level('./db_test')
     db        = levelgraph(bare);
   });
 

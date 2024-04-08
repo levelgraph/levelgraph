@@ -1,12 +1,13 @@
-var levelgraph = require('../../lib/levelgraph');
-var level = require('level-mem');
+var levelgraph = require('../../lib/levelgraph')
+  , { MemoryLevel } = require('memory-level')
+  ;
 
 module.exports = function(joinAlgorithm) {
 
   var db;
 
   beforeEach(function(done) {
-    db = levelgraph(level(), { joinAlgorithm: joinAlgorithm });
+    db = levelgraph(new MemoryLevel(), { joinAlgorithm: joinAlgorithm });
     db.put(require('./../fixture/foaf'), done);
   });
 
