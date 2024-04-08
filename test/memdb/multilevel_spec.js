@@ -9,8 +9,8 @@ describe('a multileveled triple store', function() {
 
   beforeEach(function() {
     db = new MemoryLevel();
-    server = new ManyLevelHost(db)
-    client = new ManyLevelGuest()
+    server = new ManyLevelHost(db);
+    client = new ManyLevelGuest();
     graph = levelgraph(client);
 
     var serverStream = server.createRpcStream();

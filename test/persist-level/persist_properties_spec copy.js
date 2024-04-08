@@ -1,14 +1,14 @@
-var levelgraph = require('../../lib/levelgraph')
+var levelgraph = require('../../lib/levelgraph');
 
 // according to https://github.com/Level/level/blob/master/UPGRADING.md
-const { Level } = require('level')
+const { Level } = require('level');
 
 describe('a basic triple store', function() {
 
   var db;
 
   beforeEach(function() {
-    var bare  = new Level('./db_test')
+    var bare  = new Level('./db_test');
     db        = levelgraph(bare);
   });
 

@@ -11,7 +11,7 @@
     "publish-coverage": "cat coverage/lcov.info | coveralls",
     "ci": "mocha --recursive --bail --watch test",
     "jshint-lib": "jshint lib/*.js",
-    "jshint-test": "jshint test/*.js"
+    "jshint-test": "jshint test/*/*.js"
   },
   "repository": {
     "type": "git",
