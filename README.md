@@ -671,19 +671,19 @@ LevelDB and Snappy are both issued under the [New BSD Licence](http://opensource
 
 LevelGraph is only possible due to the excellent work of the following contributors:
 
-<table><tbody>
-<tr><th align="left">Matteo Collina</th><td><a href="https://github.com/mcollina">GitHub/mcollina</a></td><td><a href="https://twitter.com/matteocollina">Twitter/@matteocollina</a></td></tr>
-<tr><th align="left">Jeremy Taylor</th><td><a
-href="https://github.com/jez0990">GitHub/jez0990</a></td></tr>
-<tr><th align="left">Elf Pavlik</th><td><a href="https://github.com/elf-pavlik">GitHub/elf-pavlik</a></td><td><a href="https://twitter.com/elfpavlik">Twitter/@elfpavlik</a></td></tr>
-<tr><th align="left">Riceball LEE</th><td><a href="https://github.com/snowyu">GitHub/snowyu</a></td><td></td></tr>
-<tr><th align="left">Brian Woodward</th><td><a href="https://github.com/doowb">GitHub/doowb</a></td><td><a href="https://twitter.com/doowb">Twitter/@doowb</a></td></tr>
-<tr><th align="left">Leon Chen</th><td><a href="https://github.com/transcranial">GitHub/transcranial</a></td><td><a href="https://twitter.com/transcranial">Twitter/@transcranial</a></td></tr>
-</tbody></table>
+| Name           | Socials                                                                          |
+|:-------------- | -------------------------------------------------------------------------------- |
+| Matteo Collina | [GitHub/mcollina][gh:mcollina]         [Twitter/@matteocollina][x:matteocollina] |
+| Jeremy Taylor  | [GitHub/jez0990][gh:jez0990]                                                     |
+| Elf Pavlik     | [GitHub/elf-pavlik][gh:elf-pavlik]     [Twitter/@elfpavlik][x:elfpavlik]         |
+| Riceball LEE   | [GitHub/snowyu][gh:snowyu]                                                       |
+| Brian Woodward | [GitHub/doowb][gh:doowb]               [Twitter/@doowb][x:doowb]                 |
+| Leon Chen      | [GitHub/transcranial][gh:transcranial] [Twitter/@transcranial][x:transcranial]   |
+| Yersa Nordman  | [GitHub/finwo][gh:finwo]                                                         |
 
 ## LICENSE - "MIT License"
 
-Copyright (c) 2013-2017 Matteo Collina and LevelGraph Contributors
+Copyright (c) 2013-2024 Matteo Collina and LevelGraph Contributors
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -705,3 +705,15 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
+
+[gh:doowb]: https://github.com/doowb
+[gh:elf-pavlik]: https://github.com/elf-pavlik
+[gh:finwo]: https://github.com/finwo
+[gh:jez0990]: https://github.com/jez0990
+[gh:mcollina]: https://github.com/mcollina
+[gh:snowyu]: https://github.com/snowyu
+[gh:transcranial]: https://github.com/transcranial
+[x:doowb]: https://twitter.com/doowb
+[x:elfpavlik]: https://twitter.com/elfpavlik
+[x:matteocollina]: https://twitter.com/matteocollina
+[x:transcranial]: https://twitter.com/transcranial
