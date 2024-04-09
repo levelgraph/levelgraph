@@ -1,5 +1,7 @@
-LevelGraph&nbsp;&nbsp;&nbsp;[![Dependency Status](https://david-dm.org/levelgraph/levelgraph.svg?theme=shields.io)](https://david-dm.org/levelgraph/levelgraph)
+LevelGraph
 ===========
+
+<!-- &nbsp;&nbsp;&nbsp;[![Dependency Status](https://david-dm.org/levelgraph/levelgraph.svg?theme=shields.io)](https://david-dm.org/levelgraph/levelgraph) -->
 
 ![Logo](https://raw.githubusercontent.com/levelgraph/levelgraph/master/logo.png)
 
