@@ -53,10 +53,10 @@ checking out the full power of LevelGraph.
   * [Filtering](#filtering)
   * [Putting and Deleting through Streams](#putting-and-deleting-through-streams)
   * [Generate batch operations](#generate-batch-operations)
-  * [Generate levelup query](#generate-levelup-query)
+  * [Generate level-read-stream query](#generate-level-read-stream-query)
 * [Navigator API](#navigator-api)
-* [LevelUp integration](#levelup-integration)
-* [Browserify](#browserify)
+* [Plugin integration](#plugin-integration)
+* [Browser usage](#browser-usage)
 * [RDF support](#rdf-support)
 * [Extensions](#extensions)
 * [TODO](#todo)
@@ -585,12 +585,12 @@ db.nav("marco").archIn("friend").as("a").go("matteo").archOut("friend").as("b").
 });
 ```
 
-## LevelUp integration
+## Plugin integration
 
 LevelGraph allows to leverage the full power of all [level][gh:level/level]
 plugins.
 
-Initializing a database with LevelUp support is very easy:
+Initializing a database with plugin support is very easy:
 
 ```javascript
 var { Level }  = require("level");
@@ -685,13 +685,15 @@ See the [CONTRIBUTING.md](https://github.com/levelgraph/levelgraph/blob/master/C
 
 ## Credits
 
-*LevelGraph builds on the excellent work on both the LevelUp community
-and the LevelDB and Snappy teams from Google and additional contributors.
-LevelDB and Snappy are both issued under the [New BSD Licence](http://opensource.org/licenses/BSD-3-Clause).*
+*LevelGraph builds on the excellent work on both the level community and the
+LevelDB and Snappy teams from Google and additional contributors. LevelDB and
+Snappy are both issued under the
+[New BSD Licence](http://opensource.org/licenses/BSD-3-Clause).*
 
 ## Contributors
 
-LevelGraph is only possible due to the excellent work of the following contributors:
+LevelGraph is only possible due to the excellent work of the following
+contributors:
 
 | Name           | Socials                                                                          |
 |:-------------- | -------------------------------------------------------------------------------- |
