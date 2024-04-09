@@ -9,31 +9,31 @@ LevelGraph
 
 __LevelGraph__ is a Graph Database. Unlike many other graph database,
 __LevelGraph__ is built on the uber-fast key-value store
-[LevelDB](http://code.google.com/p/leveldb/) through the powerful
-[LevelUp](https://github.com/rvagg/node-levelup) library.
-You can use it inside your node.js application or in any
+[LevelDB][gh:google/leveldb] through the powerful [level][gh:level/level]
+library. You can use it inside your node.js application or in any
 IndexedDB-powered Browser.
 
-__LevelGraph__ loosely follows the __Hexastore__ approach as presented in the article:
-[Hexastore: sextuple indexing for semantic web data management
-C Weiss, P Karras, A Bernstein - Proceedings of the VLDB Endowment,
+__LevelGraph__ loosely follows the __Hexastore__ approach as presented in the
+article: [Hexastore: sextuple indexing for semantic web data management C Weiss,
+P Karras, A Bernstein - Proceedings of the VLDB Endowment,
 2008](https://sci-hub.se/10.14778/1453856.1453965).
-Following this approach, __LevelGraph__ uses six indices for every triple,
-in order to access them as fast as it is possible.
+Following this approach, __LevelGraph__ uses six indices for every triple, in
+order to access them as fast as it is possible.
 
-__LevelGraph__ was presented in the paper [Graph databases in the
-browser: using LevelGraph
-to explore New Delhi - A. Maccioni, M. Collina - Proceedings of the VLDB Endowment, 2016](http://www.vldb.org/pvldb/vol9/p1469-maccioni.pdf).
+__LevelGraph__ was presented in the paper [Graph databases in the browser: using
+LevelGraph to explore New Delhi - A. Maccioni, M. Collina - Proceedings of the
+VLDB Endowment, 2016](http://www.vldb.org/pvldb/vol9/p1469-maccioni.pdf).
 
-Check out a [slideshow](http://nodejsconfit.levelgraph.io)
-that introduces you to LevelGraph by
-[@matteocollina](http://twitter.com/matteocollina) at
-http://nodejsconf.it.
+Check out a [slideshow](http://nodejsconfit.levelgraph.io) that introduces you
+to LevelGraph by [@matteocollina][x:matteocollina] at http://nodejsconf.it.
 
-Also, give the [LevelGraph Playground](http://wileylabs.github.io/levelgraph-playground) to get a quick feel for adding JSON-LD and N3/Turtle documents to a filter-able subject, predicate, object table. The `db` variable in the browser console is very useful for checking out the full power of LevelGraph.
+Also, give the [LevelGraph Playground][http:playground] to get a quick feel for
+adding JSON-LD and N3/Turtle documents to a filter-able subject, predicate,
+object table. The `db` variable in the browser console is very useful for
+checking out the full power of LevelGraph.
 
-**LevelGraph** is an **OPEN Open Source Project**, see the <a href="#contributing">Contributing</a> section to find out what this means.
-
+**LevelGraph** is an **OPEN Open Source Project**, see the
+[Contributing](#contributing) section to find out what this means.
 
 ## Table of Contents
 
@@ -708,6 +708,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
+[http:playground]: http://wileylabs.github.io/levelgraph-playground
+[gh:google/leveldb]: https://github.com/google/leveldb
+[gh:level/level]: https://github.com/level/level
 [gh:doowb]: https://github.com/doowb
 [gh:elf-pavlik]: https://github.com/elf-pavlik
 [gh:finwo]: https://github.com/finwo
