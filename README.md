@@ -695,15 +695,15 @@ Snappy are both issued under the
 LevelGraph is only possible due to the excellent work of the following
 contributors:
 
-| Name           | Socials                                                                          |
-|:-------------- | -------------------------------------------------------------------------------- |
-| Matteo Collina | [GitHub/mcollina][gh:mcollina]         [Twitter/@matteocollina][x:matteocollina] |
-| Jeremy Taylor  | [GitHub/jez0990][gh:jez0990]                                                     |
-| Elf Pavlik     | [GitHub/elf-pavlik][gh:elf-pavlik]     [Twitter/@elfpavlik][x:elfpavlik]         |
-| Riceball LEE   | [GitHub/snowyu][gh:snowyu]                                                       |
-| Brian Woodward | [GitHub/doowb][gh:doowb]               [Twitter/@doowb][x:doowb]                 |
-| Leon Chen      | [GitHub/transcranial][gh:transcranial] [Twitter/@transcranial][x:transcranial]   |
-| Yersa Nordman  | [GitHub/finwo][gh:finwo]                                                         |
+| Name           | Github                          | Twitter/X                         |
+|:-------------- | ------------------------------- | --------------------------------- |
+| Matteo Collina | [mcollina][gh:mcollina]         | [@matteocollina][x:matteocollina] |
+| Jeremy Taylor  | [jez0990][gh:jez0990]           |                                   |
+| Elf Pavlik     | [elf-pavlik][gh:elf-pavlik]     | [@elfpavlik][x:elfpavlik]         |
+| Riceball LEE   | [snowyu][gh:snowyu]             |                                   |
+| Brian Woodward | [doowb][gh:doowb]               | [@doowb][x:doowb]                 |
+| Leon Chen      | [transcranial][gh:transcranial] | [@transcranial][x:transcranial]   |
+| Yersa Nordman  | [finwo][gh:finwo]               |                                   |
 
 ## LICENSE - "MIT License"
 
