@@ -86,21 +86,23 @@ Alternatively, you could load levelgraph in your project and bundle using
 
 ## Usage
 
-The LevelGraph API remains the same for Node.js and the browsers,
-however the initialization change slightly.
+The LevelGraph API remains the same for Node.JS and the browsers, however the
+initialization change slightly.
 
 Initializing a database is very easy:
+
 ```javascript
-var level = require("level-browserify");
+var { Level }  = require("level");
 var levelgraph = require("levelgraph");
 
 // just use this in the browser with the provided bundle
-var db = levelgraph(level("yourdb"));
+var db = levelgraph(new Level("yourdb"));
 ```
 
 ### Get and Put
 
 Inserting a triple in the database is extremely easy:
+
 ```javascript
 var triple = { subject: "a", predicate: "b", object: "c" };
 db.put(triple, function(err) {
@@ -116,6 +118,7 @@ db.get({ subject: "a" }, function(err, list) {
 ```
 
 It even supports a Stream interface:
+
 ```javascript
 var stream = db.getStream({ predicate: "b" });
 stream.on("data", function(data) {
@@ -125,8 +128,9 @@ stream.on("data", function(data) {
 
 #### Triple Properties
 
-LevelGraph supports adding properties to triples with very
-little overhead (apart from storage costs). It is very easy:
+LevelGraph supports adding properties to triples with very little overhead
+(apart from storage costs). It is very easy:
+
 ```javascript
 var triple = { subject: "a", predicate: "b", object: "c", "someStuff": 42 };
 db.put(triple, function() {
@@ -138,8 +142,8 @@ db.put(triple, function() {
 
 #### Limit and Offset
 
-It is possible to implement pagination of get results by using
-`'offset'` and `'limit'`, like so:
+It is possible to implement pagination of get results by using `'offset'` and
+`'limit'`, like so:
 
 ```javascript
 db.get({ subject: "a", limit: 4, offset: 2}, function(err, list) {
@@ -149,9 +153,9 @@ db.get({ subject: "a", limit: 4, offset: 2}, function(err, list) {
 
 #### Reverse Order
 
-It is possible to get results in reverse lexicographical order
-using the `'reverse'` option. This option is only supported by
-`get()` and `getStream()` and not available in `search()`.
+It is possible to get results in reverse lexicographical order using the
+`'reverse'` option. This option is only supported by `get()` and `getStream()`
+and not available in `search()`.
 
 ```javascript
 db.get({ predicate: "b", reverse: true }, function (err, list) {
@@ -159,12 +163,11 @@ db.get({ predicate: "b", reverse: true }, function (err, list) {
 });
 ```
 
-
 #### Updating
 
-__LevelGraph__ does not support in-place update, as there are no
-constraint in the graph.
-In order to update a triple, you should first delete it:
+__LevelGraph__ does not support in-place update, as there are no constraint in
+the graph. In order to update a triple, you should first delete it:
+
 ```javascript
 var triple = { subject: "a", predicate: "b", object: "c" };
 db.put(triple, function(err) {
@@ -180,6 +183,7 @@ db.put(triple, function(err) {
 #### Multiple Puts
 
 __LevelGraph__ also supports putting multiple triples:
+
 ```javascript
 var triple1 = { subject: "a1", predicate: "b", object: "c" };
 var triple2 = { subject: "a2", predicate: "b", object: "d" };
@@ -191,6 +195,7 @@ db.put([triple1, triple2],  function(err) {
 ### Deleting
 
 Deleting is easy too:
+
 ```javascript
 var triple = { subject: "a", predicate: "b", object: "c" };
 db.del(triple, function(err) {
@@ -198,10 +203,10 @@ db.del(triple, function(err) {
 });
 ```
 
-
 ### Searches
 
 __LevelGraph__ also supports searches:
+
 ```javascript
 db.put([{
   subject: "matteo",
@@ -253,6 +258,7 @@ db.put([{
 #### Search Without Streams
 
 It also supports a similar API without streams:
+
 ```javascript
 db.put([{
  //...
@@ -311,8 +317,8 @@ It also allows to generate a stream of triples, instead of a solution:
 
 #### Limit and Offset
 
-It is possible to implement pagination of search results by using
-`'offset'` and `'limit'`, like so:
+It is possible to implement pagination of search results by using `'offset'` and
+`'limit'`, like so:
 
 ```javascript
 db.search([{
@@ -331,10 +337,11 @@ db.search([{
 
 ### Filtering
 
-__LevelGraph__ supports filtering of triples when calling `get()`
- and solutions when calling `search()`, and streams are supported too.
+__LevelGraph__ supports filtering of triples when calling `get()` and solutions
+when calling `search()`, and streams are supported too.
 
 It is possible to filter the matching triples during a `get()`:
+
 ```javascript
 db.get({
     subject: 'matteo'
@@ -349,6 +356,7 @@ db.get({
 ```
 
 Moreover, it is possible to filter the triples during a `search()`
+
 ```javascript
 db.search({
     subject: 'matteo'
@@ -364,6 +372,7 @@ db.search({
 ```
 
 Finally, __LevelGraph__ supports filtering full solutions:
+
 ```javascript
 db.search({
     subject: 'matteo'
@@ -386,6 +395,7 @@ db.search({
 ```
 
 Thanks to solultion filtering, it is possible to implement a negation:
+
 ```javascript
 db.search({
     subject: 'matteo'
@@ -420,11 +430,10 @@ db.search({
 The heavier method is filtering solutions, so we recommend filtering the
 triples whenever possible.
 
-
 ### Putting and Deleting through Streams
 
-It is also possible to `put` or `del` triples from the store
-using a `Stream2` interface:
+It is also possible to `put` or `del` triples from the store using a `Stream2`
+interface:
 
 ```javascript
 var t1 = { subject: "a", predicate: "b", object: "c" };
@@ -441,8 +450,8 @@ stream.on("close", function() {
 
 ### Generate batch operations
 
-You can also generate a `put` and `del` batch, so you can
-manage the batching yourself:
+You can also generate a `put` and `del` batch, so you can manage the batching
+yourself:
 
 ```javascript
 var triple = { subject: "a", predicate: "b", object: "c" };
@@ -454,56 +463,61 @@ var putBatch = db.generateBatch(triple);
 var delBatch = db.generateBatch(triple, 'del');
 ```
 
-### Generate levelup query
+### Generate level-read-stream query
 
 Return the leveldb query for the given triple.
 
-```js
-var query = db.createQuery({ predicate: "b"});
-leveldb.createReadStream(query);
+```javascript
+var { ValueStream } = require("level-read-stream");
+var query           = db.createQuery({ predicate: "b"});
+
+var stream = new ValueStream(leveldb, query);
 ```
 
 ## Navigator API
 
 The Navigator API is a fluent API for LevelGraph, loosely inspired by
 [Gremlin](http://markorodriguez.com/2011/06/15/graph-pattern-matching-with-gremlin-1-1/)
-It allows to specify how to search our graph in a much more compact way and navigate
-between vertexes.
+It allows to specify how to search our graph in a much more compact way and
+navigate between vertexes.
 
 Here is an example, using the same dataset as before:
+
 ```javascript
-    db.nav("matteo").archIn("friend").archOut("friend").
-      solutions(function(err, results) {
-      // prints:
-      // [ { x0: 'daniele', x1: 'marco' },
-      //   { x0: 'daniele', x1: 'matteo' },
-      //   { x0: 'lucio', x1: 'marco' },
-      //   { x0: 'lucio', x1: 'matteo' } ]
-      console.log(results);
-    });
+db.nav("matteo").archIn("friend").archOut("friend").
+  solutions(function(err, results) {
+  // prints:
+  // [ { x0: 'daniele', x1: 'marco' },
+  //   { x0: 'daniele', x1: 'matteo' },
+  //   { x0: 'lucio', x1: 'marco' },
+  //   { x0: 'lucio', x1: 'matteo' } ]
+  console.log(results);
+});
 ```
 
 The above example match the same triples of:
+
 ```javascript
-    db.search([{
-      subject: db.v("x0"),
-      predicate: 'friend',
-      object: 'matteo'
-    }, {
-      subject: db.v("x0"),
-      predicate: 'friend',
-      object: db.v("x1")
-    }], function(err, results) {
-      // prints:
-      // [ { x0: 'daniele', x1: 'marco' },
-      //   { x0: 'daniele', x1: 'matteo' },
-      //   { x0: 'lucio', x1: 'marco' },
-      //   { x0: 'lucio', x1: 'matteo' } ]
-      console.log(results);
-    });
+db.search([{
+  subject: db.v("x0"),
+  predicate: 'friend',
+  object: 'matteo'
+}, {
+  subject: db.v("x0"),
+  predicate: 'friend',
+  object: db.v("x1")
+}], function(err, results) {
+  // prints:
+  // [ { x0: 'daniele', x1: 'marco'  },
+  //   { x0: 'daniele', x1: 'matteo' },
+  //   { x0: 'lucio'  , x1: 'marco'  },
+  //   { x0: 'lucio'  , x1: 'matteo' } ]
+  console.log(results);
+});
 ```
 
 It allows to see just the last reached vertex:
+
 ```javascript
     db.nav("matteo").archIn("friend").archOut("friend").
       values(function(err, results) {
@@ -513,6 +527,7 @@ It allows to see just the last reached vertex:
 ```
 
 Variable names can also be specified, like so:
+
 ```javascript
 db.nav("marco").archIn("friend").as("a").archOut("friend").archOut("friend").as("a").
       solutions(function(err, friends) {
@@ -522,6 +537,7 @@ db.nav("marco").archIn("friend").as("a").archOut("friend").archOut("friend").as(
 ```
 
 Variables can also be bound to a specific value, like so:
+
 ```javascript
 db.nav("matteo").archIn("friend").bind("lucio").archOut("friend").bind("marco").
       values(function(err, friends) {
@@ -530,6 +546,7 @@ db.nav("matteo").archIn("friend").bind("lucio").archOut("friend").bind("marco").
 ```
 
 A materialized search can also be produced, like so:
+
 ```javascript
 db.nav("matteo").archOut("friend").bind("lucio").archOut("friend").bind("marco").
       triples({:
@@ -552,6 +569,7 @@ db.nav("matteo").archOut("friend").bind("lucio").archOut("friend").bind("marco")
 ```
 
 It is also possible to change the current vertex:
+
 ```javascript
 db.nav("marco").archIn("friend").as("a").go("matteo").archOut("friend").as("b").
       solutions(function(err, solutions) {
@@ -569,42 +587,45 @@ db.nav("marco").archIn("friend").as("a").go("matteo").archOut("friend").as("b").
 
 ## LevelUp integration
 
-LevelGraph allows to leverage the full power of all
-[LevelUp](https://github.com/rvagg/node-levelup) plugins.
+LevelGraph allows to leverage the full power of all [level][gh:level/level]
+plugins.
 
 Initializing a database with LevelUp support is very easy:
+
 ```javascript
-var levelup = require("level");
+var { Level }  = require("level");
 var levelgraph = require("levelgraph");
-var db = levelgraph(levelup("yourdb"));
+var db         = levelgraph(new Level("yourdb"));
 ```
 
-### Usage with SubLevel
+### Usage with sublevels
 
-An extremely powerful usage of LevelGraph is to partition your
-LevelDB with [SubLevel](http://npm.im/level-sublevel):
+An extremely powerful usage of LevelGraph is to partition your LevelDB using
+sublevels, somewhat resembling tables in a relational database.
 
 ```javascript
-var levelup = require("level");
-var sublevel = require("level-sublevel");
+var { Level }  = require("level");
 var levelgraph = require("levelgraph");
-var db = sublevel(levelup("yourdb"));
-var graph = levelgraph(db.sublevel('graph'));
+var db         = new Level("yourdb");
+var graph      = levelgraph(db.sublevel('graph'));
 ```
 
-## Browserify
+## Browser usage
 
-You can use [browserify](https://github.com/substack/node-browserify) to bundle your module and all the dependencies, including levelgraph, into a single script-tag friendly js file for use in webpages. For the convenience of people unfamiliar with browserify, a pre-bundled version of levelgraph is included in the build folder.
+You can use [browserify](https://browserify.org/) or
+[esbuild](https://esbuild.github.io/) to bundle your module and all it's
+dependencies, including levelgraph, into a single script-tag friendly js file
+for use in webpages. For the convenience of people unfamiliar with browserify or
+esbuild, a pre-bundled version of levelgraph is included in the build folder in
+this repository.
 
-Simply `require("levelgraph")` in your browser modules and use [level.js](https://github.com/maxogden/level.js) instead of `level`:
+Simply `require("levelgraph")` in your browser modules:
 
 ```javascript
 var levelgraph = require("levelgraph");
-var leveljs = require("level-js");
-var levelup = require("levelup");
-var factory = function (location) { return new leveljs(location) };
+var { Level }  = require("level");
 
-var db = levelgraph(levelup("yourdb", { db: factory }));
+var db = levelgraph(new Level("yourdb"));
 ```
 
 ### Testling
@@ -624,8 +645,8 @@ to nest them in correct order! *(LevelGraph-N3 and LevelGraph-JSONLD are
 independent)*
 
 ```javascript
-var lg = require('levelgraph');
-var lgN3 = require('levelgraph-n3');
+var lg       = require('levelgraph');
+var lgN3     = require('levelgraph-n3');
 var lgJSONLD = require('levelgraph-jsonld');
 
 var db = lgJSONLD(lgN3(lg("yourdb")));
