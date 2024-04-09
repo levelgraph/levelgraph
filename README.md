@@ -67,23 +67,22 @@ checking out the full power of LevelGraph.
 
 
 ## Install
-### On Node.js
+
+### On Node.JS
 
 ```
-npm install levelgraph level-browserify --save
+npm install --save levelgraph
 ```
 
-At the moment it requires node v0.10.x, but the port to node v0.8.x
-should be straighforward.
-If you need it, just open a pull request.
+Testing of levelgraph is only done using Node.JS 18 and 20. Other versions may
+be supported, but your mileage may vary.
 
 ### In the Browser
 
-Just download
-[levelgraph.min.js](https://github.com/levelgraph/levelgraph/blob/master/build/levelgraph.min.js)
-and you are done!
+Just download [levelgraph.min.js](build/levelgraph.min.js) and you are done!
 
-Alternatively, you can use [browserify](http://browserify.org/).
+Alternatively, you could load levelgraph in your project and bundle using
+[browserify](https://browserify.org/) or [esbuild](https://esbuild.github.io/).
 
 ## Usage
 
