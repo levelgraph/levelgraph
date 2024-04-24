@@ -54,4 +54,4 @@ module.exports = [{
   subject: 'http://manu.sporny.org#person',
   predicate: 'http://xmlns.com/foaf/0.1/knows',
   object: 'https://my-profile.eu/people/deiu/card#me'
-}]
+}];

@@ -1,8 +1,8 @@
 
-var queryplanner = require('../lib/queryplanner')
-  , v = require('../lib/variable')
-  , SortJoinStream = require('../lib/sortjoinstream')
-  , JoinStream = require('../lib/joinstream');
+var queryplanner = require('../../lib/queryplanner')
+  , v = require('../../lib/variable')
+  , SortJoinStream = require('../../lib/sortjoinstream')
+  , JoinStream = require('../../lib/joinstream');
 
 var upperBoundChar = '\udbff\udfff';
 

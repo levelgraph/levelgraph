@@ -1,8 +1,7 @@
-
-var levelgraph = require('../lib/levelgraph')
-  , level = require('memdb'),
-  os = require('os'),
-  path = require('path');
+var levelgraph = require('../../lib/levelgraph')
+  , { MemoryLevel } = require('memory-level')
+  , os = require('os')
+  , path = require('path');
 
 describe('creation api', function() {
 
@@ -16,7 +15,7 @@ describe('creation api', function() {
   });
 
   it('should create a db passing a levelup instance', function() {
-    db = levelgraph(level());
+    db = levelgraph(new MemoryLevel());
   });
 
   it('should create a db passing a string', function() {

@@ -1,12 +1,13 @@
-var levelgraph = require('../lib/levelgraph')
-  , level = require('memdb');
+var levelgraph = require('../../lib/levelgraph')
+  , { MemoryLevel } = require('memory-level')
+  ;
 
 describe('a basic triple store', function() {
 
   var db;
 
   beforeEach(function() {
-    db = levelgraph(level());
+    db = levelgraph(new MemoryLevel());
   });
 
   afterEach(function(done) {

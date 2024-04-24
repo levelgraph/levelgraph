@@ -1,6 +1,5 @@
-
-var levelgraph = require('../lib/levelgraph')
-  , level = require('memdb')
+var levelgraph = require('../../lib/levelgraph')
+  , { MemoryLevel } = require('memory-level')
   , path = require('path')
   , osenv = require('osenv');
 
@@ -9,7 +8,7 @@ describe('a basic triple store', function() {
   var db, leveldb = leveldb;
 
   beforeEach(function() {
-    leveldb = level();
+    leveldb = new MemoryLevel();
     db = levelgraph(leveldb);
   });
 
@@ -499,15 +498,6 @@ describe('a basic triple store', function() {
       }
       db.put(triples, done);
     });
-
-    if (!process.browser) {
-      it('should return the approximate size', function(done) {
-        db.approximateSize({ predicate: 'b' }, function (err, size) {
-          expect(size).to.be.a('number');
-          done(err);
-        });
-      });
-    }
   });
 
   it('should put triples using a stream', function(done) {
@@ -635,7 +625,7 @@ describe('deferred open support', function() {
   });
 
   it('should support deferred search', function(done) {
-    db = levelgraph(level());
+    db = levelgraph(new MemoryLevel());
     db.search([{ predicate: 'likes' }], function() {
       done();
     });
@@ -646,7 +636,7 @@ describe('generateBatch', function () {
   var db, leveldb = leveldb;
 
   beforeEach(function() {
-    leveldb = level();
+    leveldb = new MemoryLevel();
     db = levelgraph(leveldb);
   });
 

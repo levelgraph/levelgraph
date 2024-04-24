@@ -1,16 +1,16 @@
-
-var levelgraph = require('../lib/levelgraph')
-  , createQuery = require('../lib/utilities').createQuery
-  , level = require('memdb')
-  , path = require('path')
-  , osenv = require('osenv');
+var levelgraph      = require('../../lib/levelgraph')
+  , createQuery     = require('../../lib/utilities').createQuery
+  , { MemoryLevel } = require('memory-level')
+  , path            = require('path')
+  , { ValueStream } = require('level-read-stream')
+  , osenv           = require('osenv');
 
 describe('createQuery', function() {
 
   var db, leveldb = leveldb;
 
   beforeEach(function(done) {
-    leveldb = level();
+    leveldb = new MemoryLevel();
     db = levelgraph(leveldb);
     db.put({ subject: 'a', predicate: 'b', object: 'c' }, done);
   });
@@ -21,7 +21,7 @@ describe('createQuery', function() {
 
   it('should get same results as levelgraph.get', function(done) {
     db.get({ predicate: 'b' }, function(err, res) {
-      leveldb.createValueStream(db.createQuery({ predicate: 'b' }))
+      new ValueStream(leveldb, db.createQuery({ predicate: 'b' }))
         .on('data', function(data) {
           expect([data]).to.eql(res);
           done();
