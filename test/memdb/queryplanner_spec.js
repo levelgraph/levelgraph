@@ -112,7 +112,7 @@ describe('query planner', function() {
         .yields(null, 10);
 
       planner(query, function(err, result) {
-        expect(result).to.eql(query);
+        expect(result).to.eql(expected);
         done();
       });
     });
